@@ -1,0 +1,11 @@
+/node_modules
+/dist
+/.env
+/coverage
+/.vscode
+.DS_Store
+*.log  
+*.tsbuildinfo
+
+Package-lock.json
+package.json
