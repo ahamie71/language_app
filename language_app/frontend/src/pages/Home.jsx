@@ -190,7 +190,7 @@ export default function Home() {
       avatar: 'MD',
       countryCode: 'fr',
       rating: 5,
-      text: 'Grâce à LinguaAI, j\'ai pu améliorer mon anglais médical en seulement 3 mois. Les conversations immersives sont incroyablement réalistes !',
+      text: 'Grâce à Lingua, j\'ai pu améliorer mon anglais médical en seulement 3 mois. Les conversations immersives sont incroyablement réalistes !',
       language: 'Français',
       progress: '+85%'
     },
@@ -263,7 +263,7 @@ export default function Home() {
       {/* Navigation Header */}
       <header className={`${styles.header} ${scrollY > 50 ? styles.headerScrolled : ''}`}>
         <div className={styles.logo}>
-          <span>LinguaAI</span>
+          <span>Lingua</span>
         </div>
         <nav className={styles.nav}>
           <button className={styles.navBtn} onClick={handleLoginClick}>
@@ -330,19 +330,19 @@ export default function Home() {
         <div className={styles.heroIllustration}>
           <div className={`${styles.illustrationCard} ${styles.illustrationCard1}`}>
             <div className={styles.illustrationCircle}>
-              <Mic size={40} color="#FCD34D" />
+              <Mic size={40} color="#FF7A1A" />
             </div>
             <p className={styles.illustrationText}>Conversation</p>
           </div>
           <div className={`${styles.illustrationCard} ${styles.illustrationCard2}`}>
             <div className={styles.illustrationCircle}>
-              <BookOpen size={40} color="#FCD34D" />
+              <BookOpen size={40} color="#FF7A1A" />
             </div>
             <p className={styles.illustrationText}>Traduction</p>
           </div>
           <div className={`${styles.illustrationCard} ${styles.illustrationCard3}`}>
             <div className={styles.illustrationCircle}>
-              <Brain size={40} color="#FCD34D" />
+              <Brain size={40} color="#FF7A1A" />
             </div>
             <p className={styles.illustrationText}>Intelligence</p>
           </div>
@@ -352,7 +352,7 @@ export default function Home() {
       {/* Features Section */}
       <section className={styles.features} id="features" data-animate>
         <h2 className={visibleSections.has('features') ? styles.animateIn : ''}>
-          Pourquoi choisir LinguaAI ?
+          Pourquoi choisir Lingua ?
         </h2>
         <div className={styles.featuresGrid}>
           {features.map((feature, index) => {
@@ -401,8 +401,8 @@ export default function Home() {
                   <Star 
                     key={i} 
                     size={16} 
-                    fill={i < testimonial.rating ? '#FCD34D' : 'none'} 
-                    color={i < testimonial.rating ? '#FCD34D' : '#D1D5DB'} 
+                    fill={i < testimonial.rating ? '#FF7A1A' : 'none'} 
+                    color={i < testimonial.rating ? '#FF7A1A' : '#334155'} 
                   />
                 ))}
               </div>
@@ -442,7 +442,7 @@ export default function Home() {
             <div className={styles.footerColumn}>
               <div className={styles.footerLogo}>
                 <Globe size={24} />
-                <span>LinguaAI</span>
+                <span>Lingua</span>
               </div>
               <p className={styles.footerDescription}>
                 Apprenez les langues intelligemment avec l'IA. Conversation en immersion, traduction au vol, et progression rapide.
@@ -516,7 +516,7 @@ export default function Home() {
           <div className={styles.footerBottom}>
             <div className={styles.footerBottomContent}>
               <p className={styles.copyright}>
-                &copy; 2024 LinguaAI. Tous droits réservés.
+                &copy; 2024 Lingua. Tous droits réservés.
               </p>
               <div className={styles.footerBottomLinks}>
                 <a href="#" className={styles.bottomLink}>Politique de confidentialité</a>
@@ -538,7 +538,7 @@ export default function Home() {
             
             <div className={styles.modalLogo}>
               <LogIn size={40} />
-              <span>LinguaAI</span>
+              <span>Lingua</span>
             </div>
             <h2 className={styles.modalTitle}>Connexion</h2>
             <p className={styles.modalSubtitle}>Reprenez votre apprentissage</p>
@@ -606,7 +606,7 @@ export default function Home() {
             
             <div className={styles.modalLogo}>
               <UserPlus size={40} />
-              <span>LinguaAI</span>
+              <span>Lingua</span>
             </div>
             <h2 className={styles.modalTitle}>Créer un compte</h2>
             <p className={styles.modalSubtitle}>Commencez votre aventure linguistique</p>
@@ -707,7 +707,7 @@ export default function Home() {
             
             <div className={styles.modalLogo}>
               <Mail size={40} />
-              <span>LinguaAI</span>
+              <span>Lingua</span>
             </div>
             <h2 className={styles.modalTitle}>Mot de passe oublié ?</h2>
             <p className={styles.modalSubtitle}>
@@ -746,3 +746,5 @@ export default function Home() {
     </div>
   )
 }
+
+

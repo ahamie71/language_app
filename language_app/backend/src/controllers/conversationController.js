@@ -124,8 +124,9 @@ exports.processUserMessage = async (req, res) => {
     });
 
     // Extract vocabulary from user message (async, don't wait)
+    // User writes in their native language, so extract with native_language
     const { extractWordsFromMessage } = require('./vocabularyController');
-    extractWordsFromMessage(req.user.id, original_text, user.target_language).catch(err => 
+    extractWordsFromMessage(req.user.id, original_text, user.native_language).catch(err => 
       console.error('Vocabulary extraction error:', err)
     );
 
@@ -140,6 +141,14 @@ exports.processUserMessage = async (req, res) => {
     const translatedText = translation.status === 'fulfilled' ? translation.value : null;
     const explanationText = explanation.status === 'fulfilled' ? explanation.value : null;
     const responseText = aiResponse.status === 'fulfilled' ? aiResponse.value : null;
+
+    // Extract vocabulary from AI response (async, don't wait)
+    // AI responds in target language, so extract with target_language
+    if (responseText) {
+      extractWordsFromMessage(req.user.id, responseText, user.target_language).catch(err => 
+        console.error('Vocabulary extraction error:', err)
+      );
+    }
 
     // Save AI response message
     const assistantMessage = await Message.create({

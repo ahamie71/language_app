@@ -18,15 +18,20 @@ const sequelize = new Sequelize(
     }
   }
 );
-
-const testConnection = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('✅ Database connected successfully');
-  } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
-    process.exit(1);
+const testConnection = async (retries = 10, delay = 3000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await sequelize.authenticate();
+      console.log('✅ Database connected successfully');
+      return true;
+    } catch (error) {
+      console.log(`⏳ DB not ready (${error.message}) - retry ${i + 1}/${retries}`);
+      await new Promise(res => setTimeout(res, delay));
+    }
   }
+
+  console.error('❌ Could not connect to DB after retries');
+  process.exit(1);
 };
 
 module.exports = { sequelize, testConnection };

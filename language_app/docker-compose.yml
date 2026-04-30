@@ -1,0 +1,122 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: linguaai-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: linguaai
+      MYSQL_USER: ahmd
+      MYSQL_PASSWORD: root
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - linguaai-network
+
+  ai_service:
+    build:
+      context: ./ai_service
+    container_name: linguaai-ai
+    restart: unless-stopped
+
+    environment:
+      PORT: 5000
+      USE_FREE_API: "true"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+
+    ports:
+      - "5000:5000"
+
+    networks:
+      - linguaai-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: linguaai-backend
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: development
+      PORT: 8000
+
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: linguaai
+      DB_USER: ahmd
+      DB_PASSWORD: root
+
+      JWT_SECRET: your_jwt_secret_key_here_change_in_production
+      AI_SERVICE_URL: http://ai_service:5000
+
+    ports:
+      - "18000:8000"
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ai_service:
+        condition: service_started
+
+    networks:
+      - linguaai-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: linguaai-frontend
+    restart: unless-stopped
+
+    environment:
+      VITE_API_URL: http://localhost:18000
+
+    ports:
+      - "5173:5173"
+
+    depends_on:
+      - backend
+
+    networks:
+      - linguaai-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: linguaai-phpmyadmin
+    restart: unless-stopped
+
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+
+    ports:
+      - "8081:80"
+
+    depends_on:
+      - mysql
+
+    networks:
+      - linguaai-network
+
+volumes:
+  mysql_data:
+
+networks:
+  linguaai-network:
+    driver: bridge

@@ -2,7 +2,7 @@
 
 ## 🏗️ Architecture
 
-- **Node.js/Express** - Main backend API (port 8000)
+- **Node.js/Express** - Main backend API (port import.meta.env.VITE_API_URL)
 - **MySQL** - Database
 
 ## 📁 Structure
@@ -30,11 +30,11 @@ npm install
 npm run dev
 ```
 
-Server will start on: http://localhost:8000
+Server will start on: http://localhost:import.meta.env.VITE_API_URL
 
 ### 3. Frontend
 
-The frontend (React) stays the same and connects to Node.js on port 8000.
+The frontend (React) stays the same and connects to Node.js on port import.meta.env.VITE_API_URL.
 
 ## 📡 API Endpoints
 

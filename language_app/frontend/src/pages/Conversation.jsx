@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, MessageSquare, Volume2, ChevronDown, ChevronUp, Sparkles, Mic, MicOff } from 'lucide-react'
+import { ArrowLeft, MessageSquare, Volume2, ChevronDown, ChevronUp, Sparkles, Mic, MicOff, Send, Bot, User } from 'lucide-react'
 import { getMessages, createMessage, processMessage } from '../services/api'
 import styles from './Conversation.module.css'
 
@@ -160,8 +160,8 @@ export default function Conversation() {
           <span>Retour</span>
         </button>
         <div className={styles.headerTitle}>
-          <MessageSquare size={20} />
-          <span>LinguaAI — Conversation</span>
+          <Sparkles size={24} />
+          <span>Lingua Coach — Conversation</span>
         </div>
       </header>
 
@@ -170,10 +170,10 @@ export default function Conversation() {
         {messages.length === 0 && !loading && (
           <div className={styles.welcome}>
             <div className={styles.welcomeIcon}>
-              <MessageSquare size={48} />
+              <MessageSquare size={64} />
             </div>
             <h2>Commencez à parler !</h2>
-            <p>Tapez votre message.</p>
+            <p>Tapez votre message ou utilisez le microphone pour parler.</p>
           </div>
         )}
 
@@ -181,9 +181,16 @@ export default function Conversation() {
           <div key={msg.id || i} className={`${styles.msgWrap} ${msg.role === 'user' ? styles.userWrap : styles.assistantWrap}`}>
             {msg.role === 'user' ? (
               <div className={styles.userBubble}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <User size={16} color="white" />
+                  <span style={{ fontSize: '12px', fontWeight: '700', opacity: '0.9' }}>Vous</span>
+                </div>
                 <div className={styles.original}>{msg.original_text}</div>
                 {msg.translated_text && (
                   <>
+                    <div className={styles.translation}>
+                      <strong>Traduction:</strong> {msg.translated_text}
+                    </div>
                     <button 
                       className={styles.speakBtn}
                       onClick={() => handleSpeak(msg.original_text, userProfile?.native_language)}
@@ -191,20 +198,24 @@ export default function Conversation() {
                     >
                       <Volume2 size={16} />
                     </button>
-                    <div className={styles.translation}>
-                      <strong>Traduction:</strong> {msg.translated_text}
-                    </div>
                   </>
                 )}
               </div>
             ) : (
               <div className={styles.assistantBubble}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Bot size={16} color="#FCD34D" />
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#FCD34D' }}>Lingua Coach</span>
+                </div>
                 <div className={styles.original}>
                   <Sparkles size={16} className={styles.aiIcon} />
                   {msg.original_text}
                 </div>
                 {msg.translated_text && (
                   <>
+                    <div className={styles.translation}>
+                      <strong>Traduction:</strong> {msg.translated_text}
+                    </div>
                     <button 
                       className={styles.speakBtn}
                       onClick={() => handleSpeak(msg.original_text, userProfile?.target_language)}
@@ -212,9 +223,6 @@ export default function Conversation() {
                     >
                       <Volume2 size={16} />
                     </button>
-                    <div className={styles.translation}>
-                      <strong>Traduction:</strong> {msg.translated_text}
-                    </div>
                   </>
                 )}
                 {msg.explanation && (
@@ -277,9 +285,11 @@ export default function Conversation() {
           onClick={handleSend}
           disabled={loading || !inputText.trim()}
         >
-          Envoyer
+          <Send size={18} />
+          <span style={{ marginLeft: '8px' }}>Envoyer</span>
         </button>
       </div>
     </div>
   )
 }
+

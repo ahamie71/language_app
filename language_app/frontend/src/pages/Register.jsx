@@ -70,7 +70,7 @@ export default function Register() {
       <div className={styles.card}>
         <div className={styles.logo}>
           <UserPlusIcon />
-          <span>LinguaAI</span>
+          <span>Lingua</span>
         </div>
         <h1 className={styles.title}>Créer un compte</h1>
         <p className={styles.subtitle}>Commencez votre aventure linguistique</p>
@@ -172,3 +172,5 @@ export default function Register() {
     </div>
   )
 }
+
+
