@@ -55,7 +55,7 @@ npm install
 npm start
 ```
 
-Le backend démarrera sur `http://localhost:8000`
+Le backend démarrera sur `http://localhost:import.meta.env.VITE_API_URL`
 
 ### Étape 5: Démarrer le frontend React
 
@@ -124,7 +124,7 @@ curl -X POST http://localhost:5000/explain \
 ```
 Frontend (React) 
     ↓
-Backend (Node.js + Express) :8000
+Backend (Node.js + Express) :import.meta.env.VITE_API_URL
     ↓
 AI Service (Python + Flask) :5000
     ↓

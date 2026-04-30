@@ -1,149 +1,187 @@
-const API_URL = "http://localhost:8000"
+// =========================
+// CONFIG API
+// =========================
 
-// --- Conversations ---
-export const getConversations = async () => {
-  const token = getToken()
-  if (!token) {
-    console.error('No token found')
-    throw new Error('Not authenticated')
-  }
-  const res = await fetch(`${API_URL}/conversations`, { headers: headers() })
-  if (!res.ok) {
-    throw new Error('Failed to fetch conversations')
-  }
-  return res.json()
-}
+// URL backend (Docker + Vite safe)
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:18000";
 
-export const createConversation = async () => {
-  const token = getToken()
-  if (!token) {
-    console.error('No token found')
-    throw new Error('Not authenticated')
-  }
-  const res = await fetch(`${API_URL}/conversations`, {
-    method: "POST",
-    headers: headers(),
-  })
-  if (!res.ok) {
-    throw new Error('Failed to create conversation')
-  }
-  return res.json()
-}
+console.log("🌐 API_URL =", API_URL);
 
-export const getMessages = async (conversationId) => {
-  const res = await fetch(`${API_URL}/conversations/${conversationId}/messages`, {
-    headers: headers(),
-  })
-  return res.json()
-}
-
-export const createMessage = async (messageData) => {
-  const res = await fetch(`${API_URL}/conversations/messages`, {
-    method: "POST",
-    headers: headers(),
-    body: JSON.stringify(messageData),
-  })
-  return res.json()
-}
-
-export const processMessage = async (messageData) => {
-  const res = await fetch(`${API_URL}/conversations/process`, {
-    method: "POST",
-    headers: headers(),
-    body: JSON.stringify(messageData),
-  })
-  return res.json()
-}
-
-const _unused = "http://localhost:8000";
-
-// Récupérer le token stocké
+// =========================
+// TOKEN + HEADERS
+// =========================
 const getToken = () => localStorage.getItem("token");
 
-const headers = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${getToken()}`,
-});
+const headers = () => {
+  const token = getToken();
 
-// --- Auth ---
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
+// =========================
+// AUTH
+// =========================
 export const register = async (data) => {
-  const res = await fetch(`${API_URL}/auth/register`, {
+  const res = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(data),
   });
+
   return res.json();
 };
 
 export const login = async (email, password) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ email, password }),
   });
+
   const data = await res.json();
+
   if (data.access_token) {
     localStorage.setItem("token", data.access_token);
-    console.log('Token stored successfully');
-  } else {
-    console.error('No access_token in response:', data);
   }
+
   return data;
 };
 
-export const logout = () => localStorage.removeItem("token");
+export const logout = () => {
+  localStorage.removeItem("token");
+};
 
-// --- User ---
+// =========================
+// CONVERSATIONS
+// =========================
+export const getConversations = async () => {
+  const res = await fetch(`${API_URL}/api/conversations`, {
+    headers: headers(),
+  });
+
+  return res.json();
+};
+
+export const createConversation = async () => {
+  const res = await fetch(`${API_URL}/api/conversations`, {
+    method: "POST",
+    headers: headers(),
+  });
+
+  return res.json();
+};
+
+export const getMessages = async (conversationId) => {
+  const res = await fetch(
+    `${API_URL}/api/conversations/${conversationId}/messages`,
+    {
+      headers: headers(),
+    }
+  );
+
+  return res.json();
+};
+
+export const createMessage = async (messageData) => {
+  const res = await fetch(`${API_URL}/api/conversations/messages`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify(messageData),
+  });
+
+  return res.json();
+};
+
+export const processMessage = async (messageData) => {
+  const res = await fetch(`${API_URL}/api/conversations/process`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify(messageData),
+  });
+
+  return res.json();
+};
+
+// =========================
+// USER
+// =========================
 export const getProfile = async () => {
-  const res = await fetch(`${API_URL}/user/me`, { headers: headers() });
-  return res.json();
-};
-
-export const updateProfile = async (profileData) => {
-  const res = await fetch(`${API_URL}/user/me`, {
-    method: 'PUT',
+  const res = await fetch(`${API_URL}/api/user/me`, {
     headers: headers(),
-    body: JSON.stringify(profileData),
   });
+
   return res.json();
 };
 
-// --- Vocabulary ---
+export const updateProfile = async (data) => {
+  const res = await fetch(`${API_URL}/api/user/me`, {
+    method: "PUT",
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+
+  return res.json();
+};
+
+// =========================
+// VOCABULARY
+// =========================
 export const getVocabulary = async (filters = {}) => {
-  const queryParams = new URLSearchParams(filters);
-  const res = await fetch(`${API_URL}/vocabulary?${queryParams}`, {
+  const query = new URLSearchParams(filters).toString();
+
+  const res = await fetch(`${API_URL}/api/vocabulary?${query}`, {
     headers: headers(),
   });
+
   return res.json();
 };
 
 export const addWord = async (wordData) => {
-  const res = await fetch(`${API_URL}/vocabulary`, {
+  const res = await fetch(`${API_URL}/api/vocabulary`, {
     method: "POST",
     headers: headers(),
     body: JSON.stringify(wordData),
   });
+
   return res.json();
 };
 
 export const updateWordProgress = async (wordId, correct) => {
-  const res = await fetch(`${API_URL}/vocabulary/${wordId}/progress`, {
-    method: "PUT",
-    headers: headers(),
-    body: JSON.stringify({ correct }),
-  });
+  const res = await fetch(
+    `${API_URL}/api/vocabulary/${wordId}/progress`,
+    {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify({ correct }),
+    }
+  );
+
   return res.json();
 };
 
 export const deleteWord = async (wordId) => {
-  const res = await fetch(`${API_URL}/vocabulary/${wordId}`, {
+  const res = await fetch(`${API_URL}/api/vocabulary/${wordId}`, {
     method: "DELETE",
     headers: headers(),
   });
+
   return res.json();
 };
 
+// =========================
+// STATS
+// =========================
 export const getStats = async () => {
-  const res = await fetch(`${API_URL}/user/stats`, { headers: headers() });
+  const res = await fetch(`${API_URL}/api/user/stats`, {
+    headers: headers(),
+  });
+
   return res.json();
 };

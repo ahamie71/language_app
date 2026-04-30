@@ -16,7 +16,7 @@
   right: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(252, 211, 77, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -27,7 +27,7 @@
   left: -5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(252, 211, 77, 0.03) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.03) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -125,7 +125,7 @@
   outline: none;
   border-color: var(--primary);
   background: var(--bg-primary);
-  box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.2);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 .row {
@@ -136,7 +136,7 @@
 .btn {
   padding: 14px 24px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -210,7 +210,7 @@
 .eyeButton {
   position: absolute;
   right: 8px;
-  background: #333333;
+  background: #262626;
   border: 2px solid #FCD34D;
   cursor: pointer;
   display: flex !important;
@@ -227,10 +227,11 @@
 
 .eyeButton:hover {
   color: #FCD34D;
-  background: #262626;
+  background: #FFFFFF;
 }
 
 .eyeButton svg {
   display: block !important;
   visibility: visible !important;
 }
+

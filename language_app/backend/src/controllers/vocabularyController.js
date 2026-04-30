@@ -142,12 +142,17 @@ exports.deleteWord = async (req, res) => {
 
 exports.extractWordsFromMessage = async (userId, messageText, language) => {
   try {
+    // Get user info to know their target language
+    const User = require('../models/User');
+    const user = await User.findByPk(userId);
+    if (!user) return;
+
     // Simple word extraction - split by spaces and filter common words
     const words = messageText.toLowerCase()
       .replace(/[^\w\s]/g, '') // Remove punctuation
       .split(/\s+/)
       .filter(word => word.length > 2) // Filter short words
-      .filter(word => !['les', 'des', 'une', 'dans', 'pour', 'avec', 'sur', 'par', 'mais', 'donc', 'puis', 'the', 'and', 'but', 'for', 'with', 'from', 'this', 'that'].includes(word)); // Filter common words
+      .filter(word => !['les', 'des', 'une', 'dans', 'pour', 'avec', 'sur', 'par', 'mais', 'donc', 'puis', 'the', 'and', 'but', 'for', 'with', 'from', 'this', 'that', 'keep', 'your', 'english'].includes(word)); // Filter common words
 
     const uniqueWords = [...new Set(words)];
 
@@ -164,12 +169,24 @@ exports.extractWordsFromMessage = async (userId, messageText, language) => {
       if (!existingWord) {
         // Try to get translation
         try {
-          const translation = await require('../services/aiService').translate(word, language, 'en'); // Translate to English for storage
+          // If word is in user's native language, translate to target language
+          // If word is in target language, translate to native language
+          const translationLang = (language === user.native_language) 
+            ? user.target_language 
+            : user.native_language;
+            
+          const translation = await require('../services/aiService').translate(word, language, translationLang);
+
+          // Skip if translation is mock/bad
+          if (!translation || translation.includes('[Mock') || translation === word) {
+            console.log(`Skipping word "${word}" - no valid translation`);
+            continue;
+          }
 
           await Vocabulary.create({
             user_id: userId,
             word,
-            translation: translation || word,
+            translation: translation,
             language,
             category: 'From Conversation'
           });
@@ -179,14 +196,9 @@ exports.extractWordsFromMessage = async (userId, messageText, language) => {
             where: { user_id: userId }
           });
         } catch (translationError) {
-          // If translation fails, still add the word
-          await Vocabulary.create({
-            user_id: userId,
-            word,
-            translation: word, // Use same word if translation fails
-            language,
-            category: 'From Conversation'
-          });
+          console.error(`Translation error for "${word}":`, translationError.message);
+          // Skip word if translation fails
+          continue;
         }
       }
     }

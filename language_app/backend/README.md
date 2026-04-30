@@ -25,7 +25,7 @@ Edit `.env` file with your database credentials and API keys.
 npm run dev
 ```
 
-Server will run on: http://localhost:8000
+Server will run on: http://localhost:import.meta.env.VITE_API_URL
 
 ## 📁 Structure
 
@@ -49,4 +49,4 @@ See `.env` file for configuration.
 
 ## 📡 API Documentation
 
-Once server is running, visit: http://localhost:8000
+Once server is running, visit: http://localhost:import.meta.env.VITE_API_URL

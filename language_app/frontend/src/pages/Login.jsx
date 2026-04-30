@@ -42,7 +42,7 @@ export default function Login() {
       <div className={styles.card}>
         <div className={styles.logo}>
           <LogIn size={40} />
-          <span>LinguaAI</span>
+          <span>Lingua</span>
         </div>
         <h1 className={styles.title}>Connexion</h1>
         <p className={styles.subtitle}>Reprenez votre apprentissage</p>
@@ -110,3 +110,5 @@ export default function Login() {
     </div>
   )
 }
+
+

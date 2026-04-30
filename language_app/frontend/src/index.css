@@ -1,18 +1,44 @@
 :root {
-  --primary: #FCD34D;
-  --primary-dark: #F59E0B;
-  --primary-light: #FECF5C;
-  --accent: #FF6B35;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #EF4444;
-  --bg-primary: #1A1A1A;
-  --bg-secondary: #262626;
-  --bg-tertiary: #333333;
-  --text-primary: #FFFFFF;
-  --text-secondary: #D1D5DB;
-  --text-tertiary: #9CA3AF;
-  --border: #404040;
+  /* Duolingo-inspired color palette */
+  --primary: #1a1a1a;
+  --primary-dark: #000000;
+  --primary-light: #333333;
+  --accent: #FF9600;
+  --secondary: #CE82FF;
+  --success: #1a1a1a;
+  --warning: #FF9600;
+  --error: #EA4335;
+  
+  /* Background colors */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F7F7F7;
+  --bg-tertiary: #E5E5E5;
+  --bg-card: #FFFFFF;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Text colors */
+  --text-primary: #3C3C3C;
+  --text-secondary: #777777;
+  --text-tertiary: #AFB0B2;
+  --text-inverse: #FFFFFF;
+  --text-accent: #1a1a1a;
+  
+  /* Border and UI elements */
+  --border: #E5E5E5;
+  --border-light: #F0F0F0;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-hover: rgba(0, 0, 0, 0.15);
+  
+  /* Level colors (gamification) */
+  --level-beginner: #1a1a1a;
+  --level-intermediate: #FF9600;
+  --level-advanced: #CE82FF;
+  
+  /* Streak and achievement colors */
+  --streak-fire: #FF6B35;
+  --achievement-gold: #FFD700;
+  --achievement-silver: #C0C0C0;
+  --achievement-bronze: #CD7F32;
 }
 
 * {
@@ -26,12 +52,13 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   background: var(--bg-secondary);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
 }
 
 button {
@@ -55,10 +82,158 @@ input, select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
+  background: #475569;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #64748B;
+}
+
+/* Duolingo-inspired global styles */
+.duo-button {
+  background: var(--primary);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 var(--primary-dark);
+  position: relative;
+  top: 0;
+}
+
+.duo-button:hover {
+  transform: translateY(1px);
+  box-shadow: 0 3px 0 var(--primary-dark);
+}
+
+.duo-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--primary-dark);
+}
+
+.duo-button-secondary {
+  background: var(--accent);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 0 #E67E00;
+}
+
+.duo-button-secondary:hover {
+  box-shadow: 0 3px 0 #E67E00;
+}
+
+.duo-button-secondary:active {
+  box-shadow: 0 1px 0 #E67E00;
+}
+
+.duo-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px var(--shadow);
+  border: 2px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.duo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow-hover);
+}
+
+.duo-progress-bar {
+  background: var(--bg-tertiary);
+  border-radius: 12px;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.duo-progress-fill {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.duo-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.duo-badge {
+  background: var(--primary);
+  color: var(--text-inverse);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.duo-streak {
+  background: linear-gradient(135deg, var(--streak-fire) 0%, #FF8C42 100%);
+  color: var(--text-inverse);
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+/* Animation classes */
+.bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
