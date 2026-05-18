@@ -1,239 +1,157 @@
-:root {
-  /* Duolingo-inspired color palette */
-  --primary: #1a1a1a;
-  --primary-dark: #000000;
-  --primary-light: #333333;
-  --accent: #FF9600;
-  --secondary: #CE82FF;
-  --success: #1a1a1a;
-  --warning: #FF9600;
-  --error: #EA4335;
-  
-  /* Background colors */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F7F7F7;
-  --bg-tertiary: #E5E5E5;
-  --bg-card: #FFFFFF;
-  --bg-overlay: rgba(0, 0, 0, 0.5);
-  
-  /* Text colors */
-  --text-primary: #3C3C3C;
-  --text-secondary: #777777;
-  --text-tertiary: #AFB0B2;
-  --text-inverse: #FFFFFF;
-  --text-accent: #1a1a1a;
-  
-  /* Border and UI elements */
-  --border: #E5E5E5;
-  --border-light: #F0F0F0;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --shadow-hover: rgba(0, 0, 0, 0.15);
-  
-  /* Level colors (gamification) */
-  --level-beginner: #1a1a1a;
-  --level-intermediate: #FF9600;
-  --level-advanced: #CE82FF;
-  
-  /* Streak and achievement colors */
-  --streak-fire: #FF6B35;
-  --achievement-gold: #FFD700;
-  --achievement-silver: #C0C0C0;
-  --achievement-bronze: #CD7F32;
-}
+@import 'flag-icons/css/flag-icons.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-weight: 400;
-}
-
-button {
-  cursor: pointer;
-  font-family: inherit;
-  border: none;
-}
-
-input, select {
-  font-family: inherit;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #64748B;
-}
-
-/* Duolingo-inspired global styles */
-.duo-button {
-  background: var(--primary);
-  color: var(--text-inverse);
-  border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 0 var(--primary-dark);
-  position: relative;
-  top: 0;
-}
-
-.duo-button:hover {
-  transform: translateY(1px);
-  box-shadow: 0 3px 0 var(--primary-dark);
-}
-
-.duo-button:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--primary-dark);
-}
-
-.duo-button-secondary {
-  background: var(--accent);
-  color: var(--text-inverse);
-  box-shadow: 0 4px 0 #E67E00;
-}
-
-.duo-button-secondary:hover {
-  box-shadow: 0 3px 0 #E67E00;
-}
-
-.duo-button-secondary:active {
-  box-shadow: 0 1px 0 #E67E00;
-}
-
-.duo-card {
-  background: var(--bg-card);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 8px var(--shadow);
-  border: 2px solid var(--border);
-  transition: all 0.2s ease;
-}
-
-.duo-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px var(--shadow-hover);
-}
-
-.duo-progress-bar {
-  background: var(--bg-tertiary);
-  border-radius: 12px;
-  height: 12px;
-  overflow: hidden;
-  position: relative;
-}
-
-.duo-progress-fill {
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-  height: 100%;
-  border-radius: 12px;
-  transition: width 0.3s ease;
-  position: relative;
-}
-
-.duo-progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.duo-badge {
-  background: var(--primary);
-  color: var(--text-inverse);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.duo-streak {
-  background: linear-gradient(135deg, var(--streak-fire) 0%, #FF8C42 100%);
-  color: var(--text-inverse);
-  padding: 8px 16px;
-  border-radius: 24px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
-}
-
-/* Animation classes */
-.bounce-in {
-  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-@keyframes bounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
+/* ═══════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════ */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: #F7F7F7;
+    color: #3C3C3C;
+    font-family: 'Nunito', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
+  button { cursor: pointer; font-family: inherit; border: none; background: none; }
+  input, select, textarea { font-family: inherit; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #D5D5D5; border-radius: 3px; }
+}
+
+/* ═══════════════════════════════════════════════
+   COMPONENTS – DUOLINGO STYLE
+═══════════════════════════════════════════════ */
+@layer components {
+
+  /* ── 3-D Button (signature Duolingo) ── */
+  .duo-btn {
+    @apply inline-flex items-center justify-center gap-2 font-extrabold rounded-duo
+           select-none transition-all duration-75 text-sm uppercase tracking-wide;
+    border-bottom: 4px solid transparent;
+    padding: 14px 24px;
   }
-  70% {
-    transform: scale(0.9);
+  .duo-btn:active:not(:disabled) {
+    transform: translateY(3px);
+    border-bottom-width: 1px !important;
   }
-  100% {
-    opacity: 1;
-    transform: scale(1);
+  .duo-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .duo-btn-green  { @apply bg-duo-green  text-white; border-bottom-color:#58A700; }
+  .duo-btn-yellow { @apply bg-duo-yellow text-duo-text; border-bottom-color:#CCA800; }
+  .duo-btn-blue   { @apply bg-duo-blue   text-white; border-bottom-color:#0099D6; }
+  .duo-btn-red    { @apply bg-duo-red    text-white; border-bottom-color:#EA2929; }
+  .duo-btn-ghost  {
+    @apply bg-white text-duo-blue font-extrabold border-2 border-duo-border rounded-duo;
+    border-bottom: 4px solid #C5C5C5;
+  }
+  .duo-btn-ghost:active:not(:disabled) {
+    transform: translateY(3px);
+    border-bottom-width: 2px !important;
+  }
+
+  /* ── Card ── */
+  .duo-card {
+    @apply bg-white rounded-duo border-2 border-duo-border p-5 transition-all;
+    border-bottom: 4px solid #E5E5E5;
+  }
+
+  /* ── Input ── */
+  .duo-input {
+    @apply w-full bg-white border-2 border-duo-border rounded-duo px-4 py-3
+           text-sm font-semibold text-duo-text focus:outline-none focus:border-duo-blue transition-colors;
+  }
+  .duo-input:focus { border-bottom-color: #0099D6; }
+
+  /* ── Select ── */
+  .duo-select {
+    @apply w-full bg-white border-2 border-duo-border rounded-duo px-4 py-3
+           text-sm font-semibold text-duo-text focus:outline-none focus:border-duo-blue transition-colors;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23777' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  /* ── Progress bar ── */
+  .duo-progress { @apply h-4 bg-duo-border rounded-full overflow-hidden relative; }
+  .duo-progress-fill {
+    @apply h-full bg-duo-green rounded-full transition-all duration-700 relative overflow-hidden;
+  }
+  .duo-progress-fill::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: shimmer 1.8s infinite;
+  }
+
+  /* ── Badge ── */
+  .duo-badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold;
+  }
+
+  /* ── Streak pill ── */
+  .streak-pill {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-extrabold text-sm;
+    background: linear-gradient(135deg, #FF6B35, #FF9600);
+    color: white;
   }
 }
 
-.slide-up {
-  animation: slideUp 0.4s ease-out;
-}
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@layer utilities {
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
+  .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
+
+  @keyframes bounceIn {
+    0%   { opacity: 0; transform: scale(0.4); }
+    60%  { opacity: 1; transform: scale(1.15); }
+    100% {             transform: scale(1); }
+  }
+  .animate-bounce-in { animation: bounceIn 0.45s ease-out forwards; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-10px); }
+  }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(88,204,2,0.4); }
+    50%       { box-shadow: 0 0 0 10px rgba(88,204,2,0); }
+  }
+  .animate-pulse-green { animation: pulse-green 2s infinite; }
+
+  /* Typing dots */
+  @keyframes typingDot {
+    0%, 100% { opacity: 0.2; transform: scale(0.75); }
+    50%       { opacity: 1;   transform: scale(1); }
+  }
+  .typing-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #AFAFAF;
+    animation: typingDot 1.4s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 }

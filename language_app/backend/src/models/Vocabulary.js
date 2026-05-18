@@ -50,6 +50,18 @@ const Vocabulary = sequelize.define('Vocabulary', {
   first_learned: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
+  },
+  srs_interval: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1
+  },
+  srs_ease_factor: {
+    type: DataTypes.FLOAT,
+    defaultValue: 2.5
+  },
+  next_review_date: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
 }, {
   tableName: 'vocabulary',

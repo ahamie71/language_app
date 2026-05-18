@@ -75,38 +75,90 @@ exports.updateWordProgress = async (req, res) => {
     const { id } = req.params;
     const { correct } = req.body;
 
-    const word = await Vocabulary.findOne({
-      where: {
-        id,
-        user_id: req.user.id
-      }
-    });
+    const word = await Vocabulary.findOne({ where: { id, user_id: req.user.id } });
+    if (!word) return res.status(404).json({ error: 'Mot non trouvé' });
 
-    if (!word) {
-      return res.status(404).json({ error: 'Mot non trouvé' });
-    }
-
-    // Update practice stats
-    await word.increment('times_practiced');
-
-    if (correct) {
-      await word.increment('times_correct');
-    }
-
-    // Update last practiced
+    word.times_practiced += 1;
+    if (correct) word.times_correct += 1;
     word.last_practiced = new Date();
-    await word.save();
 
-    // Check if mastered (80% success rate and practiced at least 5 times)
+    // SM-2 spaced repetition algorithm
+    const q = correct ? 5 : 1;
+    let ef = word.srs_ease_factor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    if (ef < 1.3) ef = 1.3;
+    word.srs_ease_factor = ef;
+
+    if (!correct) {
+      word.srs_interval = 1;
+    } else if (word.times_practiced === 1) {
+      word.srs_interval = 1;
+    } else if (word.times_practiced === 2) {
+      word.srs_interval = 6;
+    } else {
+      word.srs_interval = Math.round(word.srs_interval * ef);
+    }
+
+    const nextReview = new Date();
+    nextReview.setDate(nextReview.getDate() + word.srs_interval);
+    word.next_review_date = nextReview;
+
     const successRate = (word.times_correct / word.times_practiced) * 100;
     if (word.times_practiced >= 5 && successRate >= 80 && !word.mastered) {
       word.mastered = true;
-      await word.save();
     }
+
+    await word.save();
+
+    // Update flashcards_reviewed stat
+    await UserStats.increment('flashcards_reviewed', { where: { user_id: req.user.id } });
 
     res.json(word);
   } catch (error) {
     console.error('Update word progress error:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+};
+
+exports.getDueForReview = async (req, res) => {
+  try {
+    const { Op } = require('sequelize');
+    const now = new Date();
+
+    const dueWords = await Vocabulary.findAll({
+      where: {
+        user_id: req.user.id,
+        next_review_date: { [Op.lte]: now }
+      },
+      order: [['next_review_date', 'ASC']],
+      limit: 20
+    });
+
+    res.json(dueWords);
+  } catch (error) {
+    console.error('Get due words error:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+};
+
+exports.exportVocabulary = async (req, res) => {
+  try {
+    const words = await Vocabulary.findAll({
+      where: { user_id: req.user.id },
+      order: [['created_at', 'DESC']]
+    });
+
+    const csv = [
+      'Mot,Traduction,Langue,Catégorie,Maîtrisé,Pratiqué,Correct',
+      ...words.map(w =>
+        `"${w.word}","${w.translation}","${w.language}","${w.category}","${w.mastered ? 'Oui' : 'Non'}","${w.times_practiced}","${w.times_correct}"`
+      )
+    ].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="vocabulaire.csv"');
+    res.send('﻿' + csv);
+  } catch (error) {
+    console.error('Export vocabulary error:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 };
@@ -167,39 +219,31 @@ exports.extractWordsFromMessage = async (userId, messageText, language) => {
       });
 
       if (!existingWord) {
-        // Try to get translation
+        const translationLang = (language === user.native_language)
+          ? user.target_language
+          : user.native_language;
+
+        let translation = '…';
         try {
-          // If word is in user's native language, translate to target language
-          // If word is in target language, translate to native language
-          const translationLang = (language === user.native_language) 
-            ? user.target_language 
-            : user.native_language;
-            
-          const translation = await require('../services/aiService').translate(word, language, translationLang);
-
-          // Skip if translation is mock/bad
-          if (!translation || translation.includes('[Mock') || translation === word) {
-            console.log(`Skipping word "${word}" - no valid translation`);
-            continue;
+          const result = await require('../services/aiService').translate(word, language, translationLang);
+          if (result && !result.includes('[') && result !== word) {
+            translation = result;
           }
-
-          await Vocabulary.create({
-            user_id: userId,
-            word,
-            translation: translation,
-            language,
-            category: 'From Conversation'
-          });
-
-          // Update stats
-          await UserStats.increment('total_words_learned', {
-            where: { user_id: userId }
-          });
         } catch (translationError) {
           console.error(`Translation error for "${word}":`, translationError.message);
-          // Skip word if translation fails
-          continue;
         }
+
+        await Vocabulary.create({
+          user_id: userId,
+          word,
+          translation,
+          language,
+          category: 'From Conversation'
+        });
+
+        await UserStats.increment('total_words_learned', {
+          where: { user_id: userId }
+        });
       }
     }
   } catch (error) {
