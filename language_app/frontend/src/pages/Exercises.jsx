@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  CheckCircle, XCircle, Loader2, RotateCcw,
-  Zap, ChevronRight, Trophy, BookOpen, Sparkles
+  CheckCircle, XCircle, Loader2, RotateCcw, Zap, ChevronRight,
+  Trophy, BookOpen, Sparkles, Flame, Target, Plane, Utensils,
+  Users, Briefcase, GraduationCap, MessageCircle, Brain, Award,
+  TrendingUp, X
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { generateExercise, getVocabulary, updateWordProgress } from '../services/api'
@@ -14,52 +16,64 @@ const LANG_NAMES = {
 }
 
 const TOPICS = [
-  { label: 'Général',    value: 'general vocabulary and greetings'  },
-  { label: 'Voyage',     value: 'travel and transportation'         },
-  { label: 'Nourriture', value: 'food and restaurant'               },
-  { label: 'Famille',    value: 'family and relationships'          },
-  { label: 'Travail',    value: 'work and professions'              },
-  { label: 'Grammaire',  value: 'grammar and sentence structure'    },
+  { label: 'Général',    value: 'general vocabulary and greetings', Icon: MessageCircle },
+  { label: 'Voyage',     value: 'travel and transportation',        Icon: Plane         },
+  { label: 'Nourriture', value: 'food and restaurant',              Icon: Utensils      },
+  { label: 'Famille',    value: 'family and relationships',         Icon: Users         },
+  { label: 'Travail',    value: 'work and professions',             Icon: Briefcase     },
+  { label: 'Grammaire',  value: 'grammar and sentence structure',   Icon: GraduationCap },
 ]
 
 const ROUND_SIZE = 5
+const OPTION_LETTERS = ['A', 'B', 'C', 'D']
 
-/* ── Génère un QCM à partir du vocabulaire de l'utilisateur ─────────── */
 function buildVocabExercise(words, usedIds) {
   const pool = words.filter(w => !usedIds.includes(w.id))
   if (pool.length === 0) return null
-
-  // Priorité aux mots non maîtrisés
   const notMastered = pool.filter(w => !w.mastered)
   const target = notMastered.length > 0
     ? notMastered[Math.floor(Math.random() * notMastered.length)]
     : pool[Math.floor(Math.random() * pool.length)]
-
-  // 3 mauvaises réponses parmi les autres mots
   const others = words.filter(w => w.id !== target.id)
   const wrong  = [...others].sort(() => Math.random() - 0.5).slice(0, 3)
-
-  const options = [...wrong.map(w => w.translation), target.translation]
-    .sort(() => Math.random() - 0.5)
-
-  const correctIdx = options.indexOf(target.translation)
-
+  const options = [...wrong.map(w => w.translation), target.translation].sort(() => Math.random() - 0.5)
   return {
     question:    `Comment traduit-on "${target.word}" ?`,
     options,
-    correct:     correctIdx,
-    explanation: `🇫🇷 "${target.word}" signifie "${target.translation}" en français.\n\n🌐 "${target.word}" = "${target.translation}"`,
+    correct:     options.indexOf(target.translation),
+    explanation: `"${target.word}" signifie "${target.translation}".`,
     wordId:      target.id,
   }
+}
+
+function ScoreRing({ pct, score, total }) {
+  const r = 54, c = 2 * Math.PI * r
+  const dash = (pct / 100) * c
+  const color = pct === 100 ? '#f59e0b' : pct >= 60 ? '#58cc02' : '#1cb0f6'
+  return (
+    <div className="relative w-36 h-36 mx-auto">
+      <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" />
+        <circle cx="60" cy="60" r={r} fill="none" stroke={color}
+          strokeWidth="10" strokeLinecap="round"
+          strokeDasharray={`${dash} ${c}`}
+          style={{ transition: 'stroke-dasharray 1s ease' }} />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-black text-gray-800">{score}</span>
+        <span className="text-xs font-bold text-gray-400">/ {total}</span>
+      </div>
+    </div>
+  )
 }
 
 export default function Exercises() {
   const navigate  = useNavigate()
   const { user }  = useAuth()
 
-  const [mode,       setMode]       = useState(null)      // null | 'vocab' | 'theme'
+  const [mode,       setMode]       = useState(null)
   const [topic,      setTopic]      = useState(TOPICS[0])
-  const [phase,      setPhase]      = useState('pick')    // pick | playing | result
+  const [phase,      setPhase]      = useState('pick')
   const [exercise,   setExercise]   = useState(null)
   const [loading,    setLoading]    = useState(false)
   const [selected,   setSelected]   = useState(null)
@@ -67,11 +81,13 @@ export default function Exercises() {
   const [score,      setScore]      = useState(0)
   const [round,      setRound]      = useState(0)
   const [xp,         setXp]         = useState(0)
+  const [combo,      setCombo]      = useState(0)
   const [vocabWords, setVocabWords] = useState([])
   const [usedIds,    setUsedIds]    = useState([])
   const [vocabError, setVocabError] = useState('')
+  const [shake,      setShake]      = useState(false)
+  const [pop,        setPop]        = useState(false)
 
-  /* ── Charge le vocabulaire quand mode vocab sélectionné ── */
   useEffect(() => {
     if (mode === 'vocab') {
       setLoading(true)
@@ -79,120 +95,127 @@ export default function Exercises() {
         .then(d => {
           const words = Array.isArray(d) ? d : []
           setVocabWords(words)
-          if (words.length < 4) {
-            setVocabError(`Vous avez ${words.length} mot(s) dans votre vocabulaire. Il en faut au moins 4 pour jouer.`)
-          } else {
-            setVocabError('')
-          }
+          setVocabError(words.length < 4
+            ? `Vous avez ${words.length} mot(s) dans votre vocabulaire. Il en faut au moins 4 pour jouer.`
+            : '')
         })
         .finally(() => setLoading(false))
     }
   }, [mode])
 
-  /* ── Question suivante ── */
   const fetchNext = async () => {
-    setLoading(true)
-    setSelected(null)
-    setAnswered(false)
-    setExercise(null)
-
+    setLoading(true); setSelected(null); setAnswered(false); setExercise(null)
     if (mode === 'vocab') {
       const ex = buildVocabExercise(vocabWords, usedIds)
-      if (ex) {
-        setUsedIds(prev => [...prev, ex.wordId])
-        setExercise(ex)
-      }
+      if (ex) { setUsedIds(prev => [...prev, ex.wordId]); setExercise(ex) }
       setLoading(false)
     } else {
       try {
-        const data = await generateExercise(
-          user?.target_language || 'en',
-          user?.level || 'debutant',
-          topic.value
-        )
+        const data = await generateExercise(user?.target_language || 'en', user?.level || 'debutant', topic.value)
         setExercise(data)
       } catch {
-        setExercise({
-          question:    "¿Cómo se dice 'Bonjour' en español?",
-          options:     ["Hola", "Adiós", "Gracias", "Por favor"],
-          correct:     0,
-          explanation: "🇫🇷 \"Hola\" signifie \"Bonjour\" en espagnol.\n\n🌐 \"Hola\" significa \"Bonjour\" en francés.",
-        })
+        setExercise({ question:"¿Cómo se dice 'Bonjour' en español?", options:["Hola","Adiós","Gracias","Por favor"], correct:0, explanation:'"Hola" signifie "Bonjour" en espagnol.' })
       }
       setLoading(false)
     }
   }
 
   const startRound = async () => {
-    setScore(0); setRound(0); setXp(0); setUsedIds([])
+    setScore(0); setRound(0); setXp(0); setCombo(0); setUsedIds([])
     setPhase('playing')
     await fetchNext()
   }
 
   const handleAnswer = async (idx) => {
     if (answered) return
-    setSelected(idx)
-    setAnswered(true)
+    setSelected(idx); setAnswered(true)
     const isCorrect = idx === exercise.correct
-    if (isCorrect) { setScore(s => s + 1); setXp(x => x + 15) }
-
-    // Met à jour la progression du mot dans le vocabulaire
+    if (isCorrect) {
+      setScore(s => s + 1)
+      setCombo(c => c + 1)
+      setXp(x => x + (combo >= 2 ? 25 : 15))
+      setPop(true); setTimeout(() => setPop(false), 500)
+    } else {
+      setCombo(0)
+      setShake(true); setTimeout(() => setShake(false), 500)
+    }
     if (mode === 'vocab' && exercise.wordId) {
       try { await updateWordProgress(exercise.wordId, isCorrect) } catch {}
     }
   }
 
   const handleNext = async () => {
-    const nextRound = round + 1
-    if (nextRound >= ROUND_SIZE) { setPhase('result'); return }
-    setRound(nextRound)
+    const next = round + 1
+    if (next >= ROUND_SIZE) { setPhase('result'); return }
+    setRound(next)
     await fetchNext()
   }
 
   /* ════ ÉCRAN 0 — Choix du mode ════════════════════════════════════════ */
   if (!mode) return (
-    <div className="min-h-screen bg-duo-gray font-duo pb-24">
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-30">
-        <div className="max-w-lg mx-auto px-4 py-4 text-center">
-          <h1 className="text-xl font-black text-duo-text">Exercices</h1>
-          <p className="text-xs font-semibold text-duo-muted mt-0.5">{LANG_NAMES[user?.target_language]}</p>
-        </div>
-      </header>
+    <div className="min-h-screen font-duo pb-24"
+      style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
 
-      <div className="max-w-lg mx-auto px-4 mt-8 space-y-4">
-        <p className="text-xs font-extrabold text-duo-muted uppercase tracking-wider mb-2">
-          Choisir un mode
+      <div className="max-w-lg mx-auto px-5 pt-10">
+        {/* Header */}
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
+              <Target size={20} className="text-white" />
+            </div>
+            <h1 className="text-2xl font-black text-gray-800">Exercices</h1>
+          </div>
+          <p className="text-gray-400 font-semibold text-sm pl-[52px]">
+            Entraînez-vous en <span className="text-purple-500 font-extrabold">{LANG_NAMES[user?.target_language]}</span>
+          </p>
+        </div>
+
+        <p className="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4">
+          Sélectionner un mode
         </p>
 
         {/* Mode Vocabulaire */}
         <button onClick={() => setMode('vocab')}
-          className="duo-card w-full text-left border-2 hover:border-duo-green transition-all group">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-duo-blue-bg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <BookOpen size={26} className="text-duo-blue" />
+          className="w-full mb-4 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0 text-left"
+          style={{ background: 'linear-gradient(135deg,#1cb0f6,#0e8fcf)' }}>
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <BookOpen size={26} className="text-white" />
             </div>
-            <div>
-              <div className="font-extrabold text-duo-text text-base">Mon Vocabulaire</div>
-              <div className="text-duo-muted text-sm font-semibold mt-0.5">
-                Révise les mots extraits de tes conversations
+            <div className="flex-1">
+              <div className="font-black text-white text-lg leading-tight">Mon Vocabulaire</div>
+              <div className="text-blue-100 text-sm font-semibold mt-0.5">
+                Révise les mots de tes conversations
               </div>
             </div>
+            <ChevronRight className="text-white/60" size={20} />
+          </div>
+          <div className="px-5 pb-4 flex gap-2">
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Répétition espacée</span>
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Personnalisé</span>
           </div>
         </button>
 
         {/* Mode Thèmes IA */}
         <button onClick={() => setMode('theme')}
-          className="duo-card w-full text-left border-2 hover:border-duo-green transition-all group">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-duo-purple-bg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <Sparkles size={26} className="text-duo-purple" />
+          className="w-full rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0 text-left"
+          style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <Brain size={26} className="text-white" />
             </div>
-            <div>
-              <div className="font-extrabold text-duo-text text-base">Thèmes IA</div>
-              <div className="text-duo-muted text-sm font-semibold mt-0.5">
-                Questions générées par l'IA sur un thème
+            <div className="flex-1">
+              <div className="font-black text-white text-lg leading-tight">Thèmes IA</div>
+              <div className="text-purple-100 text-sm font-semibold mt-0.5">
+                Questions générées par intelligence artificielle
               </div>
             </div>
+            <ChevronRight className="text-white/60" size={20} />
+          </div>
+          <div className="px-5 pb-4 flex gap-2">
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Illimité</span>
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">6 thèmes</span>
           </div>
         </button>
       </div>
@@ -201,48 +224,66 @@ export default function Exercises() {
     </div>
   )
 
-  /* ════ ÉCRAN 1 — Config (thème ou info vocab) ══════════════════════════ */
+  /* ════ ÉCRAN 1 — Config ══════════════════════════════════════════════ */
   if (phase === 'pick') return (
-    <div className="min-h-screen bg-duo-gray font-duo pb-24">
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-30">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
+    <div className="min-h-screen font-duo pb-24"
+      style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
+
+      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 z-30">
+        <div className="max-w-lg mx-auto px-5 py-4 flex items-center gap-3">
           <button onClick={() => setMode(null)}
-            className="text-duo-muted hover:text-duo-text font-extrabold text-xs uppercase">← Retour</button>
-          <h1 className="text-lg font-black text-duo-text">
-            {mode === 'vocab' ? 'Mon Vocabulaire' : 'Thèmes IA'}
-          </h1>
+            className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+            <X size={16} />
+          </button>
+          <div>
+            <h1 className="font-black text-gray-800 text-base leading-none">
+              {mode === 'vocab' ? 'Mon Vocabulaire' : 'Thèmes IA'}
+            </h1>
+            <p className="text-xs text-gray-400 font-semibold mt-0.5">{LANG_NAMES[user?.target_language]}</p>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 mt-6">
+      <div className="max-w-lg mx-auto px-5 mt-6">
 
         {/* Mode Vocabulaire */}
         {mode === 'vocab' && (
           loading ? (
-            <div className="flex justify-center py-12"><Loader2 size={28} className="animate-spin text-duo-muted" /></div>
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <Loader2 size={28} className="animate-spin text-blue-400" />
+              <p className="text-gray-400 font-semibold text-sm">Chargement…</p>
+            </div>
           ) : vocabError ? (
-            <div className="duo-card border-2 border-duo-border text-center py-8">
-              <span className="text-5xl block mb-3">📚</span>
-              <p className="font-extrabold text-duo-text mb-2">Pas assez de mots</p>
-              <p className="text-duo-muted text-sm font-semibold mb-5">{vocabError}</p>
+            <div className="text-center py-10">
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-5">
+                <BookOpen size={28} className="text-gray-400" />
+              </div>
+              <h2 className="font-black text-gray-800 text-xl mb-2">Pas assez de mots</h2>
+              <p className="text-gray-400 font-semibold text-sm mb-8 max-w-xs mx-auto">{vocabError}</p>
               <button onClick={() => navigate('/dashboard')}
-                className="duo-btn duo-btn-green text-sm px-8 py-3">
-                FAIRE UNE LEÇON IA
+                className="font-extrabold text-white px-8 py-4 rounded-xl shadow-md hover:opacity-90 transition-all active:scale-95 text-sm"
+                style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                COMMENCER UNE LEÇON
               </button>
             </div>
           ) : (
-            <div>
-              <div className="duo-card border-2 border-duo-green bg-duo-green-bg mb-5">
-                <div className="font-extrabold text-duo-green mb-1">
-                  {vocabWords.length} mots disponibles
-                </div>
-                <div className="text-duo-muted text-sm font-semibold">
-                  {vocabWords.filter(w => !w.mastered).length} mots à réviser •{' '}
-                  {vocabWords.filter(w => w.mastered).length} maîtrisés
-                </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { val: vocabWords.length,                          label: 'Total',     color: '#1cb0f6', bg: '#f0f9ff' },
+                  { val: vocabWords.filter(w => !w.mastered).length, label: 'À réviser', color: '#ff9600', bg: '#fff7ed' },
+                  { val: vocabWords.filter(w => w.mastered).length,  label: 'Maîtrisés', color: '#58cc02', bg: '#f0fdf4' },
+                ].map(s => (
+                  <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg }}>
+                    <div className="text-2xl font-black" style={{ color: s.color }}>{s.val}</div>
+                    <div className="text-xs font-bold text-gray-400 mt-0.5">{s.label}</div>
+                  </div>
+                ))}
               </div>
-              <button onClick={startRound} className="duo-btn duo-btn-green w-full text-base py-4">
-                <Zap size={18} /> COMMENCER ({ROUND_SIZE} questions)
+              <button onClick={startRound}
+                className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+                style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                <Zap size={18} fill="white" /> COMMENCER — {ROUND_SIZE} QUESTIONS
               </button>
             </div>
           )
@@ -250,32 +291,36 @@ export default function Exercises() {
 
         {/* Mode Thèmes */}
         {mode === 'theme' && (
-          <div>
-            <p className="text-xs font-extrabold text-duo-muted uppercase tracking-wider mb-3">
-              Choisir un thème
-            </p>
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {TOPICS.map(t => (
-                <button key={t.value} onClick={() => setTopic(t)}
-                  className={`duo-card text-left border-2 transition-all ${
-                    topic.value === t.value
-                      ? 'border-duo-green bg-duo-green-bg'
-                      : 'border-duo-border hover:border-duo-green'
-                  }`}>
-                  <div className={`font-extrabold text-sm ${topic.value === t.value ? 'text-duo-green' : 'text-duo-text'}`}>
-                    {t.label}
-                  </div>
-                  {topic.value === t.value && <CheckCircle size={14} className="text-duo-green mt-1" />}
-                </button>
-              ))}
+          <div className="space-y-5">
+            <p className="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Choisir un thème</p>
+            <div className="grid grid-cols-2 gap-3">
+              {TOPICS.map(t => {
+                const active = topic.value === t.value
+                return (
+                  <button key={t.value} onClick={() => setTopic(t)}
+                    className={`rounded-xl p-4 text-left border-2 transition-all ${
+                      active ? 'border-purple-400 bg-purple-50 shadow-sm' : 'border-gray-100 bg-white hover:border-purple-200'
+                    }`}>
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
+                      active ? 'bg-purple-500' : 'bg-gray-100'
+                    }`}>
+                      <t.Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
+                    </div>
+                    <div className={`font-extrabold text-sm ${active ? 'text-purple-600' : 'text-gray-700'}`}>
+                      {t.label}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
-            <button onClick={startRound} className="duo-btn duo-btn-green w-full text-base py-4">
-              <Zap size={18} /> COMMENCER
+            <button onClick={startRound}
+              className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
+              <Sparkles size={18} /> COMMENCER — {topic.label.toUpperCase()}
             </button>
           </div>
         )}
       </div>
-
       <BottomNav active="exercises" />
     </div>
   )
@@ -283,36 +328,54 @@ export default function Exercises() {
   /* ════ ÉCRAN 2 — Résultats ═════════════════════════════════════════════ */
   if (phase === 'result') {
     const pct  = Math.round((score / ROUND_SIZE) * 100)
-    const perf = pct === 100 ? { msg:'Parfait !',   emoji:'🏆', color:'text-duo-yellow' }
-               : pct >= 60   ? { msg:'Bien joué !', emoji:'🎉', color:'text-duo-green'  }
-               :               { msg:'Continuez !', emoji:'💪', color:'text-duo-blue'   }
+    const perf = pct === 100 ? { msg:'Parfait !',   grad:'linear-gradient(135deg,#fbbf24,#f59e0b)', Icon: Trophy   }
+               : pct >= 60   ? { msg:'Bien joué !', grad:'linear-gradient(135deg,#58cc02,#3fa801)', Icon: Award    }
+               :               { msg:'Continuez !', grad:'linear-gradient(135deg,#1cb0f6,#0e8fcf)', Icon: TrendingUp }
     return (
-      <div className="min-h-screen bg-duo-gray font-duo pb-24 flex items-center justify-center">
-        <div className="max-w-sm w-full mx-4">
-          <div className="duo-card text-center">
-            <div className="text-7xl mb-4">{perf.emoji}</div>
-            <h2 className={`text-3xl font-black mb-1 ${perf.color}`}>{perf.msg}</h2>
-            <p className="text-duo-muted font-semibold mb-6">{score} / {ROUND_SIZE} bonnes réponses</p>
-            <div className="flex justify-center gap-6 mb-8">
-              <div className="text-center">
-                <div className="text-3xl font-black text-duo-green">{pct}%</div>
-                <div className="text-xs font-bold text-duo-muted">Score</div>
+      <div className="min-h-screen font-duo pb-24 flex flex-col items-center justify-center px-5"
+        style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
+        <div className="w-full max-w-sm">
+
+          {/* Trophy card */}
+          <div className="rounded-2xl overflow-hidden shadow-xl mb-5" style={{ background: perf.grad }}>
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
+                <perf.Icon size={40} className="text-white" />
               </div>
-              <div className="w-px bg-duo-border" />
+              <h2 className="text-3xl font-black text-white mb-1">{perf.msg}</h2>
+              <p className="text-white/75 font-semibold">{score} bonnes réponses sur {ROUND_SIZE}</p>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="bg-white rounded-2xl shadow-md p-6 mb-5">
+            <ScoreRing pct={pct} score={score} total={ROUND_SIZE} />
+            <div className="flex justify-center gap-8 mt-5 pt-5 border-t border-gray-100">
               <div className="text-center">
-                <div className="text-3xl font-black text-duo-purple">+{xp}</div>
-                <div className="text-xs font-bold text-duo-muted">XP gagnés</div>
+                <div className="flex items-center gap-1 justify-center">
+                  <Zap size={16} className="text-yellow-500" fill="#eab308" />
+                  <span className="text-2xl font-black text-gray-800">+{xp}</span>
+                </div>
+                <div className="text-xs font-bold text-gray-400 mt-0.5">XP gagnés</div>
+              </div>
+              <div className="w-px bg-gray-100" />
+              <div className="text-center">
+                <div className="text-2xl font-black text-gray-800">{pct}%</div>
+                <div className="text-xs font-bold text-gray-400 mt-0.5">Précision</div>
               </div>
             </div>
-            <div className="flex flex-col gap-3">
-              <button onClick={startRound} className="duo-btn duo-btn-green w-full text-sm py-3">
-                <RotateCcw size={16} /> REJOUER
-              </button>
-              <button onClick={() => { setPhase('pick'); setMode(null) }}
-                className="duo-btn duo-btn-ghost w-full text-sm py-3">
-                CHANGER DE MODE
-              </button>
-            </div>
+          </div>
+
+          <div className="space-y-3">
+            <button onClick={startRound}
+              className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+              <RotateCcw size={16} /> REJOUER
+            </button>
+            <button onClick={() => { setPhase('pick'); setMode(null) }}
+              className="w-full py-4 rounded-xl font-black text-gray-500 bg-white border-2 border-gray-100 text-sm hover:bg-gray-50 transition-all">
+              CHANGER DE MODE
+            </button>
           </div>
         </div>
         <BottomNav active="exercises" />
@@ -321,103 +384,136 @@ export default function Exercises() {
   }
 
   /* ════ ÉCRAN 3 — Question ══════════════════════════════════════════════ */
+  const isCorrect = answered && selected === exercise?.correct
+  const TopicIcon = topic.Icon
+
   return (
-    <div className="min-h-screen bg-duo-gray font-duo pb-24">
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-30">
-        <div className="max-w-lg mx-auto px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
+    <div className="min-h-screen font-duo pb-24"
+      style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
+
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 z-30">
+        <div className="max-w-lg mx-auto px-5 py-3">
+          <div className="flex items-center justify-between mb-3">
             <button onClick={() => setPhase('pick')}
-              className="text-duo-muted hover:text-duo-red font-extrabold text-xs uppercase">
-              ✕ Quitter
+              className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-400 transition-colors">
+              <X size={16} />
             </button>
-            <span className="text-xs font-extrabold text-duo-muted">{round + 1} / {ROUND_SIZE}</span>
-            <div className="flex items-center gap-1 text-duo-purple font-extrabold text-xs">
-              <Zap size={13} /> +{xp} XP
+
+            {combo >= 2 && (
+              <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl animate-bounce-in">
+                <Flame size={13} className="text-orange-500" fill="#f97316" />
+                <span className="text-orange-600 font-extrabold text-xs">{combo}x Combo</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-xl">
+              <Zap size={13} className="text-amber-500" fill="#f59e0b" />
+              <span className="font-extrabold text-amber-600 text-sm">+{xp} XP</span>
             </div>
           </div>
-          <div className="w-full bg-duo-gray rounded-full h-3 border border-duo-border overflow-hidden">
-            <div className="h-full bg-duo-green rounded-full transition-all duration-500"
-              style={{ width: `${(round / ROUND_SIZE) * 100}%` }} />
+
+          {/* Progress bar */}
+          <div className="flex gap-1.5">
+            {Array.from({ length: ROUND_SIZE }).map((_, i) => (
+              <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                i < round ? 'bg-green-400' : i === round ? 'bg-green-200' : 'bg-gray-200'
+              }`} />
+            ))}
           </div>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 mt-6">
+      <div className="max-w-lg mx-auto px-5 mt-6 pb-6">
 
-        {/* Badge mode */}
-        <div className="flex justify-center mb-4">
-          <span className={`text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full border ${
-            mode === 'vocab'
-              ? 'text-duo-blue bg-duo-blue-bg border-blue-200'
-              : 'text-duo-purple bg-duo-purple-bg border-purple-200'
+        {/* Mode badge */}
+        <div className="flex justify-center mb-5">
+          <div className={`flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider px-4 py-2 rounded-xl ${
+            mode === 'vocab' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'
           }`}>
-            {mode === 'vocab' ? '📚 Mon Vocabulaire' : `✨ ${topic.label} — ${LANG_NAMES[user?.target_language]}`}
-          </span>
+            {mode === 'vocab'
+              ? <><BookOpen size={13} /> Vocabulaire</>
+              : <><TopicIcon size={13} /> {topic.label}</>
+            }
+          </div>
         </div>
 
-        {/* Question */}
-        <div className="duo-card border-2 border-duo-border mb-5 min-h-[100px] flex items-center justify-center">
+        {/* Question card */}
+        <div className={`bg-white rounded-2xl shadow-md p-6 mb-5 min-h-[120px] flex items-center justify-center ${
+          shake ? 'animate-shake' : pop ? 'animate-bounce-in' : ''
+        }`}>
           {loading || !exercise
-            ? <Loader2 size={28} className="animate-spin text-duo-muted" />
-            : <p className="font-extrabold text-duo-text text-lg text-center leading-relaxed">
+            ? <div className="flex flex-col items-center gap-3">
+                <Loader2 size={24} className="animate-spin text-gray-300" />
+                <span className="text-gray-300 text-sm font-semibold">Chargement…</span>
+              </div>
+            : <p className="font-black text-gray-800 text-xl text-center leading-relaxed">
                 {exercise.question}
-              </p>}
+              </p>
+          }
         </div>
 
         {/* Options */}
         {exercise && !loading && (
-          <div className="grid grid-cols-1 gap-3 mb-5">
+          <div className="space-y-3 mb-5">
             {exercise.options.map((opt, idx) => {
-              let style = 'border-duo-border bg-white hover:border-duo-blue text-duo-text'
-              if (answered) {
-                if (idx === exercise.correct) style = 'border-duo-green bg-duo-green-bg text-duo-green'
-                else if (idx === selected)    style = 'border-duo-red bg-duo-red-bg text-duo-red'
-                else                         style = 'border-duo-border bg-white text-duo-muted opacity-40'
-              }
+              const isRight  = answered && idx === exercise.correct
+              const isWrong  = answered && idx === selected && idx !== exercise.correct
+              const isDimmed = answered && !isRight && !isWrong
+
               return (
                 <button key={idx} onClick={() => handleAnswer(idx)} disabled={answered}
-                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-duo border-2 border-b-4 font-extrabold text-sm text-left transition-all active:translate-y-0.5 active:border-b-2 ${style}`}>
-                  <span className="w-7 h-7 rounded-full border-2 border-current flex items-center justify-center text-xs shrink-0">
-                    {String.fromCharCode(65 + idx)}
+                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border-2 font-extrabold text-sm text-left transition-all duration-200 ${
+                    isRight  ? 'border-green-400 bg-green-50 text-green-700'
+                    : isWrong  ? 'border-red-400 bg-red-50 text-red-600'
+                    : isDimmed ? 'border-gray-100 bg-white/60 text-gray-300'
+                    : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50 active:scale-[0.98]'
+                  }`}>
+                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                    isRight  ? 'bg-green-500 text-white'
+                    : isWrong  ? 'bg-red-500 text-white'
+                    : isDimmed ? 'bg-gray-100 text-gray-300'
+                    : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {OPTION_LETTERS[idx]}
                   </span>
                   <span className="flex-1">{opt}</span>
-                  {answered && idx === exercise.correct && <CheckCircle size={18} className="text-duo-green shrink-0" />}
-                  {answered && idx === selected && idx !== exercise.correct && <XCircle size={18} className="text-duo-red shrink-0" />}
+                  {isRight && <CheckCircle size={18} className="text-green-500 shrink-0" />}
+                  {isWrong && <XCircle     size={18} className="text-red-400   shrink-0" />}
                 </button>
               )
             })}
           </div>
         )}
 
-        {/* Explication bilingue */}
+        {/* Feedback */}
         {answered && exercise && (
-          <div className={`rounded-2xl border-2 p-4 mb-5 animate-slide-up ${
-            selected === exercise.correct ? 'bg-duo-green-bg border-green-200' : 'bg-duo-red-bg border-red-200'
+          <div className={`rounded-xl border-2 p-4 mb-5 ${
+            isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
           }`}>
-            <div className={`flex items-center gap-2 font-extrabold text-sm mb-3 ${
-              selected === exercise.correct ? 'text-duo-green' : 'text-duo-red'
+            <div className={`flex items-center gap-2 font-extrabold text-sm mb-2 ${
+              isCorrect ? 'text-green-600' : 'text-red-500'
             }`}>
-              {selected === exercise.correct
-                ? <><CheckCircle size={15} /> Bonne réponse !</>
-                : <><XCircle size={15} /> Pas tout à fait…</>}
+              {isCorrect
+                ? <><CheckCircle size={15} /> Bonne réponse {combo >= 2 ? `— ${combo}x combo !` : ''}</>
+                : <><XCircle size={15} /> Pas tout à fait…</>
+              }
             </div>
-            <div className="space-y-3">
-              {exercise.explanation.split('\n\n').filter(Boolean).map((part, i) => (
-                <div key={i} className="flex gap-2.5">
-                  <span className="text-base shrink-0">{i === 0 ? '🇫🇷' : '🌐'}</span>
-                  <p className="text-duo-muted font-semibold text-sm leading-relaxed">{part.trim()}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-gray-500 font-semibold text-sm leading-relaxed">{exercise.explanation}</p>
           </div>
         )}
 
         {/* Bouton suivant */}
         {answered && (
-          <button onClick={handleNext} className="duo-btn duo-btn-green w-full text-sm py-4">
+          <button onClick={handleNext}
+            className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+            style={{ background: round + 1 >= ROUND_SIZE
+              ? 'linear-gradient(135deg,#fbbf24,#f59e0b)'
+              : 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
             {round + 1 >= ROUND_SIZE
-              ? <><Trophy size={16} /> VOIR MES RÉSULTATS</>
-              : <>QUESTION SUIVANTE <ChevronRight size={16} /></>}
+              ? <><Trophy size={17} /> VOIR MES RÉSULTATS</>
+              : <>QUESTION SUIVANTE <ChevronRight size={17} /></>
+            }
           </button>
         )}
       </div>

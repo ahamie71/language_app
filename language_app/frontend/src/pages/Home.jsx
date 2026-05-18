@@ -1,92 +1,105 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  X, Eye, EyeOff, Loader2, CheckCircle,
-  Sparkles, Bot, Wand2, BookMarked, Mic2, Trophy, Rocket,
-  Github, Twitter, Youtube, Facebook, Instagram
+  X, Eye, EyeOff, Loader2, CheckCircle, AlertCircle,
+  Bot, Wand2, BookMarked, Mic2, Trophy, Rocket,
+  Github, Twitter, Youtube, Facebook, Instagram,
+  MessageSquare, Sparkles, Globe, Users, ChevronRight,
+  UserPlus, LogIn, Brain, Zap, BarChart3, Volume2,
+  ArrowRight, Shield, Star, Play
 } from 'lucide-react'
 import { login, register, getProfile } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
-/* ── Language options ──────────────────────────────────────────────────── */
 const LANGUAGES = [
-  { value: 'en', label: '🇬🇧 Anglais' },
-  { value: 'es', label: '🇪🇸 Espagnol' },
-  { value: 'de', label: '🇩🇪 Allemand' },
-  { value: 'ar', label: '🇸🇦 Arabe' },
-  { value: 'it', label: '🇮🇹 Italien' },
-  { value: 'pt', label: '🇧🇷 Portugais' },
-  { value: 'zh', label: '🇨🇳 Chinois' },
-  { value: 'ja', label: '🇯🇵 Japonais' },
-  { value: 'fr', label: '🇫🇷 Français' },
+  { value: 'en', label: 'Anglais',   flag: 'gb' },
+  { value: 'es', label: 'Espagnol',  flag: 'es' },
+  { value: 'de', label: 'Allemand',  flag: 'de' },
+  { value: 'ar', label: 'Arabe',     flag: 'sa' },
+  { value: 'it', label: 'Italien',   flag: 'it' },
+  { value: 'pt', label: 'Portugais', flag: 'br' },
+  { value: 'zh', label: 'Chinois',   flag: 'cn' },
+  { value: 'ja', label: 'Japonais',  flag: 'jp' },
+  { value: 'fr', label: 'Français',  flag: 'fr' },
 ]
 
-/* ── Features highlighting AI impact ─────────────────────────────────── */
 const FEATURES = [
   {
-    icon: Bot,
+    Icon: Bot,
     title: 'Coach IA Personnel',
-    desc: "Conversez avec un tuteur IA qui parle votre langue cible, s'adapte à votre niveau et vous corrige avec bienveillance.",
-    accent: 'from-violet-500 to-purple-600',
-    iconBg: 'bg-violet-100',
-    iconColor: 'text-violet-600',
-    tag: 'IA',
+    desc: "Un tuteur IA qui s'adapte à votre niveau, corrige vos erreurs et répond dans la langue que vous apprenez.",
+    grad: 'from-violet-500 to-purple-600',
+    light: 'bg-violet-50',
+    color: 'text-violet-600',
   },
   {
-    icon: Wand2,
+    Icon: Wand2,
     title: 'Corrections Instantanées',
-    desc: "Chaque message est analysé : grammaire, conjugaison, style. Explications claires en français.",
-    accent: 'from-blue-500 to-cyan-500',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    tag: 'Smart',
+    desc: "Chaque message est analysé : grammaire, conjugaison, style. Explications claires dans votre langue.",
+    grad: 'from-blue-500 to-cyan-500',
+    light: 'bg-blue-50',
+    color: 'text-blue-600',
   },
   {
-    icon: BookMarked,
+    Icon: BookMarked,
     title: 'Vocabulaire Intelligent',
-    desc: "L'IA extrait chaque nouveau mot, l'enregistre dans votre carnet personnel avec contexte et traduction.",
-    accent: 'from-emerald-500 to-teal-500',
-    iconBg: 'bg-emerald-100',
-    iconColor: 'text-emerald-600',
-    tag: 'Mémoire',
+    desc: "L'IA extrait chaque nouveau mot de vos conversations et l'enregistre dans votre carnet personnel.",
+    grad: 'from-emerald-500 to-teal-500',
+    light: 'bg-emerald-50',
+    color: 'text-emerald-600',
   },
   {
-    icon: Mic2,
+    Icon: Mic2,
     title: 'Voix en Temps Réel',
     desc: "Parlez à voix haute. L'IA transcrit, traduit et analyse votre expression orale en quelques secondes.",
-    accent: 'from-amber-500 to-orange-500',
-    iconBg: 'bg-amber-100',
-    iconColor: 'text-amber-600',
-    tag: 'Oral',
+    grad: 'from-amber-500 to-orange-500',
+    light: 'bg-amber-50',
+    color: 'text-amber-600',
   },
   {
-    icon: Trophy,
+    Icon: Trophy,
     title: 'Progression Gamifiée',
-    desc: "Streak quotidien, XP, badges et niveaux — chaque session compte et vous maintient motivé.",
-    accent: 'from-rose-500 to-pink-600',
-    iconBg: 'bg-rose-100',
-    iconColor: 'text-rose-600',
-    tag: 'Niveau',
+    desc: "Streak quotidien, XP, badges et niveaux — chaque session vous maintient motivé et engagé.",
+    grad: 'from-rose-500 to-pink-600',
+    light: 'bg-rose-50',
+    color: 'text-rose-600',
   },
   {
-    icon: Rocket,
+    Icon: Rocket,
     title: 'Immersion Accélérée',
     desc: "L'apprentissage par immersion avec l'IA est 3× plus rapide que les méthodes classiques.",
-    accent: 'from-indigo-500 to-blue-700',
-    iconBg: 'bg-indigo-100',
-    iconColor: 'text-indigo-600',
-    tag: '3× Rapide',
+    grad: 'from-indigo-500 to-blue-700',
+    light: 'bg-indigo-50',
+    color: 'text-indigo-600',
   },
 ]
 
-/* ═══════════════════════════════════════════════════════════════════════
-   COMPONENT
-═══════════════════════════════════════════════════════════════════════ */
-export default function Home() {
-  const navigate       = useNavigate()
-  const { loginUser }  = useAuth()
+const STEPS = [
+  {
+    Icon: UserPlus,
+    title: 'Créez votre profil',
+    desc: 'Choisissez votre langue cible et votre niveau. Inscription en 30 secondes, sans carte bancaire.',
+    color: 'bg-blue-500',
+  },
+  {
+    Icon: MessageSquare,
+    title: 'Conversez avec l\'IA',
+    desc: 'Écrivez ou parlez dans votre langue. L\'IA répond, traduit et explique en temps réel.',
+    color: 'bg-purple-500',
+  },
+  {
+    Icon: BarChart3,
+    title: 'Mesurez vos progrès',
+    desc: 'Streak, XP, vocabulaire automatique — chaque session est tracée et valorisée.',
+    color: 'bg-emerald-500',
+  },
+]
 
-  const [modal,   setModal]   = useState(null)   // 'login' | 'register'
+export default function Home() {
+  const navigate      = useNavigate()
+  const { loginUser } = useAuth()
+
+  const [modal,   setModal]   = useState(null)
   const [showPwd, setShowPwd] = useState(false)
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState('')
@@ -98,15 +111,13 @@ export default function Home() {
     native_language: 'fr', target_language: 'en', level: 'debutant',
   })
 
-  const openLogin    = () => { setModal('login');    resetAlerts(); setShowPwd(false) }
-  const openRegister = () => { setModal('register'); resetAlerts(); setShowPwd(false) }
-  const closeModal   = () => { setModal(null);       resetAlerts() }
-  const resetAlerts  = () => { setError(''); setSuccess('') }
+  const openLogin    = () => { setModal('login');    setError(''); setSuccess(''); setShowPwd(false) }
+  const openRegister = () => { setModal('register'); setError(''); setSuccess(''); setShowPwd(false) }
+  const closeModal   = () => { setModal(null); setError(''); setSuccess('') }
 
-  /* ── Login ── */
   const handleLogin = async (e) => {
     e.preventDefault()
-    setLoading(true); resetAlerts()
+    setLoading(true); setError('')
     try {
       const data = await login(loginForm.email, loginForm.password)
       if (data.access_token) {
@@ -123,14 +134,13 @@ export default function Home() {
     setLoading(false)
   }
 
-  /* ── Register ── */
   const handleRegister = async (e) => {
     e.preventDefault()
-    setLoading(true); resetAlerts()
+    setLoading(true); setError('')
     try {
       const data = await register(regForm)
       if (data.user_id) {
-        setSuccess('Compte créé avec succès ! Connectez-vous maintenant.')
+        setSuccess('Compte créé ! Redirection vers la connexion…')
         setTimeout(openLogin, 1800)
       } else {
         setError(data.detail || "Erreur lors de l'inscription")
@@ -141,205 +151,310 @@ export default function Home() {
     setLoading(false)
   }
 
-  /* ── Render ── */
   return (
-    <div className="min-h-screen font-duo">
+    <div className="min-h-screen font-duo bg-white">
 
-      {/* ════ NAVBAR ════════════════════════════════════════════════════ */}
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-4xl">🦉</span>
-            <span className="text-2xl font-black text-duo-green tracking-tight">Lingua</span>
+      {/* ════ NAVBAR ═══════════════════════════════════════════════════════ */}
+      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+              <Brain size={20} className="text-white" />
+            </div>
+            <span className="text-xl font-black text-gray-800 tracking-tight">Lingua<span className="text-green-500">AI</span></span>
           </div>
+
+          {/* Nav links — desktop */}
+          <nav className="hidden md:flex items-center gap-6">
+            {['Fonctionnalités', 'Comment ça marche', 'Langues'].map(l => (
+              <a key={l} href="#" className="text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors">{l}</a>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-2">
             <button onClick={openLogin}
-              className="duo-btn duo-btn-ghost text-xs px-5 py-2.5">
-              CONNEXION
+              className="px-5 py-2.5 rounded-xl font-extrabold text-sm text-gray-600 hover:bg-gray-100 transition-colors">
+              Connexion
             </button>
             <button onClick={openRegister}
-              className="duo-btn duo-btn-green text-xs px-5 py-2.5">
-              S'INSCRIRE
+              className="px-5 py-2.5 rounded-xl font-extrabold text-sm text-white shadow-md hover:opacity-90 transition-all"
+              style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+              S'inscrire
             </button>
           </div>
         </div>
       </header>
 
-      {/* ════ HERO ══════════════════════════════════════════════════════ */}
-      <section className="bg-white">
-        <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12">
-          {/* Text side */}
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl font-black text-duo-text leading-tight mb-4">
-              Apprenez une langue<br />
-              <span className="text-duo-green">gratuitement</span> avec l'IA
-            </h1>
-            <p className="text-duo-muted text-lg font-semibold mb-8 max-w-md mx-auto md:mx-0">
-              L'IA vous aide à progresser 3× plus vite grâce à des conversations immersives, des corrections instantanées et un suivi personnalisé.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <button onClick={openRegister}
-                className="duo-btn duo-btn-green text-base px-10 py-4">
-                COMMENCER GRATUITEMENT
-              </button>
-              <button onClick={openLogin}
-                className="duo-btn duo-btn-ghost text-base px-10 py-4">
-                J'AI DÉJÀ UN COMPTE
-              </button>
-            </div>
-          </div>
+      {/* ════ HERO ══════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden"
+        style={{ background: 'linear-gradient(160deg,#f0fdf4 0%,#faf5ff 50%,#eff6ff 100%)' }}>
 
-          {/* Mascot + chat preview */}
-          <div className="flex-1 flex justify-center">
-            <div className="relative w-72">
-              {/* Owl mascot */}
-              <div className="text-center mb-4">
-                <span className="text-9xl animate-float inline-block">🦉</span>
+        {/* Background blobs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none"
+          style={{ background: 'radial-gradient(circle,#86efac,transparent)' }} />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none"
+          style={{ background: 'radial-gradient(circle,#c4b5fd,transparent)' }} />
+
+        <div className="max-w-6xl mx-auto px-6 py-20 md:py-28 relative">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+
+            {/* Left — text */}
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-white border border-green-200 text-green-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-6 shadow-sm">
+                <Sparkles size={11} />
+                Propulsé par l'Intelligence Artificielle
               </div>
-              {/* Fake chat preview */}
-              <div className="duo-card space-y-3">
-                <div className="flex items-end gap-2">
-                  <span className="text-2xl">🦉</span>
-                  <div className="bg-duo-gray rounded-duo-lg rounded-bl-sm px-4 py-2.5 text-sm font-semibold text-duo-text max-w-[180px]">
-                    Bonjour ! Parlez-moi en français, je vous répondrai en anglais 😊
-                  </div>
+
+              <h1 className="text-5xl md:text-6xl font-black text-gray-900 leading-[1.1] mb-6">
+                Apprenez une langue<br />
+                <span className="text-transparent bg-clip-text"
+                  style={{ backgroundImage: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                  3× plus vite
+                </span>{' '}
+                avec l'IA
+              </h1>
+
+              <p className="text-gray-500 text-lg font-semibold mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                Conversations immersives, corrections instantanées et vocabulaire automatique — tout ce dont vous avez besoin pour progresser vraiment.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
+                <button onClick={openRegister}
+                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-white text-base shadow-lg hover:opacity-90 active:scale-95 transition-all"
+                  style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                  Commencer gratuitement <ArrowRight size={18} />
+                </button>
+                <button onClick={openLogin}
+                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-extrabold text-gray-600 bg-white border-2 border-gray-200 text-base hover:border-gray-300 transition-all">
+                  <LogIn size={17} /> J'ai déjà un compte
+                </button>
+              </div>
+
+              {/* Social proof */}
+              <div className="flex items-center gap-3 justify-center lg:justify-start">
+                <div className="flex -space-x-2">
+                  {['bg-blue-400','bg-purple-400','bg-green-400','bg-amber-400'].map((c,i) => (
+                    <div key={i} className={`w-8 h-8 rounded-full ${c} border-2 border-white flex items-center justify-center`}>
+                      <Users size={12} className="text-white" />
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-end gap-2 flex-row-reverse">
-                  <span className="text-2xl">🧑‍🎓</span>
-                  <div className="bg-duo-blue text-white rounded-duo-lg rounded-br-sm px-4 py-2.5 text-sm font-semibold max-w-[180px]">
-                    J'aime apprendre les langues !
-                  </div>
-                </div>
-                <div className="flex items-end gap-2">
-                  <span className="text-2xl">🦉</span>
-                  <div className="bg-duo-gray rounded-duo-lg rounded-bl-sm px-4 py-2.5 text-sm font-semibold text-duo-text max-w-[180px]">
-                    I love learning languages! Great sentence 🎉
-                  </div>
-                </div>
-                {/* AI badge */}
-                <div className="flex justify-center pt-1">
-                  <span className="duo-badge bg-duo-purple-bg text-duo-purple border border-purple-200 text-xs">
-                    <Sparkles size={11} /> Propulsé par l'IA
-                  </span>
+                <div className="text-sm text-gray-500 font-semibold">
+                  <span className="font-black text-gray-800">10 000+</span> apprenants actifs
                 </div>
               </div>
             </div>
+
+            {/* Right — chat preview */}
+            <div className="flex-1 flex justify-center lg:justify-end w-full max-w-sm lg:max-w-none">
+              <div className="w-full max-w-[360px]">
+                {/* App window chrome */}
+                <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+                  {/* Window bar */}
+                  <div className="bg-gray-50 border-b border-gray-100 px-4 py-3 flex items-center gap-3">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                    </div>
+                    <div className="flex-1 bg-white rounded-lg px-3 py-1.5 flex items-center gap-2 border border-gray-200">
+                      <Brain size={12} className="text-green-500" />
+                      <span className="text-xs text-gray-400 font-semibold">Lingua AI — Coach Espagnol</span>
+                    </div>
+                  </div>
+
+                  {/* Chat messages */}
+                  <div className="p-4 space-y-3 bg-gray-50/50">
+                    {/* AI message */}
+                    <div className="flex items-end gap-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
+                        <Brain size={14} className="text-white" />
+                      </div>
+                      <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border border-gray-100 max-w-[220px]">
+                        <p className="text-sm font-semibold text-gray-700">¡Hola! ¿Cómo estás hoy?</p>
+                        <div className="mt-1.5 flex items-center gap-1 text-xs text-purple-500 font-bold">
+                          <Sparkles size={9} /> Traduction : "Bonjour ! Comment vas-tu ?"
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* User message */}
+                    <div className="flex items-end gap-2 flex-row-reverse">
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                        <Users size={14} className="text-gray-500" />
+                      </div>
+                      <div className="rounded-2xl rounded-br-sm px-4 py-3 max-w-[200px] text-white text-sm font-semibold"
+                        style={{ background: 'linear-gradient(135deg,#1cb0f6,#0e8fcf)' }}>
+                        Estoy bien, gracias !
+                      </div>
+                    </div>
+
+                    {/* AI correction */}
+                    <div className="flex items-end gap-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
+                        <Brain size={14} className="text-white" />
+                      </div>
+                      <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border border-gray-100 max-w-[220px]">
+                        <p className="text-sm font-semibold text-gray-700">¡Muy bien! Perfect sentence.</p>
+                        <div className="mt-2 bg-green-50 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+                          <CheckCircle size={11} className="text-green-500 shrink-0" />
+                          <span className="text-xs text-green-700 font-semibold">+15 XP gagnés</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Input bar */}
+                    <div className="bg-white rounded-xl border border-gray-200 px-3 py-2.5 flex items-center gap-2 mt-2">
+                      <div className="flex-1 text-xs text-gray-300 font-semibold">Écrivez en français…</div>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                        <ArrowRight size={13} className="text-white" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating badge */}
+                <div className="flex justify-center mt-4">
+                  <div className="bg-white border border-gray-100 shadow-md rounded-full px-4 py-2 flex items-center gap-2">
+                    <Shield size={13} className="text-green-500" />
+                    <span className="text-xs font-bold text-gray-500">100% gratuit · Sans carte bancaire</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* ════ STATS ══════════════════════════════════════════════════════ */}
-      <section className="bg-duo-green py-10">
-        <div className="max-w-5xl mx-auto px-4 grid grid-cols-3 gap-4 text-center text-white">
-          {[['10K+', 'Apprenants actifs'], ['500K+', 'Leçons complétées'], ['9', 'Langues disponibles']].map(([n, l]) => (
-            <div key={l}>
-              <div className="text-3xl md:text-4xl font-black">{n}</div>
-              <div className="text-sm font-bold opacity-80 mt-1">{l}</div>
+      {/* ════ STATS BAR ═════════════════════════════════════════════════════ */}
+      <section className="border-y border-gray-100 bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-3 gap-4 text-center">
+          {[
+            { n: '10K+',  l: 'Apprenants actifs',   Icon: Users     },
+            { n: '500K+', l: 'Leçons complétées',   Icon: CheckCircle },
+            { n: '9',     l: 'Langues disponibles', Icon: Globe     },
+          ].map(({ n, l, Icon }) => (
+            <div key={l} className="flex flex-col items-center gap-1">
+              <Icon size={18} className="text-green-500 mb-1" />
+              <div className="text-2xl md:text-3xl font-black text-gray-800">{n}</div>
+              <div className="text-xs font-bold text-gray-400">{l}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ════ FEATURES (AI impact) ══════════════════════════════════════ */}
-      <section className="py-20 px-4 bg-gradient-to-b from-white via-slate-50 to-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-5">
-              <Sparkles size={12} />
-              Intelligence Artificielle
+      {/* ════ FEATURES ══════════════════════════════════════════════════════ */}
+      <section className="py-24 px-6 bg-white" id="features">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 text-purple-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-5">
+              <Sparkles size={11} /> Intelligence Artificielle
             </div>
-            <h2 className="text-4xl font-black text-duo-text mb-3">
+            <h2 className="text-4xl font-black text-gray-900 mb-4">
               L'IA{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
+              <span className="text-transparent bg-clip-text"
+                style={{ backgroundImage: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
                 réinvente
               </span>{' '}
               l'apprentissage
             </h2>
-            <p className="text-duo-muted font-semibold max-w-xl mx-auto text-lg">
+            <p className="text-gray-400 font-semibold max-w-xl mx-auto text-lg">
               Six fonctionnalités propulsées par l'IA pour que vous progressiez plus vite et plus longtemps.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f, i) => (
               <div key={i}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group">
-                {/* Gradient top bar */}
-                <div className={`h-1.5 bg-gradient-to-r ${f.accent}`} />
-                <div className="p-6">
-                  <h3 className="font-extrabold text-duo-text text-base mb-2">{f.title}</h3>
-                  <p className="text-duo-muted text-sm font-semibold leading-relaxed">{f.desc}</p>
+                className="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
+                <div className={`w-12 h-12 rounded-xl ${f.light} flex items-center justify-center mb-5`}>
+                  <f.Icon size={24} className={f.color} />
                 </div>
+                <h3 className="font-extrabold text-gray-800 text-base mb-2">{f.title}</h3>
+                <p className="text-gray-400 text-sm font-semibold leading-relaxed">{f.desc}</p>
+                <div className={`mt-4 h-1 w-12 rounded-full bg-gradient-to-r ${f.grad} group-hover:w-full transition-all duration-300`} />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ════ HOW IT WORKS ══════════════════════════════════════════════ */}
-      <section className="bg-white py-16 px-4">
+      {/* ════ HOW IT WORKS ══════════════════════════════════════════════════ */}
+      <section className="py-24 px-6 bg-gray-50" id="how">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-black text-center text-duo-text mb-12">Comment ça marche ?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: '1', icon: '👤', title: 'Créez votre profil', desc: 'Choisissez votre langue cible et votre niveau. Inscription en 30 secondes.' },
-              { step: '2', icon: '💬', title: 'Parlez avec l\'IA', desc: 'Écrivez ou parlez en français. L\'IA répond, traduit et explique en temps réel.' },
-              { step: '3', icon: '📈', title: 'Progressez', desc: 'Streak, XP, vocabulaire auto — chaque session mesure votre progression.' },
-            ].map(item => (
-              <div key={item.step} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-duo-green flex items-center justify-center text-white text-2xl font-black mx-auto mb-4 shadow-lg">
-                  {item.step}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-gray-900 mb-4">Comment ça marche ?</h2>
+            <p className="text-gray-400 font-semibold text-lg">Trois étapes pour commencer à progresser aujourd'hui.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Connector line */}
+            <div className="hidden md:block absolute top-10 left-[calc(16.5%+24px)] right-[calc(16.5%+24px)] h-px bg-gradient-to-r from-blue-200 via-purple-200 to-emerald-200" />
+
+            {STEPS.map((s, i) => (
+              <div key={i} className="flex flex-col items-center text-center">
+                <div className={`w-20 h-20 rounded-2xl ${s.color} flex items-center justify-center mb-6 shadow-lg relative z-10`}>
+                  <s.Icon size={32} className="text-white" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full border-2 border-gray-100 flex items-center justify-center">
+                    <span className="text-xs font-black text-gray-600">{i + 1}</span>
+                  </div>
                 </div>
-                <div className="text-4xl mb-3">{item.icon}</div>
-                <h3 className="font-extrabold text-duo-text text-lg mb-2">{item.title}</h3>
-                <p className="text-duo-muted font-semibold text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-extrabold text-gray-800 text-lg mb-2">{s.title}</h3>
+                <p className="text-gray-400 font-semibold text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ════ CTA ════════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4 text-center">
-        <div className="max-w-xl mx-auto">
-          <span className="text-6xl block mb-4 animate-bounce-in">🦉</span>
-          <h2 className="text-3xl font-black text-duo-text mb-3">Prêt à commencer ?</h2>
-          <p className="text-duo-muted font-semibold mb-8">Rejoignez des milliers d'apprenants et voyez l'impact de l'IA sur votre progression.</p>
+      {/* ════ CTA ═══════════════════════════════════════════════════════════ */}
+      <section className="py-24 px-6 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg,#58cc02 0%,#3fa801 50%,#2d7a01 100%)' }}>
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: 'radial-gradient(circle at 20% 50%,white 1px,transparent 1px), radial-gradient(circle at 80% 50%,white 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="max-w-2xl mx-auto text-center relative">
+          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Zap size={32} className="text-white" fill="white" />
+          </div>
+          <h2 className="text-4xl font-black text-white mb-4">Prêt à commencer ?</h2>
+          <p className="text-green-100 font-semibold text-lg mb-8">
+            Rejoignez des milliers d'apprenants. Gratuit, sans engagement, pour toujours.
+          </p>
           <button onClick={openRegister}
-            className="duo-btn duo-btn-green text-base px-12 py-4">
-            C'EST PARTI !
+            className="inline-flex items-center gap-2 bg-white text-green-700 font-black px-10 py-4 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-base">
+            Créer mon compte gratuit <ArrowRight size={18} />
           </button>
         </div>
       </section>
 
-      {/* ════ FOOTER ═════════════════════════════════════════════════════ */}
-      <footer className="bg-white border-t-2 border-duo-border font-duo">
+      {/* ════ FOOTER ════════════════════════════════════════════════════════ */}
+      <footer className="bg-gray-900 text-white">
+        <div className="max-w-6xl mx-auto px-6 py-14">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
 
-        {/* Main grid */}
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-
-            {/* Brand column */}
+            {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-3xl">🦉</span>
-                <span className="text-2xl font-black text-duo-green">Lingua</span>
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                  style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                  <Brain size={16} className="text-white" />
+                </div>
+                <span className="text-lg font-black">Lingua<span className="text-green-400">AI</span></span>
               </div>
-              <p className="text-duo-muted text-sm font-semibold leading-relaxed mb-4">
-                Apprenez les langues gratuitement avec l'IA. Conversations immersives, corrections instantanées et suivi personnalisé.
+              <p className="text-gray-400 text-sm font-semibold leading-relaxed mb-5">
+                Apprenez les langues gratuitement avec l'IA. Conversations immersives et suivi personnalisé.
               </p>
-              {/* Social links */}
-              <div className="flex items-center gap-2">
-                {[
-                  { icon: Twitter,   href: '#', label: 'Twitter'   },
-                  { icon: Facebook,  href: '#', label: 'Facebook'  },
-                  { icon: Instagram, href: '#', label: 'Instagram' },
-                  { icon: Youtube,   href: '#', label: 'YouTube'   },
-                  { icon: Github,    href: '#', label: 'GitHub'    },
-                ].map(({ icon: Icon, href, label }) => (
-                  <a key={label} href={href} title={label}
-                    className="w-8 h-8 rounded-full border-2 border-duo-border text-duo-muted hover:text-duo-green hover:border-duo-green flex items-center justify-center transition-colors">
-                    <Icon size={15} />
+              <div className="flex gap-2">
+                {[Twitter, Facebook, Instagram, Youtube, Github].map((Icon, i) => (
+                  <a key={i} href="#"
+                    className="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
+                    <Icon size={14} className="text-gray-400" />
                   </a>
                 ))}
               </div>
@@ -347,22 +462,13 @@ export default function Home() {
 
             {/* Langues */}
             <div>
-              <h4 className="font-extrabold text-duo-text uppercase text-xs tracking-wider mb-4">Langues</h4>
+              <h4 className="font-extrabold text-white text-xs uppercase tracking-widest mb-4">Langues</h4>
               <ul className="space-y-2.5">
-                {[
-                  { flag:'🇬🇧', name:'Anglais' },
-                  { flag:'🇪🇸', name:'Espagnol' },
-                  { flag:'🇩🇪', name:'Allemand' },
-                  { flag:'🇸🇦', name:'Arabe' },
-                  { flag:'🇮🇹', name:'Italien' },
-                  { flag:'🇧🇷', name:'Portugais' },
-                  { flag:'🇨🇳', name:'Chinois' },
-                  { flag:'🇯🇵', name:'Japonais' },
-                ].map(l => (
-                  <li key={l.name}>
-                    <a href="#" onClick={openRegister}
-                      className="flex items-center gap-2 text-duo-muted hover:text-duo-green font-semibold text-sm transition-colors">
-                      <span>{l.flag}</span> {l.name}
+                {['Anglais','Espagnol','Allemand','Arabe','Italien','Portugais','Chinois','Japonais'].map(l => (
+                  <li key={l}>
+                    <a href="#" onClick={e => { e.preventDefault(); openRegister() }}
+                      className="text-gray-400 hover:text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
+                      <ChevronRight size={12} className="text-gray-600" /> {l}
                     </a>
                   </li>
                 ))}
@@ -371,22 +477,12 @@ export default function Home() {
 
             {/* Fonctionnalités */}
             <div>
-              <h4 className="font-extrabold text-duo-text uppercase text-xs tracking-wider mb-4">Fonctionnalités</h4>
+              <h4 className="font-extrabold text-white text-xs uppercase tracking-widest mb-4">Fonctionnalités</h4>
               <ul className="space-y-2.5">
-                {[
-                  'Conversation IA',
-                  'Traduction auto',
-                  'Explications IA',
-                  'Vocabulaire auto',
-                  'Reconnaissance vocale',
-                  'Streak & XP',
-                  'Badges',
-                  'Suivi progrès',
-                ].map(f => (
+                {['Conversation IA','Traduction auto','Explications IA','Vocabulaire auto','Reconnaissance vocale','Streak & XP','Flashcards','Dictée'].map(f => (
                   <li key={f}>
-                    <a href="#" onClick={openRegister}
-                      className="text-duo-muted hover:text-duo-green font-semibold text-sm transition-colors">
-                      {f}
+                    <a href="#" className="text-gray-400 hover:text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
+                      <ChevronRight size={12} className="text-gray-600" /> {f}
                     </a>
                   </li>
                 ))}
@@ -395,18 +491,20 @@ export default function Home() {
 
             {/* Ressources */}
             <div>
-              <h4 className="font-extrabold text-duo-text uppercase text-xs tracking-wider mb-4">Ressources</h4>
+              <h4 className="font-extrabold text-white text-xs uppercase tracking-widest mb-4">Ressources</h4>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'Blog',                  href: '#'     },
-                  { label: 'Guide de démarrage',    href: '#'     },
-                  { label: 'FAQ',                   href: '/faq'  },
-                  { label: "Conseils d'apprentissage", href: '#'  },
-                  { label: 'Méthode Lingua',        href: '#'     },
-                  { label: 'IA & éducation',        href: '#'     },
+                  { l: 'Blog',                     h: '#'    },
+                  { l: 'Guide de démarrage',        h: '#'    },
+                  { l: 'FAQ',                       h: '/faq' },
+                  { l: "Conseils d'apprentissage",  h: '#'    },
+                  { l: 'Méthode Lingua',            h: '#'    },
+                  { l: 'IA & éducation',            h: '#'    },
                 ].map(r => (
-                  <li key={r.label}>
-                    <a href={r.href} className="text-duo-muted hover:text-duo-green font-semibold text-sm transition-colors">{r.label}</a>
+                  <li key={r.l}>
+                    <a href={r.h} className="text-gray-400 hover:text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
+                      <ChevronRight size={12} className="text-gray-600" /> {r.l}
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -414,120 +512,113 @@ export default function Home() {
 
             {/* Entreprise */}
             <div>
-              <h4 className="font-extrabold text-duo-text uppercase text-xs tracking-wider mb-4">Entreprise</h4>
-              <ul className="space-y-2.5">
+              <h4 className="font-extrabold text-white text-xs uppercase tracking-widest mb-4">Entreprise</h4>
+              <ul className="space-y-2.5 mb-6">
                 {[
-                  { label: 'À propos',       href: '/about' },
-                  { label: 'Notre mission',  href: '/about' },
-                  { label: "L'équipe",       href: '/about' },
-                  { label: 'Carrières',      href: '#'      },
-                  { label: 'Presse',         href: '#'      },
-                  { label: 'Contact',        href: '#'      },
+                  { l: 'À propos',      h: '/about' },
+                  { l: 'Notre mission', h: '/about' },
+                  { l: "L'équipe",      h: '/about' },
+                  { l: 'Carrières',     h: '#'      },
+                  { l: 'Presse',        h: '#'      },
+                  { l: 'Contact',       h: '#'      },
                 ].map(e => (
-                  <li key={e.label}>
-                    <a href={e.href} className="text-duo-muted hover:text-duo-green font-semibold text-sm transition-colors">{e.label}</a>
+                  <li key={e.l}>
+                    <a href={e.h} className="text-gray-400 hover:text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
+                      <ChevronRight size={12} className="text-gray-600" /> {e.l}
+                    </a>
                   </li>
                 ))}
               </ul>
 
-              {/* App badges */}
-              <div className="mt-6 space-y-2">
-                <a href="#"
-                  className="flex items-center gap-2 bg-duo-text text-white px-3 py-2 rounded-duo-sm hover:bg-gray-700 transition-colors w-fit">
-                  <span className="text-lg">🍎</span>
-                  <div className="text-left">
-                    <div className="text-xs opacity-70 leading-none">Disponible sur</div>
-                    <div className="text-sm font-extrabold leading-tight">App Store</div>
-                  </div>
-                </a>
-                <a href="#"
-                  className="flex items-center gap-2 bg-duo-text text-white px-3 py-2 rounded-duo-sm hover:bg-gray-700 transition-colors w-fit">
-                  <span className="text-lg">🤖</span>
-                  <div className="text-left">
-                    <div className="text-xs opacity-70 leading-none">Disponible sur</div>
-                    <div className="text-sm font-extrabold leading-tight">Google Play</div>
-                  </div>
-                </a>
+              {/* App buttons */}
+              <div className="space-y-2">
+                {[
+                  { label: 'App Store',    sub: 'Disponible sur' },
+                  { label: 'Google Play',  sub: 'Disponible sur' },
+                ].map(app => (
+                  <a key={app.label} href="#"
+                    className="flex items-center gap-2.5 bg-gray-800 hover:bg-gray-700 px-3 py-2.5 rounded-xl transition-colors w-fit">
+                    <Play size={16} className="text-gray-400" />
+                    <div>
+                      <div className="text-gray-500 text-xs leading-none">{app.sub}</div>
+                      <div className="text-white font-extrabold text-sm leading-tight">{app.label}</div>
+                    </div>
+                  </a>
+                ))}
               </div>
             </div>
-
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t-2 border-duo-border bg-duo-gray">
+        <div className="border-t border-gray-800">
           <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-duo-muted text-xs font-bold">
-              © 2025 Lingua. Tous droits réservés.
-            </p>
-            <div className="flex items-center gap-4 flex-wrap justify-center">
-              {[
-                'Politique de confidentialité',
-                'Conditions d\'utilisation',
-                'Cookies',
-                'Mentions légales',
-                'Accessibilité',
-              ].map(l => (
-                <a key={l} href="#" className="text-duo-muted hover:text-duo-green text-xs font-bold transition-colors">
-                  {l}
-                </a>
+            <p className="text-gray-500 text-xs font-bold">© 2026 LinguaAI. Tous droits réservés.</p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              {['Confidentialité','Conditions','Cookies','Mentions légales'].map(l => (
+                <a key={l} href="#" className="text-gray-500 hover:text-gray-300 text-xs font-bold transition-colors">{l}</a>
               ))}
             </div>
-            {/* Language switcher */}
-            <div className="flex items-center gap-1.5 text-duo-muted text-xs font-bold">
-              <span>🌍</span>
-              <select className="bg-transparent text-xs font-bold text-duo-muted focus:outline-none cursor-pointer">
+            <div className="flex items-center gap-2">
+              <Globe size={13} className="text-gray-500" />
+              <select className="bg-transparent text-xs font-bold text-gray-500 focus:outline-none cursor-pointer">
                 <option>Français</option>
                 <option>English</option>
                 <option>Español</option>
-                <option>Deutsch</option>
               </select>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* ════ MODAL AUTH ═════════════════════════════════════════════════ */}
+      {/* ════ MODAL AUTH ════════════════════════════════════════════════════ */}
       {modal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={closeModal}>
-          <div className="bg-white rounded-duo-lg w-full max-w-md shadow-2xl animate-slide-up"
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
             onClick={e => e.stopPropagation()}>
 
-            {/* Modal header */}
-            <div className="p-6 pb-0 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-black text-duo-text">
-                  {modal === 'login' ? 'Connexion' : 'Créer un compte'}
-                </h2>
-                <p className="text-duo-muted font-semibold text-sm mt-0.5">
-                  {modal === 'login' ? 'Reprenez votre apprentissage' : 'Commencez à apprendre gratuitement'}
-                </p>
-              </div>
-              <button onClick={closeModal}
-                className="p-2 hover:bg-duo-gray rounded-full transition-colors text-duo-muted hover:text-duo-text">
-                <X size={20} />
-              </button>
-            </div>
+            {/* Modal top gradient */}
+            <div className="h-1.5 w-full"
+              style={{ background: 'linear-gradient(90deg,#58cc02,#a855f7,#1cb0f6)' }} />
 
-            <div className="p-6 space-y-4">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-black text-gray-800">
+                    {modal === 'login' ? 'Connexion' : 'Créer un compte'}
+                  </h2>
+                  <p className="text-gray-400 font-semibold text-sm mt-1">
+                    {modal === 'login'
+                      ? 'Reprenez votre apprentissage là où vous vous êtes arrêté'
+                      : 'Commencez à apprendre gratuitement aujourd\'hui'}
+                  </p>
+                </div>
+                <button onClick={closeModal}
+                  className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-400 transition-colors shrink-0">
+                  <X size={16} />
+                </button>
+              </div>
+
               {/* Alerts */}
               {error && (
-                <div className="bg-duo-red-bg border-2 border-red-200 text-duo-red text-sm font-bold px-4 py-3 rounded-duo">
-                  ⚠️ {error}
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm font-semibold px-4 py-3 rounded-xl mb-4">
+                  <AlertCircle size={15} className="shrink-0" /> {error}
                 </div>
               )}
               {success && (
-                <div className="bg-duo-green-bg border-2 border-green-200 text-duo-green text-sm font-bold px-4 py-3 rounded-duo flex items-center gap-2">
-                  <CheckCircle size={15} /> {success}
+                <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-semibold px-4 py-3 rounded-xl mb-4">
+                  <CheckCircle size={15} className="shrink-0" /> {success}
                 </div>
               )}
 
-              {/* ── Login form ── */}
+              {/* Login form */}
               {modal === 'login' && (
-                <form onSubmit={handleLogin} className="space-y-3">
-                  <FieldLabel label="Email">
-                    <input type="email" placeholder="votre@email.com" required className="duo-input"
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <FieldLabel label="Adresse email">
+                    <input type="email" placeholder="votre@email.com" required
+                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
                       value={loginForm.email}
                       onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} />
                   </FieldLabel>
@@ -537,23 +628,26 @@ export default function Home() {
                       toggle={() => setShowPwd(!showPwd)} />
                   </FieldLabel>
                   <button type="submit" disabled={loading}
-                    className="duo-btn duo-btn-green w-full text-sm py-3.5 mt-2">
-                    {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                    {loading ? 'CHARGEMENT...' : 'SE CONNECTER'}
+                    className="w-full py-3.5 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
+                    style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
+                    {loading ? 'Connexion…' : 'Se connecter'}
                   </button>
                 </form>
               )}
 
-              {/* ── Register form ── */}
+              {/* Register form */}
               {modal === 'register' && (
                 <form onSubmit={handleRegister} className="space-y-3">
                   <FieldLabel label="Nom d'utilisateur">
-                    <input type="text" placeholder="jean_dupont" required className="duo-input"
+                    <input type="text" placeholder="jean_dupont" required
+                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
                       value={regForm.username}
                       onChange={e => setRegForm({ ...regForm, username: e.target.value })} />
                   </FieldLabel>
-                  <FieldLabel label="Email">
-                    <input type="email" placeholder="votre@email.com" required className="duo-input"
+                  <FieldLabel label="Adresse email">
+                    <input type="email" placeholder="votre@email.com" required
+                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
                       value={regForm.email}
                       onChange={e => setRegForm({ ...regForm, email: e.target.value })} />
                   </FieldLabel>
@@ -564,40 +658,52 @@ export default function Home() {
                   </FieldLabel>
                   <div className="grid grid-cols-2 gap-3">
                     <FieldLabel label="Langue maternelle">
-                      <select className="duo-select" value={regForm.native_language}
+                      <select className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                        value={regForm.native_language}
                         onChange={e => setRegForm({ ...regForm, native_language: e.target.value })}>
                         {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                       </select>
                     </FieldLabel>
                     <FieldLabel label="Langue cible">
-                      <select className="duo-select" value={regForm.target_language}
+                      <select className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                        value={regForm.target_language}
                         onChange={e => setRegForm({ ...regForm, target_language: e.target.value })}>
                         {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                       </select>
                     </FieldLabel>
                   </div>
                   <FieldLabel label="Niveau actuel">
-                    <select className="duo-select" value={regForm.level}
-                      onChange={e => setRegForm({ ...regForm, level: e.target.value })}>
-                      <option value="debutant">🟢 Débutant</option>
-                      <option value="intermediaire">🟡 Intermédiaire</option>
-                      <option value="avance">🔴 Avancé</option>
-                    </select>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { v: 'debutant',       l: 'Débutant',      color: 'border-green-400 bg-green-50 text-green-700'  },
+                        { v: 'intermediaire',  l: 'Intermédiaire', color: 'border-amber-400 bg-amber-50 text-amber-700'  },
+                        { v: 'avance',         l: 'Avancé',        color: 'border-red-400 bg-red-50 text-red-700'        },
+                      ].map(opt => (
+                        <button key={opt.v} type="button"
+                          onClick={() => setRegForm({ ...regForm, level: opt.v })}
+                          className={`py-2.5 rounded-xl border-2 font-extrabold text-xs transition-all ${
+                            regForm.level === opt.v ? opt.color : 'border-gray-200 text-gray-400 hover:border-gray-300'
+                          }`}>
+                          {opt.l}
+                        </button>
+                      ))}
+                    </div>
                   </FieldLabel>
                   <button type="submit" disabled={loading}
-                    className="duo-btn duo-btn-green w-full text-sm py-3.5 mt-2">
-                    {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                    {loading ? 'CHARGEMENT...' : 'CRÉER MON COMPTE'}
+                    className="w-full py-3.5 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 mt-1 disabled:opacity-60"
+                    style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
+                    {loading ? 'Création…' : 'Créer mon compte'}
                   </button>
                 </form>
               )}
 
-              {/* Switch link */}
-              <p className="text-center text-duo-muted font-bold text-sm pt-1">
-                {modal === 'login' ? "Pas de compte ? " : "Déjà inscrit ? "}
+              {/* Switch */}
+              <p className="text-center text-gray-400 font-semibold text-sm mt-4">
+                {modal === 'login' ? "Pas encore de compte ? " : "Déjà inscrit ? "}
                 <button onClick={modal === 'login' ? openRegister : openLogin}
-                  className="text-duo-blue hover:underline font-extrabold">
-                  {modal === 'login' ? "S'INSCRIRE" : "SE CONNECTER"}
+                  className="text-green-600 hover:text-green-700 font-extrabold transition-colors">
+                  {modal === 'login' ? "S'inscrire" : "Se connecter"}
                 </button>
               </p>
             </div>
@@ -608,11 +714,10 @@ export default function Home() {
   )
 }
 
-/* ── Shared mini-components ────────────────────────────────────────────── */
 function FieldLabel({ label, children }) {
   return (
     <div>
-      <label className="block text-xs font-extrabold text-duo-muted uppercase tracking-wide mb-1.5">
+      <label className="block text-xs font-extrabold text-gray-500 uppercase tracking-wide mb-1.5">
         {label}
       </label>
       {children}
@@ -624,10 +729,10 @@ function PwdInput({ value, onChange, show, toggle }) {
   return (
     <div className="relative">
       <input type={show ? 'text' : 'password'} placeholder="••••••••" required
-        className="duo-input pr-11"
+        className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
         value={value} onChange={e => onChange(e.target.value)} />
       <button type="button" onClick={toggle}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-duo-muted hover:text-duo-text transition-colors">
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
         {show ? <EyeOff size={17} /> : <Eye size={17} />}
       </button>
     </div>
