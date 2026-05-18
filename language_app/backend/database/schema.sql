@@ -45,6 +45,35 @@ CREATE TABLE IF NOT EXISTS user_stats (
     total_conversations INT DEFAULT 0,
     total_words_learned INT DEFAULT 0,
     last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    streak_days INT DEFAULT 0,
+    last_activity_date DATE DEFAULT NULL,
+    xp_total INT DEFAULT 0,
+    exercises_completed INT DEFAULT 0,
+    dictation_completed INT DEFAULT 0,
+    flashcards_reviewed INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Vocabulary table
+CREATE TABLE IF NOT EXISTS vocabulary (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    word VARCHAR(100) NOT NULL,
+    translation VARCHAR(100) NOT NULL,
+    language VARCHAR(5) NOT NULL,
+    category VARCHAR(50) DEFAULT 'General',
+    difficulty_level ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
+    times_practiced INT DEFAULT 0,
+    times_correct INT DEFAULT 0,
+    mastered BOOLEAN DEFAULT FALSE,
+    last_practiced TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    first_learned TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    srs_interval INT DEFAULT 1,
+    srs_ease_factor FLOAT DEFAULT 2.5,
+    next_review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_word_lang (user_id, word, language),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -54,3 +83,5 @@ CREATE INDEX idx_user_username ON users(username);
 CREATE INDEX idx_conversation_user ON conversations(user_id);
 CREATE INDEX idx_message_conversation ON messages(conversation_id);
 CREATE INDEX idx_stats_user ON user_stats(user_id);
+CREATE INDEX idx_vocab_user ON vocabulary(user_id);
+CREATE INDEX idx_vocab_review ON vocabulary(user_id, next_review_date);

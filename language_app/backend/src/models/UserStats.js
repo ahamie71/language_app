@@ -27,6 +27,30 @@ const UserStats = sequelize.define('UserStats', {
   last_activity: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
+  },
+  streak_days: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  last_activity_date: {
+    type: DataTypes.DATEONLY,
+    defaultValue: null
+  },
+  xp_total: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  exercises_completed: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  dictation_completed: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  flashcards_reviewed: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   }
 }, {
   tableName: 'user_stats',

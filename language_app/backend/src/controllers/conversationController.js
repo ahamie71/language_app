@@ -130,17 +130,20 @@ exports.processUserMessage = async (req, res) => {
       console.error('Vocabulary extraction error:', err)
     );
 
-    // Process with AI: translate, explain, and generate response
-    const [translation, explanation, aiResponse] = await Promise.allSettled([
+    // Process with AI: translate and generate response first
+    const [translation, aiResponse] = await Promise.allSettled([
       aiService.translate(original_text, user.native_language, user.target_language),
-      aiService.getExplanation(original_text, user.target_language, user.level),
       aiService.generateResponse(original_text, [], user.target_language)
     ]);
 
     // Extract results
     const translatedText = translation.status === 'fulfilled' ? translation.value : null;
-    const explanationText = explanation.status === 'fulfilled' ? explanation.value : null;
     const responseText = aiResponse.status === 'fulfilled' ? aiResponse.value : null;
+
+    // Explain the AI's target-language response (what the user is learning), not the user's input
+    const explanationText = responseText
+      ? await aiService.getExplanation(responseText, user.target_language, user.level)
+      : null;
 
     // Extract vocabulary from AI response (async, don't wait)
     // AI responds in target language, so extract with target_language

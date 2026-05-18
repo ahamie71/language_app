@@ -6,5 +6,6 @@ const userController = require('../controllers/userController');
 router.get('/me', authMiddleware, userController.getProfile);
 router.put('/me', authMiddleware, userController.updateProfile);
 router.get('/stats', authMiddleware, userController.getStats);
+router.post('/activity', authMiddleware, userController.recordActivity);
 
 module.exports = router;
