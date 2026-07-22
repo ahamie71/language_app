@@ -37,7 +37,7 @@ export default function Conversation() {
   const audioChunksRef   = useRef([])
 
   const msgCount = messages.filter(m => m.role === 'user').length
-  const GOAL     = 5
+  const GOAL     = 20
   const progress = Math.min(100, Math.round((msgCount / GOAL) * 100))
 
   /* ── Init ── */
@@ -91,7 +91,7 @@ export default function Conversation() {
         setIsTranscribing(true)
         try {
           const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
-          const result = await transcribeAudio(blob)
+          const result = await transcribeAudio(blob, user?.native_language || 'en')
           if (result.text) setInput(result.text)
         } catch (e) {
           console.error('Transcription error:', e)

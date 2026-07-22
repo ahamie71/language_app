@@ -56,12 +56,17 @@ export default function Register() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const data = await register(form)
-    setLoading(false)
-    if (data.user_id) {
-      navigate('/login')
-    } else {
-      setError(data.detail || "Erreur lors de l'inscription")
+    try {
+      const data = await register(form)
+      if (data.user_id) {
+        navigate('/login')
+      } else {
+        setError(data.error || data.detail || "Erreur lors de l'inscription")
+      }
+    } catch {
+      setError("Impossible de contacter le serveur. Vérifiez votre connexion.")
+    } finally {
+      setLoading(false)
     }
   }
 

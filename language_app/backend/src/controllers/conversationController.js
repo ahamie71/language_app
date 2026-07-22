@@ -130,20 +130,22 @@ exports.processUserMessage = async (req, res) => {
       console.error('Vocabulary extraction error:', err)
     );
 
-    // Process with AI: translate and generate response first
-    const [translation, aiResponse] = await Promise.allSettled([
-      aiService.translate(original_text, user.native_language, user.target_language),
-      aiService.generateResponse(original_text, [], user.target_language)
+    // Generate the coach's reply in the target language first, since the
+    // translation and explanation below both depend on its content.
+    const aiResponse = await aiService.generateResponse(original_text, [], user.target_language)
+      .catch(err => { console.error('Response generation error:', err.message); return null; });
+    const responseText = aiResponse;
+
+    // Translate the AI's reply into the user's native language ("Traduction IA"
+    // helper text), and explain it — both describe the assistant's message,
+    // not the user's own input.
+    const [translation, explanation] = await Promise.allSettled([
+      responseText ? aiService.translate(responseText, user.target_language, user.native_language) : Promise.resolve(null),
+      responseText ? aiService.getExplanation(responseText, user.target_language, user.level) : Promise.resolve(null)
     ]);
 
-    // Extract results
     const translatedText = translation.status === 'fulfilled' ? translation.value : null;
-    const responseText = aiResponse.status === 'fulfilled' ? aiResponse.value : null;
-
-    // Explain the AI's target-language response (what the user is learning), not the user's input
-    const explanationText = responseText
-      ? await aiService.getExplanation(responseText, user.target_language, user.level)
-      : null;
+    const explanationText = explanation.status === 'fulfilled' ? explanation.value : null;
 
     // Extract vocabulary from AI response (async, don't wait)
     // AI responds in target language, so extract with target_language
