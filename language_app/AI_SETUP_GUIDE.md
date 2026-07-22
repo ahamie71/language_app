@@ -1,10 +1,14 @@
 # Guide d'installation - Fonctionnalités AI
 
+## 3.3.1. Mise en place de la retranscription
 ## 3.3.2. Mise en place de la traduction
 ## 3.3.3. Mise en place de la lecture de la traduction
 ## 3.3.4. Mise en place des explications
 
-### Étape 1: Installer Python et les dépendances
+Tous les modèles IA tournent **en local, sur CPU, gratuitement** — aucune clé
+API, aucun compte externe, aucun coût, aucune limite d'appels.
+
+### Étape 1: Installer Python, ffmpeg et les dépendances
 
 ```bash
 # Aller dans le dossier ai_service
@@ -20,29 +24,31 @@ venv\Scripts\activate
 # Sur Linux/Mac:
 source venv/bin/activate
 
-# Installer les dépendances
+# Installer les dépendances (télécharge torch, transformers, vosk, coqui-tts...)
 pip install -r requirements.txt
 ```
 
-### Étape 2: Configurer la clé OpenAI
+ffmpeg est requis pour la transcription (conversion audio) :
+- Windows : télécharger sur https://ffmpeg.org et l'ajouter au PATH
+- Linux/Mac : `apt-get install ffmpeg` / `brew install ffmpeg`
+- Avec Docker : déjà inclus dans le `Dockerfile`, rien à faire
 
-1. Créer un compte sur https://platform.openai.com
-2. Obtenir une clé API
-3. Modifier le fichier `ai_service/.env` :
-```
-OPENAI_API_KEY=sk-votre_clé_api_ici
-```
-
-### Étape 3: Démarrer le service AI Python
+### Étape 2: Démarrer le service AI Python
 
 ```bash
 # Dans le dossier ai_service (environnement activé)
 python app.py
 ```
 
-Le service AI démarrera sur `http://localhost:5000`
+Le service AI démarrera sur `http://localhost:5000`. Au premier appel de
+chaque fonctionnalité, le modèle correspondant se télécharge automatiquement
+puis reste en cache pour les appels suivants :
+- NLLB-200 (traduction) : ~2.4 Go
+- Qwen2.5-1.5B-Instruct (explications/conversation/exercices) : ~3 Go
+- Vosk (transcription) : ~50-300 Mo par langue
+- Coqui TTS (lecture) : ~100-200 Mo par langue
 
-### Étape 4: Démarrer le backend Node.js
+### Étape 3: Démarrer le backend Node.js
 
 ```bash
 # Dans un autre terminal, aller dans le dossier backend
@@ -57,7 +63,7 @@ npm start
 
 Le backend démarrera sur `http://localhost:import.meta.env.VITE_API_URL`
 
-### Étape 5: Démarrer le frontend React
+### Étape 4: Démarrer le frontend React
 
 ```bash
 # Dans un autre terminal, aller dans le dossier frontend
@@ -77,11 +83,8 @@ Le frontend sera disponible sur `http://localhost:5173`
 ### Tester le service AI
 
 ```bash
-# Dans un navigateur ou avec curl
 curl http://localhost:5000/health
 ```
-
-Devrait retourner: `{"status": "healthy", "service": "AI Language Service"}`
 
 ### Tester la traduction
 
@@ -101,34 +104,38 @@ curl -X POST http://localhost:5000/explain \
 
 ## Fonctionnalités implémentées
 
+### ✅ 3.3.1 Retranscription (Speech-to-Text)
+- Transcrit un enregistrement micro en texte
+- Utilise Vosk, en local, un modèle par langue
+- Supporte: FR, EN, ES, DE, AR, IT, PT, ZH, JA
+
 ### ✅ 3.3.2 Traduction
 - Traduction automatique entre langues
-- Utilise OpenAI GPT-3.5-turbo
+- Utilise NLLB-200 (Meta), en local
 - Supporte: FR, EN, ES, DE, AR, IT, PT, ZH, JA
 
 ### ✅ 3.3.3 Lecture de la traduction (Text-to-Speech)
 - Bouton audio sur chaque message
-- Utilise l'API SpeechSynthesis du navigateur
-- Vitesse réduite pour l'apprentissage (0.9x)
-- Support multilingue
+- Utilise Coqui TTS en local pour FR, EN, ES, DE, IT, PT
+- Bascule sur l'API SpeechSynthesis du navigateur pour AR, ZH, JA (pas de
+  modèle Coqui disponible pour ces langues)
 
 ### ✅ 3.3.4 Explications
-- Explications grammaticales détaillées
-- Notes de vocabulaire
-- Contexte culturel
-- Conseils d'utilisation
+- Explications grammaticales détaillées, notes de vocabulaire, contexte culturel
+- Coach conversationnel et génération d'exercices QCM
+- Utilise Qwen2.5-1.5B-Instruct, en local
 - Adapté au niveau (débutant, intermédiaire, avancé)
 
 ## Architecture
 
 ```
-Frontend (React) 
+Frontend (React)
     ↓
 Backend (Node.js + Express) :import.meta.env.VITE_API_URL
     ↓
 AI Service (Python + Flask) :5000
     ↓
-OpenAI API (GPT-3.5-turbo)
+Modèles locaux (NLLB-200, Qwen2.5-1.5B, Vosk, Coqui TTS — tous gratuits, CPU)
 ```
 
 ## Dépannage
@@ -138,9 +145,12 @@ OpenAI API (GPT-3.5-turbo)
 - Vérifier que l'environnement virtuel est activé
 - Vérifier les dépendances: `pip list`
 
-### Erreur de clé API
-- Vérifier que OPENAI_API_KEY est configuré dans `.env`
-- Vérifier que la clé est valide sur platform.openai.com
+### La transcription échoue
+- Vérifier que ffmpeg est installé et dans le PATH: `ffmpeg -version`
+
+### Le premier appel est très lent
+- Normal : le modèle se télécharge (quelques Go) puis se charge en mémoire.
+  Les appels suivants sont rapides (quelques secondes).
 
 ### Le frontend ne reçoit pas les réponses
 - Vérifier que les 3 services tournent (AI, Backend, Frontend)

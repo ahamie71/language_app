@@ -5,6 +5,11 @@ import { generateDictationText, transcribeAudio, checkPronunciation, speakText, 
 import { useAuth } from '../contexts/AuthContext'
 import BottomNav from '../components/BottomNav'
 
+const LANG_LOCALE = {
+  fr:'fr-FR', en:'en-US', us:'en-US', es:'es-ES', de:'de-DE',
+  ar:'ar-SA', it:'it-IT', pt:'pt-BR', zh:'zh-CN', ja:'ja-JP',
+}
+
 const STEPS = { READY: 'ready', LISTENING: 'listening', RECORDING: 'recording', CHECKING: 'checking', RESULT: 'result' }
 
 export default function Dictation() {
@@ -48,7 +53,12 @@ export default function Dictation() {
       a.play()
       a.onended = () => URL.revokeObjectURL(url)
     } catch {
-      // TTS unavailable — user types manually
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+        const u = new SpeechSynthesisUtterance(dictText)
+        u.lang = LANG_LOCALE[user?.target_language] || 'en-US'; u.rate = 0.85
+        window.speechSynthesis.speak(u)
+      }
     }
   }
 
@@ -64,7 +74,7 @@ export default function Dictation() {
         stream.getTracks().forEach(t => t.stop())
         setStep(STEPS.CHECKING)
         try {
-          const { text } = await transcribeAudio(blob)
+          const { text } = await transcribeAudio(blob, user?.target_language || 'en')
           setUserText(text || '')
           await checkAnswer(text || '')
         } catch {

@@ -182,10 +182,11 @@ export const deleteWord = async (wordId) => {
 // AI — SPEECH (3.3.1 + 3.3.3)
 // =========================
 
-/** 3.3.1 — Retranscription : envoie un blob audio à Whisper, retourne le texte */
-export const transcribeAudio = async (audioBlob) => {
+/** 3.3.1 — Retranscription : envoie un blob audio à Vosk, retourne le texte */
+export const transcribeAudio = async (audioBlob, language = "en") => {
   const formData = new FormData();
   formData.append("audio", audioBlob, "audio.webm");
+  formData.append("language", language);
   const res = await fetch(`${AI_URL}/transcribe`, {
     method: "POST",
     body: formData,
