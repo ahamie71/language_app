@@ -9,3 +9,7 @@
 
 Package-lock.json
 package.json
+# Documents personnels (mémoire) - pas destinés au dépôt
+MEMOIRE_*.md
+MEMOIRE_*.docx
+~$*.docx
