@@ -78,7 +78,7 @@ def get_nllb():
         from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
         print(f"⏳ Chargement de {NLLB_MODEL} (traduction)...")
         _nllb_tokenizer = AutoTokenizer.from_pretrained(NLLB_MODEL)
-        _nllb_model = AutoModelForSeq2SeqLM.from_pretrained(NLLB_MODEL)
+        _nllb_model = AutoModelForSeq2SeqLM.from_pretrained(NLLB_MODEL, low_cpu_mem_usage=False)
         print("✅ NLLB-200 chargé")
     return _nllb_model, _nllb_tokenizer
 
@@ -198,7 +198,10 @@ def get_llm():
     if _llm_pipeline is None:
         from transformers import pipeline
         print(f"⏳ Chargement de {LOCAL_LLM_MODEL} (premier appel, peut prendre plusieurs minutes)...")
-        _llm_pipeline = pipeline("text-generation", model=LOCAL_LLM_MODEL, device_map="cpu")
+        _llm_pipeline = pipeline(
+            "text-generation", model=LOCAL_LLM_MODEL, device=-1,
+            model_kwargs={"low_cpu_mem_usage": False},
+        )
         print("✅ Modèle local chargé")
     return _llm_pipeline
 
@@ -505,6 +508,37 @@ def speak():
     })
 
 
+_EXERCISE_PLACEHOLDER_TOKENS = {
+    "...", "..", ".", "option", "opt1", "opt2", "opt3", "opt4",
+    "explanation", "correct", "question", "answer", "n/a", "none",
+}
+
+
+def _is_valid_exercise(parsed):
+    """Rejette les générations où le petit LLM local a recopié les
+    placeholders du prompt (ex: "..." ou "explanation") au lieu de
+    produire de vrais mots — un mode d'échec observé en pratique."""
+    options = parsed.get("options")
+    correct = parsed.get("correct")
+    question = str(parsed.get("question", "")).strip()
+    explanation = str(parsed.get("explanation", "")).strip()
+
+    if not isinstance(options, list) or len(options) != 4:
+        return False
+    if not isinstance(correct, int) or not (0 <= correct < 4):
+        return False
+    if len(question) < 3 or len(explanation) < 3:
+        return False
+
+    cleaned = [str(o).strip().strip("<>").lower() for o in options]
+    if any(not c or c in _EXERCISE_PLACEHOLDER_TOKENS for c in cleaned):
+        return False
+    if len(set(cleaned)) != len(cleaned):
+        return False
+
+    return True
+
+
 @app.route("/exercise", methods=["POST"])
 def exercise():
     """Génère un exercice QCM dans la langue cible via Mistral-7B-Instruct (local, gratuit)."""
@@ -543,7 +577,7 @@ def exercise():
             json_str = _re.sub(r",(\s*[}\]])", r"\1", match.group(0))  # virgules finales
             try:
                 parsed = _json.loads(json_str)
-                if all(k in parsed for k in ("question", "options", "correct", "explanation")):
+                if all(k in parsed for k in ("question", "options", "correct", "explanation")) and _is_valid_exercise(parsed):
                     return jsonify(parsed)
             except Exception:
                 pass

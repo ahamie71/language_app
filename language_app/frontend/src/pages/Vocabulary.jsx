@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Trash2, CheckCircle, Circle, Loader2, Plus, Layers, Download } from 'lucide-react'
+import { Search, Trash2, CheckCircle, Circle, Loader2, Plus, Layers, Download, BookOpen, FileQuestion } from 'lucide-react'
 import { getVocabulary, deleteWord, getDueVocabulary, exportVocabulary } from '../services/api'
 import BottomNav from '../components/BottomNav'
+import { scoreColorClass, scoreBarClass } from '../utils/stats'
 
 const DIFF = {
   easy:   { label:'Facile',    cls:'bg-duo-green-bg text-duo-green border-green-200' },
@@ -52,7 +53,7 @@ export default function Vocabulary() {
   if (loading) return (
     <div className="flex items-center justify-center h-screen bg-duo-gray font-duo">
       <div className="text-center">
-        <span className="text-6xl block mb-4 animate-float">📚</span>
+        <BookOpen size={48} className="text-duo-green mx-auto mb-4 animate-float" />
         <p className="text-duo-muted font-bold">Chargement...</p>
       </div>
     </div>
@@ -65,7 +66,9 @@ export default function Vocabulary() {
       <header className="bg-white border-b-2 border-duo-border sticky top-0 z-20">
         <div className="max-w-lg mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-1">
-            <h1 className="text-xl font-black text-duo-text">📚 Mon Vocabulaire</h1>
+            <h1 className="text-xl font-black text-duo-text flex items-center gap-2">
+              <BookOpen size={20} className="text-duo-green" /> Mon Vocabulaire
+            </h1>
             <button onClick={handleExport} disabled={exporting || words.length === 0}
               className="flex items-center gap-1 text-duo-muted hover:text-duo-green font-extrabold text-xs transition-colors disabled:opacity-40">
               {exporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
@@ -132,7 +135,7 @@ export default function Vocabulary() {
             <button key={v} onClick={() => setFilter(v)}
               className={`flex-1 py-2.5 rounded-duo text-xs font-extrabold uppercase tracking-wide border-b-4 transition-all ${
                 filter === v
-                  ? 'bg-duo-green text-white border-duo-green-d'
+                  ? 'bg-duo-green text-duo-black border-duo-green-d'
                   : 'bg-white text-duo-muted border-duo-border'
               }`}>
               {l}
@@ -143,7 +146,7 @@ export default function Vocabulary() {
         {/* ── Empty ── */}
         {filtered.length === 0 && (
           <div className="text-center py-12">
-            <span className="text-6xl block mb-4">📝</span>
+            <FileQuestion size={48} className="text-duo-border mx-auto mb-4" />
             <p className="font-extrabold text-duo-text mb-1">
               {words.length === 0 ? 'Aucun mot pour l\'instant' : 'Aucun résultat'}
             </p>
@@ -188,8 +191,8 @@ export default function Vocabulary() {
                       </span>
                     )}
                     {word.mastered && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-duo-green text-white font-extrabold">
-                        ✓ Maîtrisé
+                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-duo-green text-duo-black font-extrabold">
+                        <CheckCircle size={12} /> Maîtrisé
                       </span>
                     )}
                   </div>
@@ -205,14 +208,13 @@ export default function Vocabulary() {
                         <span className="text-xs font-bold text-duo-muted">
                           {word.times_correct}/{word.times_practiced} correct
                         </span>
-                        <span className={`text-xs font-extrabold ${accuracy >= 80 ? 'text-duo-green' : accuracy >= 50 ? 'text-duo-orange' : 'text-duo-red'}`}>
+                        <span className={`text-xs font-extrabold ${scoreColorClass(accuracy)}`}>
                           {accuracy}%
                         </span>
                       </div>
                       <div className="h-2 bg-duo-border rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all ${
-                          accuracy >= 80 ? 'bg-duo-green' : accuracy >= 50 ? 'bg-duo-orange' : 'bg-duo-red'
-                        }`} style={{ width: `${accuracy}%` }} />
+                        <div className={`h-full rounded-full transition-all ${scoreBarClass(accuracy)}`}
+                          style={{ width: `${accuracy}%` }} />
                       </div>
                     </div>
                   )}

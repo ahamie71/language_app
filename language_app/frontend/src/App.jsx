@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Loader2 } from 'lucide-react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Landing      from './pages/Home'
 import Dashboard    from './pages/Dashboard'
@@ -16,7 +17,7 @@ import Progress     from './pages/Progress'
 function Spinner() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-duo-gray font-duo gap-4">
-      <span className="text-7xl animate-float">🦉</span>
+      <Loader2 size={40} className="animate-spin text-duo-green" />
       <p className="text-duo-muted font-bold text-sm">Chargement...</p>
     </div>
   )

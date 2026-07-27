@@ -8,17 +8,9 @@ import {
 import { getStats, getVocabulary } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import BottomNav from '../components/BottomNav'
-
-const LANG_NAMES = {
-  fr:'Français', en:'Anglais', us:'Anglais', es:'Espagnol', de:'Allemand',
-  ar:'Arabe', it:'Italien', pt:'Portugais', zh:'Chinois', ja:'Japonais',
-}
-
-const LEVEL_INFO = {
-  debutant:      { label:'Débutant',      color:'text-emerald-600', bg:'bg-emerald-50', border:'border-emerald-200' },
-  intermediaire: { label:'Intermédiaire', color:'text-amber-600',   bg:'bg-amber-50',   border:'border-amber-200'   },
-  avance:        { label:'Avancé',        color:'text-rose-600',    bg:'bg-rose-50',    border:'border-rose-200'    },
-}
+import { LANG_NAMES } from '../constants/languages'
+import { LEVEL_INFO } from '../constants/levels'
+import { getXp, getMasteredCount } from '../utils/stats'
 
 const BADGES = [
   { cond: c => c.convs    >= 1,  icon: MessageCircle, label: 'Premier échange',    color: 'text-blue-500'    },
@@ -53,8 +45,8 @@ export default function Profile() {
   }, [])
 
   const level     = LEVEL_INFO[user?.level] || LEVEL_INFO.debutant
-  const xp        = stats?.xp_total || (stats?.total_messages ? stats.total_messages * 10 : 0)
-  const mastered  = stats?.mastered_words ?? vocab.filter(w => w.mastered).length
+  const xp        = getXp(stats)
+  const mastered  = getMasteredCount(stats, vocab)
   const convs     = stats?.total_conversations  || 0
   const messages  = stats?.total_messages       || 0
   const words     = stats?.total_words_learned  || 0
@@ -101,10 +93,10 @@ export default function Profile() {
           <div className="lg:col-span-1 space-y-5">
 
             {/* Carte identité */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="duo-card p-0 overflow-hidden">
               <div className="h-2 bg-gradient-to-r from-duo-green to-emerald-400" />
               <div className="p-6 text-center">
-                <div className="w-24 h-24 rounded-2xl bg-duo-green flex items-center justify-center text-4xl font-black text-white mx-auto mb-4 shadow-md">
+                <div className="w-24 h-24 rounded-2xl bg-duo-green flex items-center justify-center text-4xl font-black text-duo-black mx-auto mb-4 shadow-md">
                   {user?.username?.[0]?.toUpperCase() ?? <User size={36} />}
                 </div>
                 <h2 className="text-2xl font-black text-duo-text">{user?.username}</h2>
@@ -133,14 +125,14 @@ export default function Profile() {
 
             {/* Streak + XP */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+              <div className="duo-card text-center">
                 <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center mx-auto mb-3">
                   <Flame size={24} className="text-orange-500" />
                 </div>
                 <div className="text-3xl font-black text-duo-text">{streak}</div>
                 <div className="text-xs font-bold text-duo-muted mt-1">Jours de suite</div>
               </div>
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+              <div className="duo-card text-center">
                 <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mx-auto mb-3">
                   <Zap size={24} className="text-violet-500" />
                 </div>
@@ -154,7 +146,7 @@ export default function Profile() {
           <div className="lg:col-span-2 space-y-5">
 
             {/* Statistiques */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="duo-card p-6">
               <div className="flex items-center gap-2 mb-6">
                 <BarChart2 size={18} className="text-duo-muted" />
                 <h3 className="font-extrabold text-duo-text uppercase text-xs tracking-widest">Statistiques</h3>
@@ -184,7 +176,7 @@ export default function Profile() {
             </div>
 
             {/* Badges */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="duo-card p-6">
               <div className="flex items-center gap-2 mb-6">
                 <Star size={18} className="text-duo-muted" />
                 <h3 className="font-extrabold text-duo-text uppercase text-xs tracking-widest">Badges</h3>

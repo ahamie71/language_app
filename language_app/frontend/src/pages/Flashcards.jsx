@@ -70,7 +70,7 @@ export default function Flashcards() {
         </div>
       </header>
       <div className="flex flex-col items-center justify-center h-64 text-center px-6">
-        <span className="text-6xl mb-4">🎉</span>
+        <Trophy size={48} className="text-duo-green mb-4" />
         <p className="font-extrabold text-duo-text text-lg mb-2">Aucune carte à réviser !</p>
         <p className="text-duo-muted font-semibold text-sm mb-6">
           Toutes vos cartes sont à jour. Revenez plus tard ou faites plus de conversations pour en ajouter.
@@ -98,7 +98,7 @@ export default function Flashcards() {
         </header>
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
           <div className="w-24 h-24 rounded-full bg-duo-green flex items-center justify-center mb-6 shadow-lg">
-            <Trophy size={40} className="text-white" />
+            <Trophy size={40} className="text-duo-black" />
           </div>
           <h2 className="text-3xl font-black text-duo-text mb-1">{pct}%</h2>
           <p className="text-duo-muted font-semibold mb-2">{correct}/{results.length} cartes correctes</p>
@@ -179,10 +179,10 @@ export default function Flashcards() {
             {/* Back */}
             <div style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', position: 'absolute', inset: 0 }}
               className="bg-duo-green rounded-2xl border-2 border-duo-green shadow-lg flex flex-col items-center justify-center p-8">
-              <div className="text-xs font-extrabold text-white opacity-70 uppercase tracking-widest mb-4">Traduction</div>
-              <div className="text-4xl font-black text-white mb-3">{current?.translation}</div>
+              <div className="text-xs font-extrabold text-duo-black opacity-70 uppercase tracking-widest mb-4">Traduction</div>
+              <div className="text-4xl font-black text-duo-black mb-3">{current?.translation}</div>
               {current?.times_practiced > 0 && (
-                <div className="text-white opacity-70 text-sm font-semibold">
+                <div className="text-duo-black opacity-70 text-sm font-semibold">
                   Taux de réussite : {Math.round((current.times_correct / current.times_practiced) * 100)}%
                 </div>
               )}

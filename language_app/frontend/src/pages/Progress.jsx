@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, Flame, Zap, BookOpen, MessageCircle, CheckCircle, PenLine, Mic } from 'lucide-react'
+import { ChevronLeft, Flame, Zap, BookOpen, MessageCircle, CheckCircle, PenLine, Mic, BarChart3 } from 'lucide-react'
 import { getStats, getVocabulary } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import BottomNav from '../components/BottomNav'
-
-const LANG_NAMES = {
-  fr:'Français', en:'Anglais', es:'Espagnol', de:'Allemand',
-  ar:'Arabe', it:'Italien', pt:'Portugais', zh:'Chinois', ja:'Japonais',
-}
+import { LANG_NAMES } from '../constants/languages'
+import { LEVEL_INFO } from '../constants/levels'
+import { getXp, getMasteredCount } from '../utils/stats'
 
 function StatCard({ icon: Icon, label, value, color, bg, sub }) {
   return (
@@ -52,18 +50,18 @@ export default function Progress() {
   if (loading) return (
     <div className="flex items-center justify-center h-screen bg-duo-gray font-duo">
       <div className="text-center">
-        <span className="text-6xl block mb-4 animate-float">📊</span>
+        <BarChart3 size={48} className="text-duo-green mx-auto mb-4 animate-float" />
         <p className="text-duo-muted font-bold">Chargement...</p>
       </div>
     </div>
   )
 
-  const xp         = stats?.xp_total || (stats?.total_messages * 10) || 0
+  const xp         = getXp(stats)
   const streak     = stats?.streak_days || 0
   const messages   = stats?.total_messages || 0
   const convs      = stats?.total_conversations || 0
   const words      = stats?.total_words_learned || 0
-  const mastered   = stats?.mastered_words || vocab.filter(w => w.mastered).length
+  const mastered   = getMasteredCount(stats, vocab)
   const exercises  = stats?.exercises_completed || 0
   const dictations = stats?.dictation_completed || 0
   const flashcards = stats?.flashcards_reviewed || 0
@@ -105,7 +103,7 @@ export default function Progress() {
       <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
 
         {/* XP + Streak hero */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="duo-card p-0 overflow-hidden">
           <div className="h-1.5 bg-gradient-to-r from-duo-green to-emerald-400" />
           <div className="p-5 grid grid-cols-2 gap-4">
             <div className="text-center">
@@ -136,7 +134,7 @@ export default function Progress() {
         </div>
 
         {/* Vocabulary mastery */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="duo-card">
           <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">Maîtrise du vocabulaire</h3>
           <div className="flex items-center justify-between mb-3">
             <span className="text-duo-muted font-semibold text-sm">{mastered}/{words} mots maîtrisés</span>
@@ -156,7 +154,7 @@ export default function Progress() {
 
         {/* Top categories */}
         {topCats.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div className="duo-card">
             <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">Catégories les plus étudiées</h3>
             <div className="space-y-3">
               {topCats.map(([cat, count]) => (
@@ -167,15 +165,11 @@ export default function Progress() {
         )}
 
         {/* Level info */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="duo-card">
           <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">Niveau actuel</h3>
           <div className="flex items-center gap-4">
-            <div className={`px-4 py-2 rounded-full font-extrabold text-sm ${
-              user?.level === 'avance' ? 'bg-rose-50 text-rose-600' :
-              user?.level === 'intermediaire' ? 'bg-amber-50 text-amber-600' :
-              'bg-emerald-50 text-emerald-600'
-            }`}>
-              {user?.level === 'avance' ? 'Avancé' : user?.level === 'intermediaire' ? 'Intermédiaire' : 'Débutant'}
+            <div className={`px-4 py-2 rounded-full font-extrabold text-sm ${(LEVEL_INFO[user?.level] || LEVEL_INFO.debutant).bg} ${(LEVEL_INFO[user?.level] || LEVEL_INFO.debutant).color}`}>
+              {(LEVEL_INFO[user?.level] || LEVEL_INFO.debutant).label}
             </div>
             <div className="flex-1">
               <div className="text-xs text-duo-muted font-semibold">Niveau adaptatif basé sur vos résultats</div>
