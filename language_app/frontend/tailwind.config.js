@@ -5,9 +5,11 @@ export default {
     extend: {
       colors: {
         duo: {
-          green:       '#58CC02',
-          'green-d':   '#58A700',
-          'green-bg':  '#D7FFB8',
+          green:       '#F2B705',
+          'green-d':   '#B8890A',
+          'green-bg':  '#FFF6DE',
+          black:       '#121212',
+          'black-d':   '#000000',
           yellow:      '#FFD900',
           'yellow-d':  '#CCA800',
           'yellow-bg': '#FFF9E0',
@@ -23,8 +25,8 @@ export default {
           orange:      '#FF9600',
           gray:        '#F7F7F7',
           border:      '#E5E5E5',
-          text:        '#3C3C3C',
-          muted:       '#777777',
+          text:        '#161616',
+          muted:       '#6B6B6B',
         },
       },
       borderRadius: { duo: '16px', 'duo-sm': '12px', 'duo-lg': '24px' },

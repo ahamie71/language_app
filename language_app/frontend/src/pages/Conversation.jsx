@@ -2,39 +2,32 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   X, Volume2, ChevronDown, ChevronUp, Sparkles,
-  Mic, MicOff, Send, Loader2, Brain, BookOpen
+  Mic, MicOff, Send, Loader2, Brain, BookOpen, Zap, PartyPopper, Bot, User
 } from 'lucide-react'
-import { getMessages, processMessage, transcribeAudio, speakText } from '../services/api'
+import { getMessages, processMessage, transcribeAudio } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
-
-const LANG_LOCALE = {
-  fr:'fr-FR', en:'en-US', us:'en-US', es:'es-ES', de:'de-DE',
-  ar:'ar-SA', it:'it-IT', pt:'pt-BR', zh:'zh-CN', ja:'ja-JP',
-}
-const LANG_NAMES = {
-  fr:'Français', en:'Anglais', us:'Anglais', es:'Espagnol', de:'Allemand',
-  ar:'Arabe', it:'Italien', pt:'Portugais', zh:'Chinois', ja:'Japonais',
-}
+import { useSpeak } from '../hooks/useSpeak'
+import { useAudioRecorder } from '../hooks/useAudioRecorder'
+import { LANG_NAMES } from '../constants/languages'
 
 export default function Conversation() {
   const { id }     = useParams()
   const navigate   = useNavigate()
   const { user }   = useAuth()
+  const speak      = useSpeak()
+  const { isRecording, startRecording, stopRecording } = useAudioRecorder()
 
   const [messages,       setMessages]       = useState([])
   const [input,          setInput]          = useState('')
   const [sending,        setSending]        = useState(false)
   const [initLoading,    setInitLoading]    = useState(true)
   const [openExp,        setOpenExp]        = useState(null)
-  const [isRecording,    setIsRecording]    = useState(false)
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [canRecord,      setCanRecord]      = useState(false)
   const [xpGained,       setXpGained]      = useState(0)
 
   const bottomRef        = useRef(null)
   const inputRef         = useRef(null)
-  const mediaRecorderRef = useRef(null)
-  const audioChunksRef   = useRef([])
 
   const msgCount = messages.filter(m => m.role === 'user').length
   const GOAL     = 20
@@ -70,65 +63,32 @@ export default function Conversation() {
     setSending(false)
   }
 
-  /* ── 3.3.1 Mic — enregistrement + Whisper ── */
+  /* ── 3.3.1 Mic — enregistrement + transcription ── */
   const toggleMic = async () => {
     if (isRecording) {
-      mediaRecorderRef.current?.stop()
+      stopRecording()
       return
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream)
-      audioChunksRef.current = []
-
-      recorder.ondataavailable = e => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data)
-      }
-
-      recorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop())
-        setIsRecording(false)
+      await startRecording(async (blob) => {
         setIsTranscribing(true)
         try {
-          const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
           const result = await transcribeAudio(blob, user?.native_language || 'en')
           if (result.text) setInput(result.text)
         } catch (e) {
           console.error('Transcription error:', e)
         }
         setIsTranscribing(false)
-      }
-
-      recorder.start()
-      mediaRecorderRef.current = recorder
-      setIsRecording(true)
+      })
     } catch (e) {
       console.error('Mic access denied:', e)
-    }
-  }
-
-  /* ── 3.3.3 TTS — OpenAI TTS avec fallback navigateur ── */
-  const speak = async (text, lang) => {
-    try {
-      const blob = await speakText(text, lang)
-      const url  = URL.createObjectURL(blob)
-      const audio = new Audio(url)
-      audio.onended = () => URL.revokeObjectURL(url)
-      audio.play()
-    } catch {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-        const u = new SpeechSynthesisUtterance(text)
-        u.lang = LANG_LOCALE[lang] || 'en-US'; u.rate = 0.85
-        window.speechSynthesis.speak(u)
-      }
     }
   }
 
   if (initLoading) return (
     <div className="flex items-center justify-center h-screen bg-duo-gray font-duo">
       <div className="text-center">
-        <span className="text-6xl block mb-4 animate-float">🦉</span>
+        <Bot size={48} className="text-duo-green mx-auto mb-4 animate-float" />
         <p className="text-duo-muted font-bold">Chargement de la leçon...</p>
       </div>
     </div>
@@ -152,7 +112,7 @@ export default function Conversation() {
             {/* XP gain */}
             {xpGained > 0 && (
               <div className="flex items-center gap-1 text-duo-yellow font-extrabold text-sm animate-bounce-in">
-                ⚡ +{xpGained} XP
+                <Zap size={14} /> +{xpGained} XP
               </div>
             )}
           </div>
@@ -184,7 +144,7 @@ export default function Conversation() {
           {/* Empty / welcome */}
           {messages.length === 0 && !sending && (
             <div className="flex flex-col items-center justify-center py-12 text-center gap-4">
-              <span className="text-7xl animate-float block">🦉</span>
+              <Bot size={56} className="text-duo-green animate-float" />
               <div className="duo-card max-w-sm">
                 <p className="font-extrabold text-duo-text mb-1">Commencez la conversation !</p>
                 <p className="text-duo-muted text-sm font-semibold">
@@ -200,8 +160,8 @@ export default function Conversation() {
             return (
               <div key={expKey} className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : ''}`}>
                 {/* Avatar */}
-                <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-lg">
-                  {isUser ? '🧑‍🎓' : '🦉'}
+                <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${isUser ? 'bg-duo-blue-bg text-duo-blue' : 'bg-duo-green-bg text-duo-green'}`}>
+                  {isUser ? <User size={17} /> : <Bot size={17} />}
                 </div>
 
                 <div className={`flex flex-col gap-1.5 max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
@@ -259,7 +219,9 @@ export default function Conversation() {
           {/* Typing indicator */}
           {sending && (
             <div className="flex items-end gap-2">
-              <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-lg">🦉</div>
+              <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-duo-green-bg text-duo-green">
+                <Bot size={17} />
+              </div>
               <div className="bg-white border-2 border-duo-border rounded-duo-lg rounded-bl-sm px-4 py-3.5">
                 <div className="flex items-center gap-1.5">
                   <span className="typing-dot" />
@@ -273,12 +235,12 @@ export default function Conversation() {
           {/* Goal reached banner */}
           {msgCount >= GOAL && (
             <div className="duo-card border-duo-yellow border-2 bg-duo-yellow-bg text-center animate-bounce-in">
-              <div className="text-4xl mb-2">🎉</div>
+              <PartyPopper size={36} className="text-duo-orange mx-auto mb-2" />
               <div className="font-extrabold text-duo-text">Objectif atteint !</div>
               <div className="text-duo-muted text-sm font-semibold">Vous avez complété {GOAL} échanges avec votre coach IA</div>
               <div className="flex justify-center gap-1 mt-2">
                 <span className="duo-badge bg-duo-yellow text-duo-text border border-yellow-300">
-                  ⚡ +{msgCount * 10} XP gagnés
+                  <Zap size={12} /> +{msgCount * 10} XP gagnés
                 </span>
               </div>
             </div>

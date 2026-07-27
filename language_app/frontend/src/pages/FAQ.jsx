@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, ChevronDown } from 'lucide-react'
+import { ArrowLeft, ChevronDown, Languages } from 'lucide-react'
 
 const FAQS = [
   {
@@ -115,7 +115,7 @@ export default function FAQ() {
             <ArrowLeft size={20} />
           </button>
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <span className="text-3xl">🦉</span>
+            <Languages size={26} className="text-duo-green" />
             <span className="text-xl font-black text-duo-green">Lingua</span>
           </div>
         </div>

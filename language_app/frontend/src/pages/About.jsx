@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Target, Heart, Zap, Users } from 'lucide-react'
+import { ArrowLeft, Target, Heart, Zap, Users, Languages, Globe2, Briefcase, Code2, Brain, Palette, Terminal } from 'lucide-react'
 
 const VALUES = [
   {
@@ -37,12 +37,12 @@ const VALUES = [
 ]
 
 const TEAM = [
-  { name: 'Sophie Martin',  role: 'Co-fondatrice & CEO',        emoji: '👩‍💼' },
-  { name: 'Lucas Bernard',  role: 'Co-fondateur & CTO',         emoji: '👨‍💻' },
-  { name: 'Amina Khalil',   role: 'Responsable IA & NLP',       emoji: '👩‍🔬' },
-  { name: 'Thomas Durand',  role: 'Designer UX/UI',             emoji: '🎨' },
-  { name: 'Yuki Tanaka',    role: 'Ingénieure linguistique',    emoji: '📚' },
-  { name: 'Rayan Oussama',  role: 'Développeur fullstack',      emoji: '⚙️' },
+  { name: 'Sophie Martin',  role: 'Co-fondatrice & CEO',        icon: Briefcase },
+  { name: 'Lucas Bernard',  role: 'Co-fondateur & CTO',         icon: Code2 },
+  { name: 'Amina Khalil',   role: 'Responsable IA & NLP',       icon: Brain },
+  { name: 'Thomas Durand',  role: 'Designer UX/UI',             icon: Palette },
+  { name: 'Yuki Tanaka',    role: 'Ingénieure linguistique',    icon: Languages },
+  { name: 'Rayan Oussama',  role: 'Développeur fullstack',      icon: Terminal },
 ]
 
 export default function About() {
@@ -59,7 +59,7 @@ export default function About() {
             <ArrowLeft size={20} />
           </button>
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <span className="text-3xl">🦉</span>
+            <Languages size={26} className="text-duo-green" />
             <span className="text-xl font-black text-duo-green">Lingua</span>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function About() {
       {/* Hero */}
       <section className="bg-gradient-to-b from-white to-slate-50 py-20 px-4 text-center">
         <div className="max-w-2xl mx-auto">
-          <span className="text-6xl block mb-6">🌍</span>
+          <Globe2 size={56} className="text-duo-green mx-auto mb-6" />
           <h1 className="text-4xl font-black text-duo-text mb-4">
             À propos de <span className="text-duo-green">Lingua</span>
           </h1>
@@ -80,7 +80,7 @@ export default function About() {
 
       {/* Stats */}
       <section className="bg-duo-green py-10">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-3 gap-4 text-center text-white">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-3 gap-4 text-center text-duo-black">
           {[['2023', 'Année de création'], ['10K+', 'Apprenants actifs'], ['9', 'Langues disponibles']].map(([n, l]) => (
             <div key={l}>
               <div className="text-3xl md:text-4xl font-black">{n}</div>
@@ -135,7 +135,9 @@ export default function About() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           {TEAM.map(member => (
             <div key={member.name} className="text-center duo-card hover:shadow-md transition-shadow">
-              <div className="text-5xl mb-3">{member.emoji}</div>
+              <div className="w-14 h-14 rounded-full bg-duo-green-bg flex items-center justify-center mx-auto mb-3">
+                <member.icon size={24} className="text-duo-green" />
+              </div>
               <h3 className="font-extrabold text-duo-text text-sm">{member.name}</h3>
               <p className="text-duo-muted text-xs font-semibold mt-1">{member.role}</p>
             </div>
@@ -144,11 +146,11 @@ export default function About() {
       </section>
 
       {/* CTA */}
-      <section className="bg-duo-green py-16 px-4 text-center text-white">
+      <section className="bg-duo-green py-16 px-4 text-center text-duo-black">
         <h2 className="text-2xl font-black mb-3">Rejoignez l'aventure</h2>
-        <p className="font-semibold opacity-90 mb-6">Commencez à apprendre gratuitement dès aujourd'hui.</p>
+        <p className="font-semibold opacity-80 mb-6">Commencez à apprendre gratuitement dès aujourd'hui.</p>
         <button onClick={() => navigate('/')}
-          className="bg-white text-duo-green font-extrabold px-10 py-3 rounded-duo-sm hover:bg-gray-50 transition-colors text-sm">
+          className="bg-duo-black text-duo-green font-extrabold px-10 py-3 rounded-duo-sm hover:bg-gray-900 transition-colors text-sm">
           COMMENCER GRATUITEMENT
         </button>
       </section>

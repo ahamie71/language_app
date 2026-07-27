@@ -42,12 +42,12 @@
   }
   .duo-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-  .duo-btn-green  { @apply bg-duo-green  text-white; border-bottom-color:#58A700; }
+  .duo-btn-green  { @apply bg-duo-green  text-duo-black font-black; border-bottom-color:#B8890A; }
   .duo-btn-yellow { @apply bg-duo-yellow text-duo-text; border-bottom-color:#CCA800; }
   .duo-btn-blue   { @apply bg-duo-blue   text-white; border-bottom-color:#0099D6; }
   .duo-btn-red    { @apply bg-duo-red    text-white; border-bottom-color:#EA2929; }
   .duo-btn-ghost  {
-    @apply bg-white text-duo-blue font-extrabold border-2 border-duo-border rounded-duo;
+    @apply bg-white text-duo-black font-extrabold border-2 border-duo-border rounded-duo;
     border-bottom: 4px solid #C5C5C5;
   }
   .duo-btn-ghost:active:not(:disabled) {
@@ -135,8 +135,8 @@
   .animate-float { animation: float 3s ease-in-out infinite; }
 
   @keyframes pulse-green {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(88,204,2,0.4); }
-    50%       { box-shadow: 0 0 0 10px rgba(88,204,2,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(242,183,5,0.4); }
+    50%       { box-shadow: 0 0 0 10px rgba(242,183,5,0); }
   }
   .animate-pulse-green { animation: pulse-green 2s infinite; }
 

@@ -3,24 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { updateProfile } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
-
-const LANGUAGES = [
-  { value: 'fr', label: '🇫🇷 Français' },
-  { value: 'en', label: '🇬🇧 Anglais' },
-  { value: 'es', label: '🇪🇸 Espagnol' },
-  { value: 'de', label: '🇩🇪 Allemand' },
-  { value: 'ar', label: '🇸🇦 Arabe' },
-  { value: 'it', label: '🇮🇹 Italien' },
-  { value: 'pt', label: '🇵🇹 Portugais' },
-  { value: 'zh', label: '🇨🇳 Chinois' },
-  { value: 'ja', label: '🇯🇵 Japonais' },
-]
-
-const LEVELS = [
-  { value: 'debutant',      label: '🌱 Débutant' },
-  { value: 'intermediaire', label: '⚡ Intermédiaire' },
-  { value: 'avance',        label: '🔥 Avancé' },
-]
+import { LANGUAGES } from '../constants/languages'
+import { LEVELS } from '../constants/levels'
 
 export default function EditProfile() {
   const navigate        = useNavigate()
@@ -86,7 +70,7 @@ export default function EditProfile() {
 
         {/* Avatar preview */}
         <div className="duo-card flex flex-col items-center py-6">
-          <div className="w-20 h-20 rounded-full bg-duo-green flex items-center justify-center text-4xl font-black text-white shadow-lg mb-3">
+          <div className="w-20 h-20 rounded-full bg-duo-green flex items-center justify-center text-4xl font-black text-duo-black shadow-lg mb-3">
             {form.username?.[0]?.toUpperCase() || '?'}
           </div>
           <p className="text-duo-muted font-semibold text-sm">Photo de profil basée sur l'initiale</p>
@@ -158,7 +142,7 @@ export default function EditProfile() {
                 className="duo-select"
               >
                 {LANGUAGES.map(l => (
-                  <option key={l.value} value={l.value}>{l.label}</option>
+                  <option key={l.code} value={l.code}>{l.flag} {l.name}</option>
                 ))}
               </select>
             </div>
@@ -173,7 +157,7 @@ export default function EditProfile() {
                 className="duo-select"
               >
                 {LANGUAGES.map(l => (
-                  <option key={l.value} value={l.value}>{l.label}</option>
+                  <option key={l.code} value={l.code}>{l.flag} {l.name}</option>
                 ))}
               </select>
             </div>
@@ -188,12 +172,13 @@ export default function EditProfile() {
                     key={lv.value}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, level: lv.value }))}
-                    className={`py-3 px-2 rounded-duo border-2 font-extrabold text-sm text-center transition-all ${
+                    className={`flex flex-col items-center gap-1 py-3 px-2 rounded-duo border-2 font-extrabold text-sm text-center transition-all ${
                       form.level === lv.value
                         ? 'border-duo-green bg-green-50 text-duo-green'
                         : 'border-duo-border bg-white text-duo-muted hover:border-duo-green'
                     }`}
                   >
+                    <lv.icon size={16} />
                     {lv.label}
                   </button>
                 ))}

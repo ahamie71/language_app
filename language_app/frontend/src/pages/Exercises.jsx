@@ -9,11 +9,7 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { generateExercise, getVocabulary, updateWordProgress } from '../services/api'
 import BottomNav from '../components/BottomNav'
-
-const LANG_NAMES = {
-  fr:'Français', en:'Anglais', es:'Espagnol', de:'Allemand',
-  ar:'Arabe', it:'Italien', pt:'Portugais', zh:'Chinois', ja:'Japonais',
-}
+import { LANG_NAMES } from '../constants/languages'
 
 const TOPICS = [
   { label: 'Général',    value: 'general vocabulary and greetings', Icon: MessageCircle },

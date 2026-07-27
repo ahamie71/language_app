@@ -10,18 +10,8 @@ import {
 } from 'lucide-react'
 import { login, register, getProfile } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
-
-const LANGUAGES = [
-  { value: 'en', label: 'Anglais',   flag: 'gb' },
-  { value: 'es', label: 'Espagnol',  flag: 'es' },
-  { value: 'de', label: 'Allemand',  flag: 'de' },
-  { value: 'ar', label: 'Arabe',     flag: 'sa' },
-  { value: 'it', label: 'Italien',   flag: 'it' },
-  { value: 'pt', label: 'Portugais', flag: 'br' },
-  { value: 'zh', label: 'Chinois',   flag: 'cn' },
-  { value: 'ja', label: 'Japonais',  flag: 'jp' },
-  { value: 'fr', label: 'Français',  flag: 'fr' },
-]
+import { LANGUAGES } from '../constants/languages'
+import { LEVELS } from '../constants/levels'
 
 const FEATURES = [
   {
@@ -160,10 +150,10 @@ export default function Home() {
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
-              <Brain size={20} className="text-white" />
+              style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
+              <Brain size={20} className="text-gray-900" />
             </div>
-            <span className="text-xl font-black text-gray-800 tracking-tight">Lingua<span className="text-green-500">AI</span></span>
+            <span className="text-xl font-black text-gray-800 tracking-tight">Lingua<span className="text-amber-600">AI</span></span>
           </div>
 
           {/* Nav links — desktop */}
@@ -179,8 +169,8 @@ export default function Home() {
               Connexion
             </button>
             <button onClick={openRegister}
-              className="px-5 py-2.5 rounded-xl font-extrabold text-sm text-white shadow-md hover:opacity-90 transition-all"
-              style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+              className="px-5 py-2.5 rounded-xl font-extrabold text-sm text-gray-900 shadow-md hover:opacity-90 transition-all"
+              style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
               S'inscrire
             </button>
           </div>
@@ -202,7 +192,7 @@ export default function Home() {
 
             {/* Left — text */}
             <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-white border border-green-200 text-green-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-white border border-amber-200 text-amber-700 px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider mb-6 shadow-sm">
                 <Sparkles size={11} />
                 Propulsé par l'Intelligence Artificielle
               </div>
@@ -210,7 +200,7 @@ export default function Home() {
               <h1 className="text-5xl md:text-6xl font-black text-gray-900 leading-[1.1] mb-6">
                 Apprenez une langue<br />
                 <span className="text-transparent bg-clip-text"
-                  style={{ backgroundImage: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                  style={{ backgroundImage: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
                   3× plus vite
                 </span>{' '}
                 avec l'IA
@@ -222,8 +212,8 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
                 <button onClick={openRegister}
-                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-white text-base shadow-lg hover:opacity-90 active:scale-95 transition-all"
-                  style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                  className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-gray-900 text-base shadow-lg hover:opacity-90 active:scale-95 transition-all"
+                  style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
                   Commencer gratuitement <ArrowRight size={18} />
                 </button>
                 <button onClick={openLogin}
@@ -260,7 +250,7 @@ export default function Home() {
                       <div className="w-3 h-3 rounded-full bg-green-400" />
                     </div>
                     <div className="flex-1 bg-white rounded-lg px-3 py-1.5 flex items-center gap-2 border border-gray-200">
-                      <Brain size={12} className="text-green-500" />
+                      <Brain size={12} className="text-amber-600" />
                       <span className="text-xs text-gray-400 font-semibold">Lingua AI — Coach Espagnol</span>
                     </div>
                   </div>
@@ -300,9 +290,9 @@ export default function Home() {
                       </div>
                       <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border border-gray-100 max-w-[220px]">
                         <p className="text-sm font-semibold text-gray-700">¡Muy bien! Perfect sentence.</p>
-                        <div className="mt-2 bg-green-50 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
-                          <CheckCircle size={11} className="text-green-500 shrink-0" />
-                          <span className="text-xs text-green-700 font-semibold">+15 XP gagnés</span>
+                        <div className="mt-2 bg-amber-50 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+                          <CheckCircle size={11} className="text-amber-600 shrink-0" />
+                          <span className="text-xs text-amber-700 font-semibold">+15 XP gagnés</span>
                         </div>
                       </div>
                     </div>
@@ -311,8 +301,8 @@ export default function Home() {
                     <div className="bg-white rounded-xl border border-gray-200 px-3 py-2.5 flex items-center gap-2 mt-2">
                       <div className="flex-1 text-xs text-gray-300 font-semibold">Écrivez en français…</div>
                       <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
-                        <ArrowRight size={13} className="text-white" />
+                        style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
+                        <ArrowRight size={13} className="text-gray-900" />
                       </div>
                     </div>
                   </div>
@@ -321,7 +311,7 @@ export default function Home() {
                 {/* Floating badge */}
                 <div className="flex justify-center mt-4">
                   <div className="bg-white border border-gray-100 shadow-md rounded-full px-4 py-2 flex items-center gap-2">
-                    <Shield size={13} className="text-green-500" />
+                    <Shield size={13} className="text-amber-600" />
                     <span className="text-xs font-bold text-gray-500">100% gratuit · Sans carte bancaire</span>
                   </div>
                 </div>
@@ -341,7 +331,7 @@ export default function Home() {
             { n: '9',     l: 'Langues disponibles', Icon: Globe     },
           ].map(({ n, l, Icon }) => (
             <div key={l} className="flex flex-col items-center gap-1">
-              <Icon size={18} className="text-green-500 mb-1" />
+              <Icon size={18} className="text-amber-600 mb-1" />
               <div className="text-2xl md:text-3xl font-black text-gray-800">{n}</div>
               <div className="text-xs font-bold text-gray-400">{l}</div>
             </div>
@@ -415,19 +405,19 @@ export default function Home() {
 
       {/* ════ CTA ═══════════════════════════════════════════════════════════ */}
       <section className="py-24 px-6 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg,#58cc02 0%,#3fa801 50%,#2d7a01 100%)' }}>
+        style={{ background: 'linear-gradient(135deg,#F2B705 0%,#D9A305 50%,#B8890A 100%)' }}>
         <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: 'radial-gradient(circle at 20% 50%,white 1px,transparent 1px), radial-gradient(circle at 80% 50%,white 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+          style={{ backgroundImage: 'radial-gradient(circle at 20% 50%,black 1px,transparent 1px), radial-gradient(circle at 80% 50%,black 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="max-w-2xl mx-auto text-center relative">
-          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Zap size={32} className="text-white" fill="white" />
+          <div className="w-16 h-16 bg-black/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Zap size={32} className="text-gray-900" fill="currentColor" />
           </div>
-          <h2 className="text-4xl font-black text-white mb-4">Prêt à commencer ?</h2>
-          <p className="text-green-100 font-semibold text-lg mb-8">
+          <h2 className="text-4xl font-black text-gray-900 mb-4">Prêt à commencer ?</h2>
+          <p className="text-gray-800 font-semibold text-lg mb-8 opacity-80">
             Rejoignez des milliers d'apprenants. Gratuit, sans engagement, pour toujours.
           </p>
           <button onClick={openRegister}
-            className="inline-flex items-center gap-2 bg-white text-green-700 font-black px-10 py-4 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-base">
+            className="inline-flex items-center gap-2 bg-gray-900 text-white font-black px-10 py-4 rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-base">
             Créer mon compte gratuit <ArrowRight size={18} />
           </button>
         </div>
@@ -442,10 +432,10 @@ export default function Home() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
-                  <Brain size={16} className="text-white" />
+                  style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
+                  <Brain size={16} className="text-gray-900" />
                 </div>
-                <span className="text-lg font-black">Lingua<span className="text-green-400">AI</span></span>
+                <span className="text-lg font-black">Lingua<span className="text-amber-400">AI</span></span>
               </div>
               <p className="text-gray-400 text-sm font-semibold leading-relaxed mb-5">
                 Apprenez les langues gratuitement avec l'IA. Conversations immersives et suivi personnalisé.
@@ -580,7 +570,7 @@ export default function Home() {
 
             {/* Modal top gradient */}
             <div className="h-1.5 w-full"
-              style={{ background: 'linear-gradient(90deg,#58cc02,#a855f7,#1cb0f6)' }} />
+              style={{ background: 'linear-gradient(90deg,#F2B705,#a855f7,#1cb0f6)' }} />
 
             <div className="p-6">
               {/* Header */}
@@ -618,7 +608,7 @@ export default function Home() {
                 <form onSubmit={handleLogin} className="space-y-4">
                   <FieldLabel label="Adresse email">
                     <input type="email" placeholder="votre@email.com" required
-                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-amber-400 transition-colors"
                       value={loginForm.email}
                       onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} />
                   </FieldLabel>
@@ -628,8 +618,8 @@ export default function Home() {
                       toggle={() => setShowPwd(!showPwd)} />
                   </FieldLabel>
                   <button type="submit" disabled={loading}
-                    className="w-full py-3.5 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                    className="w-full py-3.5 rounded-xl font-black text-gray-900 text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
+                    style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
                     {loading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
                     {loading ? 'Connexion…' : 'Se connecter'}
                   </button>
@@ -641,13 +631,13 @@ export default function Home() {
                 <form onSubmit={handleRegister} className="space-y-3">
                   <FieldLabel label="Nom d'utilisateur">
                     <input type="text" placeholder="jean_dupont" required
-                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-amber-400 transition-colors"
                       value={regForm.username}
                       onChange={e => setRegForm({ ...regForm, username: e.target.value })} />
                   </FieldLabel>
                   <FieldLabel label="Adresse email">
                     <input type="email" placeholder="votre@email.com" required
-                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                      className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-amber-400 transition-colors"
                       value={regForm.email}
                       onChange={e => setRegForm({ ...regForm, email: e.target.value })} />
                   </FieldLabel>
@@ -658,40 +648,36 @@ export default function Home() {
                   </FieldLabel>
                   <div className="grid grid-cols-2 gap-3">
                     <FieldLabel label="Langue maternelle">
-                      <select className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                      <select className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-amber-400 transition-colors"
                         value={regForm.native_language}
                         onChange={e => setRegForm({ ...regForm, native_language: e.target.value })}>
-                        {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
                       </select>
                     </FieldLabel>
                     <FieldLabel label="Langue cible">
-                      <select className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+                      <select className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-3 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:border-amber-400 transition-colors"
                         value={regForm.target_language}
                         onChange={e => setRegForm({ ...regForm, target_language: e.target.value })}>
-                        {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
                       </select>
                     </FieldLabel>
                   </div>
                   <FieldLabel label="Niveau actuel">
                     <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { v: 'debutant',       l: 'Débutant',      color: 'border-green-400 bg-green-50 text-green-700'  },
-                        { v: 'intermediaire',  l: 'Intermédiaire', color: 'border-amber-400 bg-amber-50 text-amber-700'  },
-                        { v: 'avance',         l: 'Avancé',        color: 'border-red-400 bg-red-50 text-red-700'        },
-                      ].map(opt => (
-                        <button key={opt.v} type="button"
-                          onClick={() => setRegForm({ ...regForm, level: opt.v })}
+                      {LEVELS.map(opt => (
+                        <button key={opt.value} type="button"
+                          onClick={() => setRegForm({ ...regForm, level: opt.value })}
                           className={`py-2.5 rounded-xl border-2 font-extrabold text-xs transition-all ${
-                            regForm.level === opt.v ? opt.color : 'border-gray-200 text-gray-400 hover:border-gray-300'
+                            regForm.level === opt.value ? opt.selectedClass : 'border-gray-200 text-gray-400 hover:border-gray-300'
                           }`}>
-                          {opt.l}
+                          {opt.label}
                         </button>
                       ))}
                     </div>
                   </FieldLabel>
                   <button type="submit" disabled={loading}
-                    className="w-full py-3.5 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 mt-1 disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
+                    className="w-full py-3.5 rounded-xl font-black text-gray-900 text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 mt-1 disabled:opacity-60"
+                    style={{ background: 'linear-gradient(135deg,#F2B705,#B8890A)' }}>
                     {loading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
                     {loading ? 'Création…' : 'Créer mon compte'}
                   </button>
@@ -702,7 +688,7 @@ export default function Home() {
               <p className="text-center text-gray-400 font-semibold text-sm mt-4">
                 {modal === 'login' ? "Pas encore de compte ? " : "Déjà inscrit ? "}
                 <button onClick={modal === 'login' ? openRegister : openLogin}
-                  className="text-green-600 hover:text-green-700 font-extrabold transition-colors">
+                  className="text-amber-600 hover:text-amber-700 font-extrabold transition-colors">
                   {modal === 'login' ? "S'inscrire" : "Se connecter"}
                 </button>
               </p>
@@ -729,7 +715,7 @@ function PwdInput({ value, onChange, show, toggle }) {
   return (
     <div className="relative">
       <input type={show ? 'text' : 'password'} placeholder="••••••••" required
-        className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm font-semibold text-gray-700 focus:outline-none focus:border-green-400 transition-colors"
+        className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm font-semibold text-gray-700 focus:outline-none focus:border-amber-400 transition-colors"
         value={value} onChange={e => onChange(e.target.value)} />
       <button type="button" onClick={toggle}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
