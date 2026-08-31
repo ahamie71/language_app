@@ -1,15 +1,15 @@
-/node_modules
-/dist
-/.env
-/coverage
-/.vscode
-.DS_Store
-*.log  
-*.tsbuildinfo
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
 
-Package-lock.json
-package.json
-# Documents personnels (mémoire) - pas destinés au dépôt
-MEMOIRE_*.md
-MEMOIRE_*.docx
-~$*.docx
+# Node
+node_modules/
+dist/
+.env.local
+
+# IDE
+.vscode/
+.idea/
