@@ -71,7 +71,7 @@ services:
       AI_SERVICE_URL: http://ai_service:5000
 
     ports:
-      - "18000:8000"
+      - "8000:8000"
 
     depends_on:
       mysql:
@@ -89,7 +89,7 @@ services:
     restart: unless-stopped
 
     environment:
-      VITE_API_URL: http://localhost:18000
+      VITE_API_URL: http://localhost:8000
 
     ports:
       - "5173:5173"
