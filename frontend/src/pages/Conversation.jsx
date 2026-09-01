@@ -4,11 +4,12 @@ import {
   X, Volume2, ChevronDown, ChevronUp, Sparkles,
   Mic, MicOff, Send, Loader2, Brain, BookOpen, Zap, PartyPopper, Bot, User
 } from 'lucide-react'
-import { getMessages, processMessage, transcribeAudio } from '../services/api'
+import { getMessages, processMessageStream, transcribeAudio } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import { useSpeak } from '../hooks/useSpeak'
 import { useAudioRecorder } from '../hooks/useAudioRecorder'
-import { LANG_NAMES } from '../constants/languages'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
+import { LANG_NAMES, LANG_LOCALE } from '../constants/languages'
 
 export default function Conversation() {
   const { id }     = useParams()
@@ -16,10 +17,12 @@ export default function Conversation() {
   const { user }   = useAuth()
   const speak      = useSpeak()
   const { isRecording, startRecording, stopRecording } = useAudioRecorder()
+  const speech     = useSpeechRecognition()
 
   const [messages,       setMessages]       = useState([])
   const [input,          setInput]          = useState('')
   const [sending,        setSending]        = useState(false)
+  const [awaitingReply,  setAwaitingReply]  = useState(false)
   const [initLoading,    setInitLoading]    = useState(true)
   const [openExp,        setOpenExp]        = useState(null)
   const [isTranscribing, setIsTranscribing] = useState(false)
@@ -48,23 +51,58 @@ export default function Conversation() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, sending])
 
-  /* ── Send ── */
+  /* ── Send — SSE : la réponse du coach arrive dès qu'elle est prête,
+     traduction et explication se complètent ensuite au fil de l'eau ── */
   const handleSend = async () => {
     if (!input.trim() || sending) return
     const text = input.trim()
     setInput('')
     setSending(true)
+    setAwaitingReply(true)
     inputRef.current?.focus()
+
+    const tempId = `tmp-${Date.now()}`
+
     try {
-      const res = await processMessage({ conversation_id: parseInt(id), original_text: text })
-      setMessages(prev => [...prev, res.userMessage, { ...res.assistantMessage, role: 'assistant' }])
-      setXpGained(prev => prev + 10)
+      await processMessageStream(
+        { conversation_id: parseInt(id), original_text: text },
+        ({ event, data }) => {
+          if (event === 'user_message') {
+            setMessages(prev => [...prev, data])
+          } else if (event === 'reply') {
+            setAwaitingReply(false)
+            setMessages(prev => [...prev, {
+              id: tempId, role: 'assistant',
+              original_text: data.text, translated_text: null, explanation: null,
+            }])
+            setXpGained(prev => prev + 10)
+          } else if (event === 'translation') {
+            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, translated_text: data.text } : m))
+          } else if (event === 'explanation') {
+            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, explanation: data.text } : m))
+          } else if (event === 'done') {
+            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, id: data.id } : m))
+            setSending(false)
+          } else if (event === 'error') {
+            console.error(event, data.error)
+            setSending(false)
+            setAwaitingReply(false)
+          }
+        }
+      )
     } catch (e) { console.error(e) }
     setSending(false)
+    setAwaitingReply(false)
   }
 
-  /* ── 3.3.1 Mic — enregistrement + transcription ── */
+  /* ── 3.3.1 Mic — dictée en direct (Web Speech API), avec repli
+     enregistrement + transcription Vosk si le navigateur ne la supporte pas ── */
   const toggleMic = async () => {
+    if (speech.supported) {
+      if (speech.listening) { speech.stop(); return }
+      speech.start(LANG_LOCALE[user?.native_language] || 'fr-FR', (text) => setInput(text))
+      return
+    }
     if (isRecording) {
       stopRecording()
       return
@@ -217,7 +255,7 @@ export default function Conversation() {
           })}
 
           {/* Typing indicator */}
-          {sending && (
+          {awaitingReply && (
             <div className="flex items-end gap-2">
               <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-duo-green-bg text-duo-green">
                 <Bot size={17} />
@@ -255,10 +293,10 @@ export default function Conversation() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-end gap-2">
             {/* 3.3.1 Mic */}
-            {canRecord && (
+            {(canRecord || speech.supported) && (
               <button onClick={toggleMic} disabled={sending || isTranscribing}
                 className={`shrink-0 w-12 h-12 rounded-duo-sm border-b-4 flex items-center justify-center transition-all active:translate-y-0.5 active:border-b-0 ${
-                  isRecording
+                  (isRecording || speech.listening)
                     ? 'bg-duo-red border-duo-red-d animate-pulse'
                     : isTranscribing
                     ? 'bg-duo-yellow border-yellow-400 animate-pulse'
@@ -266,7 +304,7 @@ export default function Conversation() {
                 }`}>
                 {isTranscribing
                   ? <Loader2 size={19} className="animate-spin text-white" />
-                  : isRecording
+                  : (isRecording || speech.listening)
                   ? <MicOff size={19} className="text-white" />
                   : <Mic size={19} />}
               </button>

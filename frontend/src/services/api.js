@@ -112,6 +112,50 @@ export const processMessage = async (messageData) => {
   return res.json();
 };
 
+/** Comme processMessage, mais en SSE : appelle onEvent({ event, data }) au
+ * fil de l'eau (user_message, reply, translation, explanation, done, error)
+ * au lieu d'attendre la réponse complète. Pas d'EventSource natif (GET only,
+ * pas d'en-tête Authorization) : on lit le flux fetch à la main. */
+export const processMessageStream = async (messageData, onEvent) => {
+  const res = await fetch(`${API_URL}/api/conversations/process/stream`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify(messageData),
+  });
+
+  if (!res.ok || !res.body) {
+    onEvent({ event: "error", data: { error: "Impossible de joindre le serveur" } });
+    return;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    let sepIndex;
+    while ((sepIndex = buffer.indexOf("\n\n")) !== -1) {
+      const frame = buffer.slice(0, sepIndex);
+      buffer = buffer.slice(sepIndex + 2);
+
+      let event = "message";
+      let dataLine = "";
+      for (const line of frame.split("\n")) {
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) dataLine += line.slice(5).trim();
+      }
+      if (dataLine) {
+        try { onEvent({ event, data: JSON.parse(dataLine) }); }
+        catch { /* frame malformée, on l'ignore */ }
+      }
+    }
+  }
+};
+
 // =========================
 // USER
 // =========================
