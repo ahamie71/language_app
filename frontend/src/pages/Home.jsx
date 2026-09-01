@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import {
   X, Eye, EyeOff, Loader2, CheckCircle, AlertCircle,
   Bot, Wand2, BookMarked, Mic2, Trophy, Rocket,
-  Github, Twitter, Youtube, Facebook, Instagram,
   MessageSquare, Sparkles, Globe, Users, ChevronRight,
   UserPlus, LogIn, Brain, Zap, BarChart3, Volume2,
   ArrowRight, Shield, Star, Play
 } from 'lucide-react'
+import { FaXTwitter, FaFacebookF, FaInstagram, FaYoutube, FaGithub } from 'react-icons/fa6'
 import { login, register, getProfile } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import { LANGUAGES } from '../constants/languages'
@@ -441,7 +441,7 @@ export default function Home() {
                 Apprenez les langues gratuitement avec l'IA. Conversations immersives et suivi personnalisé.
               </p>
               <div className="flex gap-2">
-                {[Twitter, Facebook, Instagram, Youtube, Github].map((Icon, i) => (
+                {[FaXTwitter, FaFacebookF, FaInstagram, FaYoutube, FaGithub].map((Icon, i) => (
                   <a key={i} href="#"
                     className="w-8 h-8 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors">
                     <Icon size={14} className="text-gray-400" />

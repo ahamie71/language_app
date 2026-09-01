@@ -1,0 +1,4 @@
+# Scripts shell exécutés dans des conteneurs Linux : toujours en LF,
+# sinon /bin/sh échoue avec "not found" sur Windows (autocrlf).
+*.sh text eol=lf
+ai_service/ollama/entrypoint.sh text eol=lf
