@@ -142,7 +142,7 @@ export default function EditProfile() {
                 className="duo-select"
               >
                 {LANGUAGES.map(l => (
-                  <option key={l.code} value={l.code}>{l.flag} {l.name}</option>
+                  <option key={l.code} value={l.code}>{l.name}</option>
                 ))}
               </select>
             </div>
@@ -157,7 +157,7 @@ export default function EditProfile() {
                 className="duo-select"
               >
                 {LANGUAGES.map(l => (
-                  <option key={l.code} value={l.code}>{l.flag} {l.name}</option>
+                  <option key={l.code} value={l.code}>{l.name}</option>
                 ))}
               </select>
             </div>
