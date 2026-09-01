@@ -48,6 +48,48 @@ services:
     ports:
       - "5000:5000"
 
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    networks:
+      - linguaai-network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: linguaai-ollama
+    restart: unless-stopped
+
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+
+    volumes:
+      - ollama_models:/root/.ollama
+      - ./ai_service/ollama/Modelfile:/Modelfile:ro
+      - ./ai_service/ollama/entrypoint.sh:/entrypoint.sh:ro
+
+    environment:
+      OLLAMA_KEEP_ALIVE: "-1"        # garde le modele charge (pas de reload a froid)
+
+    ports:
+      - "11434:11434"
+
+    # healthy seulement quand lingua-llm est charge EN VRAM (ollama ps) — pas
+    # juste cree. ai_service attend cet etat (depends_on: service_healthy).
+    healthcheck:
+      test: ["CMD-SHELL", "ollama ps | grep -q lingua-llm"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
     networks:
       - linguaai-network
 
@@ -71,7 +113,7 @@ services:
       AI_SERVICE_URL: http://ai_service:5000
 
     ports:
-      - "18000:8000"
+      - "8000:8000"
 
     depends_on:
       mysql:
@@ -89,7 +131,7 @@ services:
     restart: unless-stopped
 
     environment:
-      VITE_API_URL: http://localhost:18000
+      VITE_API_URL: http://localhost:8000
 
     ports:
       - "5173:5173"
@@ -125,6 +167,7 @@ volumes:
   hf_cache:
   vosk_cache:
   tts_cache:
+  ollama_models:
 
 networks:
   linguaai-network:

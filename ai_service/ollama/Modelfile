@@ -1,0 +1,21 @@
+# Modele derive optimise pour LinguaAI (coach de langue, explications, QCM, dictee).
+# Build : ollama create lingua-llm -f Modelfile
+# Le FROM declenche le pull automatique de la base au premier build.
+
+FROM qwen3.5:4b
+
+# ── Sampling recommande Qwen3 en mode NON-thinking ──
+PARAMETER temperature 0.7
+PARAMETER top_p 0.8
+PARAMETER top_k 20
+PARAMETER repeat_penalty 1.05
+
+# ── Contexte : les historiques envoyes font ~6 messages courts, 4096 suffit ──
+# (num_ctx eleve = KV-cache qui consomme de la VRAM pour rien)
+PARAMETER num_ctx 4096
+
+# ── Offload : qwen3.5:4b en Q4 tient entierement sur 8 Go de VRAM ──
+PARAMETER num_gpu 999
+
+# Garde-fou de longueur ; chaque route repasse son propre num_predict via l'API.
+PARAMETER num_predict 512
