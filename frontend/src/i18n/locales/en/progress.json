@@ -1,0 +1,34 @@
+{
+  "loading": "Loading...",
+  "header": {
+    "title": "My progress"
+  },
+  "hero": {
+    "streakDays": "Day streak",
+    "totalXp": "Total XP"
+  },
+  "statCards": {
+    "conversations": "Conversations",
+    "aiMessages": "AI messages",
+    "exercisesDone": "Exercises done",
+    "dictations": "Dictations",
+    "flashcardsReviewed": "Flashcards reviewed",
+    "wordsMastered": "Words mastered"
+  },
+  "vocabMastery": {
+    "heading": "Vocabulary mastery",
+    "count": "{{mastered}}/{{words}} words mastered",
+    "mastered": "Mastered",
+    "inProgress": "In progress",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "categories": {
+    "heading": "Most studied categories"
+  },
+  "level": {
+    "heading": "Current level",
+    "subtitle": "Adaptive level based on your results"
+  }
+}

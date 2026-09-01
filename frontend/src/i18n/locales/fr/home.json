@@ -1,0 +1,110 @@
+{
+  "hero": {
+    "headline": "La méthode la plus fun pour apprendre une langue, et bien plus !",
+    "start": "C'est parti !",
+    "haveAccount": "J'ai déjà un compte"
+  },
+  "sections": {
+    "free": {
+      "heading": "gratuit. fun. efficace.",
+      "text1": "Apprendre avec nous, c'est fun, et en plus ",
+      "link": "ça marche vraiment",
+      "text2": " ! Avec des leçons courtes et interactives, gagne des points, progresse dans les niveaux et développe tes compétences linguistiques pour les situations de la vie courante."
+    },
+    "coach": {
+      "heading": "un coach disponible 24h/24",
+      "text": "Discute librement dans ta langue cible. Chaque message est corrigé, traduit et expliqué instantanément — comme un vrai professeur particulier, toujours là quand tu en as besoin."
+    },
+    "motivation": {
+      "heading": "une motivation toujours au top",
+      "text": "On t'aide à prendre l'habitude de pratiquer grâce à des défis amusants, un streak quotidien, des points d'XP et un vocabulaire qui s'enregistre tout seul au fil de tes conversations."
+    },
+    "voice": {
+      "heading": "parle, on t'écoute",
+      "text": "Active le micro et parle à voix haute. Ta prononciation est transcrite, traduite et analysée en quelques secondes pour un apprentissage par immersion, jusqu'à 3× plus rapide."
+    }
+  },
+  "illustration": {
+    "correction": "Correction",
+    "vocabulary": "Vocabulaire"
+  },
+  "cta": {
+    "heading1": "apprends où tu veux,",
+    "heading2": "quand tu veux",
+    "appStoreSub": "Télécharger dans",
+    "appStore": "l'App Store",
+    "googlePlaySub": "Disponible sur",
+    "googlePlay": "Google Play",
+    "button": "Commencer gratuitement"
+  },
+  "footer": {
+    "tagline": "Apprenez les langues gratuitement. Conversations immersives et suivi personnalisé.",
+    "languagesHeading": "Langues",
+    "featuresHeading": "Fonctionnalités",
+    "features": {
+      "conversation": "Conversation",
+      "translation": "Traduction auto",
+      "explanations": "Explications",
+      "vocabulary": "Vocabulaire auto",
+      "voice": "Reconnaissance vocale",
+      "streak": "Streak & XP",
+      "flashcards": "Flashcards",
+      "dictation": "Dictée"
+    },
+    "resourcesHeading": "Ressources",
+    "resources": {
+      "blog": "Blog",
+      "gettingStarted": "Guide de démarrage",
+      "faq": "FAQ",
+      "tips": "Conseils d'apprentissage"
+    },
+    "companyHeading": "Entreprise",
+    "company": {
+      "about": "À propos",
+      "mission": "Notre mission",
+      "team": "L'équipe",
+      "contact": "Contact"
+    },
+    "copyright": "© 2026 DuoLingua. Tous droits réservés.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "cookies": "Cookies",
+    "legal": "Mentions légales"
+  },
+  "modal": {
+    "loginTitle": "Connexion",
+    "loginSubtitle": "Reprenez votre apprentissage là où vous vous êtes arrêté",
+    "loginSubmit": "Se connecter",
+    "loginSubmitting": "Connexion…",
+    "registerTitle": "Créer un compte",
+    "registerSubtitle": "Commencez à apprendre gratuitement aujourd'hui",
+    "registerSubmit": "Créer mon compte",
+    "registerSubmitting": "Création…",
+    "fieldEmail": "Adresse email",
+    "fieldPassword": "Mot de passe",
+    "fieldUsername": "Nom d'utilisateur",
+    "fieldNativeLanguage": "Langue maternelle",
+    "fieldTargetLanguage": "Langue cible",
+    "fieldLevel": "Niveau actuel",
+    "placeholderEmail": "votre@email.com",
+    "placeholderUsername": "jean_dupont",
+    "switchToRegister": "Pas encore de compte ? ",
+    "switchToLogin": "Déjà inscrit ? ",
+    "registerLink": "S'inscrire",
+    "loginLink": "Se connecter",
+    "errorLoginFailed": "Email ou mot de passe incorrect",
+    "errorRegisterFailed": "Erreur lors de l'inscription",
+    "errorServerUnreachable": "Impossible de joindre le serveur",
+    "errorEmailNotVerified": "Merci de confirmer votre email avant de vous connecter",
+    "resendLink": "Renvoyer l'email de confirmation",
+    "resendSuccess": "Si un compte non confirmé existe avec cet email, un nouveau lien vient de lui être envoyé.",
+    "registerSuccess": "Compte créé ! Vérifiez votre email pour l'activer, puis connectez-vous.",
+    "forgotLink": "Mot de passe oublié ?",
+    "forgotTitle": "Mot de passe oublié",
+    "forgotSubtitle": "Entrez votre email, on vous envoie un lien de réinitialisation",
+    "forgotSubmit": "Envoyer le lien",
+    "forgotSubmitting": "Envoi…",
+    "forgotSuccess": "Si un compte existe avec cet email, un lien de réinitialisation vient de lui être envoyé.",
+    "backToLogin": "Retour à la connexion"
+  }
+}

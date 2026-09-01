@@ -1,0 +1,31 @@
+{
+  "loading": "Loading the lesson...",
+  "header": {
+    "title": "AI Conversation — Coach Lingua",
+    "goal_one": "Goal: {{count}} exchange",
+    "goal_other": "Goal: {{count}} exchanges",
+    "vocabularyLink": "My vocabulary"
+  },
+  "empty": {
+    "title": "Start the conversation!",
+    "text1": "Speak in ",
+    "text2": " — your AI coach replies in ",
+    "text3": " and explains everything."
+  },
+  "message": {
+    "translationLabel": "AI translation: ",
+    "listen": "Listen",
+    "explanationButton": "AI EXPLANATION",
+    "explanationTitle": "Analysis from your AI coach"
+  },
+  "goalReached": {
+    "title": "Goal reached!",
+    "subtitle_one": "You completed {{count}} exchange with your AI coach",
+    "subtitle_other": "You completed {{count}} exchanges with your AI coach",
+    "xpEarned": "XP earned"
+  },
+  "inputBar": {
+    "placeholder": "Speak in {{lang}}…",
+    "hint": "Enter to send • Shift+Enter for a new line"
+  }
+}

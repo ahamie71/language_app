@@ -1,0 +1,68 @@
+{
+  "streakAlert": {
+    "welcomeTitle": "Bienvenue !",
+    "welcomeSubtitle": "C'est parti, bonne session !",
+    "continueTitle": "{{count}} jours de suite !",
+    "continueSubtitle": "Continue comme ça, tu es en feu !"
+  },
+  "stats": {
+    "streak": "Streak",
+    "xp": "XP",
+    "words": "Mots"
+  },
+  "dueFlashcards": {
+    "title_one": "{{count}} carte à réviser",
+    "title_other": "{{count}} cartes à réviser",
+    "subtitle": "Flashcards SRS · Réviser maintenant →"
+  },
+  "coach": {
+    "title": "Parler avec le coach IA",
+    "conversationsCount_one": "{{count}} conversation complétée",
+    "conversationsCount_other": "{{count}} conversations complétées",
+    "newConversation": "NOUVELLE CONVERSATION"
+  },
+  "topicsModal": {
+    "heading": "Choisir un thème",
+    "freeConversation": "Conversation libre (sans thème)"
+  },
+  "topics": {
+    "restaurant": "Au restaurant",
+    "directions": "Demander son chemin",
+    "shopping": "Faire les courses",
+    "jobInterview": "Entretien d'embauche",
+    "travel": "Vacances",
+    "introduction": "Se présenter",
+    "doctor": "Chez le médecin",
+    "hobbies": "Loisirs & culture"
+  },
+  "quickActions": {
+    "heading": "Mes activités",
+    "flashcards": {
+      "label": "Flashcards",
+      "toReview": "{{count}} à réviser",
+      "reviewed": "{{count}} révisées"
+    },
+    "dictation": {
+      "label": "Dictée",
+      "completed_one": "{{count}} complétée",
+      "completed_other": "{{count}} complétées"
+    },
+    "exercises": {
+      "label": "Exercices",
+      "completed_one": "{{count}} complété",
+      "completed_other": "{{count}} complétés"
+    },
+    "vocabulary": {
+      "label": "Vocabulaire",
+      "mastered": "{{mastered}}/{{total}} maîtrisés"
+    }
+  },
+  "progress": {
+    "title": "Ma progression",
+    "subtitle": "Statistiques détaillées de votre apprentissage"
+  },
+  "recentSessions": {
+    "heading": "Mes sessions IA récentes",
+    "defaultTitle": "Session de conversation"
+  }
+}
