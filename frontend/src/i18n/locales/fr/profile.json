@@ -1,0 +1,42 @@
+{
+  "header": {
+    "title": "Mon profil",
+    "editProfile": "Modifier le profil",
+    "logout": "Déconnexion"
+  },
+  "identity": {
+    "nativeLanguage": "Langue maternelle",
+    "learning": "J'apprends"
+  },
+  "stats": {
+    "streakDays": "Jours de suite",
+    "totalXp": "XP total",
+    "heading": "Statistiques",
+    "seeAll": "Voir tout →",
+    "conversations": "Conversations",
+    "messagesExchanged": "Messages échangés",
+    "wordsInNotebook": "Mots dans le carnet",
+    "wordsMastered": "Mots maîtrisés",
+    "exercisesDone": "Exercices faits",
+    "flashcardsReviewed": "Flashcards revues"
+  },
+  "badges": {
+    "heading": "Badges",
+    "obtained": "{{earned}} / {{total}} obtenus",
+    "firstExchange": "Premier échange",
+    "conversations5": "5 conversations",
+    "conversations10": "10 conversations",
+    "words10": "10 mots appris",
+    "words50": "50 mots appris",
+    "words100": "100 mots appris",
+    "streak3": "3 jours de suite",
+    "streak7": "7 jours de suite",
+    "streak30": "30 jours de suite",
+    "mastered5": "5 mots maîtrisés",
+    "mastered20": "20 mots maîtrisés",
+    "exercises5": "5 exercices",
+    "exercises20": "20 exercices",
+    "flashcards10": "10 flashcards",
+    "dictations3": "3 dictées"
+  }
+}

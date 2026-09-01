@@ -1,0 +1,30 @@
+{
+  "nav": {
+    "learn": "Apprendre",
+    "exercises": "Exercices",
+    "flashcards": "Cartes",
+    "vocabulary": "Vocab",
+    "profile": "Profil"
+  },
+  "language": {
+    "site": "Langue du site",
+    "fr": "Français",
+    "en": "English"
+  },
+  "languageNames": {
+    "fr": "Français",
+    "en": "Anglais",
+    "es": "Espagnol",
+    "de": "Allemand",
+    "ar": "Arabe",
+    "it": "Italien",
+    "pt": "Portugais",
+    "zh": "Chinois",
+    "ja": "Japonais"
+  },
+  "levelNames": {
+    "debutant": "Débutant",
+    "intermediaire": "Intermédiaire",
+    "avance": "Avancé"
+  }
+}

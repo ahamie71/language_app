@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, Flame, Zap, BookOpen, MessageCircle, CheckCircle, PenLine, Mic, BarChart3 } from 'lucide-react'
 import { getStats, getVocabulary } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import BottomNav from '../components/BottomNav'
-import { LANG_NAMES } from '../constants/languages'
-import { LEVEL_INFO } from '../constants/levels'
+import TopNav from '../components/TopNav'
+import { translatedLanguageName } from '../constants/languages'
+import { LEVEL_INFO, translatedLevelLabel } from '../constants/levels'
 import { getXp, getMasteredCount } from '../utils/stats'
 
 function StatCard({ icon: Icon, label, value, color, bg, sub }) {
@@ -37,6 +39,7 @@ function Bar({ label, value, max, color }) {
 export default function Progress() {
   const navigate     = useNavigate()
   const { user }     = useAuth()
+  const { t }        = useTranslation('progress')
   const [stats,      setStats]  = useState(null)
   const [vocab,      setVocab]  = useState([])
   const [loading,    setLoading] = useState(true)
@@ -51,7 +54,7 @@ export default function Progress() {
     <div className="flex items-center justify-center h-screen bg-duo-gray font-duo">
       <div className="text-center">
         <BarChart3 size={48} className="text-duo-green mx-auto mb-4 animate-float" />
-        <p className="text-duo-muted font-bold">Chargement...</p>
+        <p className="text-duo-muted font-bold">{t('loading')}</p>
       </div>
     </div>
   )
@@ -85,22 +88,23 @@ export default function Progress() {
   const maxCat  = topCats[0]?.[1] || 1
 
   return (
-    <div className="min-h-screen bg-duo-gray font-duo pb-24">
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-20">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
+    <div className="min-h-screen bg-duo-gray font-duo pb-24 md:pb-8">
+      <TopNav active="profile" />
+      <header className="bg-white border-b-2 border-duo-border sticky top-0 md:static z-20">
+        <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-duo-gray rounded-lg transition-colors">
             <ChevronLeft size={20} className="text-duo-muted" />
           </button>
           <div>
-            <h1 className="text-xl font-black text-duo-text">Ma progression</h1>
+            <h1 className="text-xl font-black text-duo-text">{t('header.title')}</h1>
             <p className="text-xs text-duo-muted font-semibold">
-              {LANG_NAMES[user?.native_language]} → {LANG_NAMES[user?.target_language]}
+              {translatedLanguageName(t, user?.native_language)} → {translatedLanguageName(t, user?.target_language)}
             </p>
           </div>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 py-4 space-y-4">
 
         {/* XP + Streak hero */}
         <div className="duo-card p-0 overflow-hidden">
@@ -111,51 +115,51 @@ export default function Progress() {
                 <Flame size={28} className="text-orange-500" />
               </div>
               <div className="text-3xl font-black text-duo-text">{streak}</div>
-              <div className="text-xs font-bold text-duo-muted">Jours de suite</div>
+              <div className="text-xs font-bold text-duo-muted">{t('hero.streakDays')}</div>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 rounded-2xl bg-violet-50 flex items-center justify-center mx-auto mb-2">
                 <Zap size={28} className="text-violet-500" />
               </div>
               <div className="text-3xl font-black text-duo-text">{xp}</div>
-              <div className="text-xs font-bold text-duo-muted">XP total</div>
+              <div className="text-xs font-bold text-duo-muted">{t('hero.totalXp')}</div>
             </div>
           </div>
         </div>
 
         {/* Activity stats grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <StatCard icon={MessageCircle} label="Conversations"   value={convs}      color="text-blue-500"     bg="bg-blue-50"     />
-          <StatCard icon={Zap}           label="Messages IA"     value={messages}   color="text-violet-500"   bg="bg-violet-50"   />
-          <StatCard icon={PenLine}       label="Exercices faits" value={exercises}  color="text-amber-500"    bg="bg-amber-50"    />
-          <StatCard icon={Mic}           label="Dictées"         value={dictations} color="text-rose-500"     bg="bg-rose-50"     />
-          <StatCard icon={BookOpen}      label="Flashcards revues" value={flashcards} color="text-cyan-500"   bg="bg-cyan-50"     />
-          <StatCard icon={CheckCircle}   label="Mots maîtrisés"  value={mastered}   color="text-emerald-600"  bg="bg-emerald-50"  />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <StatCard icon={MessageCircle} label={t('statCards.conversations')}   value={convs}      color="text-blue-500"     bg="bg-blue-50"     />
+          <StatCard icon={Zap}           label={t('statCards.aiMessages')}      value={messages}   color="text-violet-500"   bg="bg-violet-50"   />
+          <StatCard icon={PenLine}       label={t('statCards.exercisesDone')}   value={exercises}  color="text-amber-500"    bg="bg-amber-50"    />
+          <StatCard icon={Mic}           label={t('statCards.dictations')}      value={dictations} color="text-rose-500"     bg="bg-rose-50"     />
+          <StatCard icon={BookOpen}      label={t('statCards.flashcardsReviewed')} value={flashcards} color="text-cyan-500"  bg="bg-cyan-50"     />
+          <StatCard icon={CheckCircle}   label={t('statCards.wordsMastered')}   value={mastered}   color="text-emerald-600"  bg="bg-emerald-50"  />
         </div>
 
         {/* Vocabulary mastery */}
         <div className="duo-card">
-          <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">Maîtrise du vocabulaire</h3>
+          <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">{t('vocabMastery.heading')}</h3>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-duo-muted font-semibold text-sm">{mastered}/{words} mots maîtrisés</span>
+            <span className="text-duo-muted font-semibold text-sm">{t('vocabMastery.count', { mastered, words })}</span>
             <span className="font-black text-duo-green text-xl">{masteryPct}%</span>
           </div>
           <div className="duo-progress mb-4">
             <div className="duo-progress-fill transition-all duration-700" style={{ width: `${masteryPct}%` }} />
           </div>
           <div className="space-y-2">
-            <Bar label="Maîtrisés"  value={mastered}  max={words} color="bg-duo-green"  />
-            <Bar label="En cours"   value={learning}  max={words} color="bg-duo-orange" />
-            <Bar label="Faciles"    value={byDiff.easy   || 0} max={words} color="bg-emerald-400" />
-            <Bar label="Moyens"     value={byDiff.medium || 0} max={words} color="bg-amber-400"   />
-            <Bar label="Difficiles" value={byDiff.hard   || 0} max={words} color="bg-rose-400"    />
+            <Bar label={t('vocabMastery.mastered')}  value={mastered}  max={words} color="bg-duo-green"  />
+            <Bar label={t('vocabMastery.inProgress')}   value={learning}  max={words} color="bg-duo-orange" />
+            <Bar label={t('vocabMastery.easy')}    value={byDiff.easy   || 0} max={words} color="bg-emerald-400" />
+            <Bar label={t('vocabMastery.medium')}     value={byDiff.medium || 0} max={words} color="bg-amber-400"   />
+            <Bar label={t('vocabMastery.hard')} value={byDiff.hard   || 0} max={words} color="bg-rose-400"    />
           </div>
         </div>
 
         {/* Top categories */}
         {topCats.length > 0 && (
           <div className="duo-card">
-            <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">Catégories les plus étudiées</h3>
+            <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">{t('categories.heading')}</h3>
             <div className="space-y-3">
               {topCats.map(([cat, count]) => (
                 <Bar key={cat} label={cat.length > 12 ? cat.slice(0, 12) + '…' : cat} value={count} max={maxCat} color="bg-duo-blue" />
@@ -166,13 +170,13 @@ export default function Progress() {
 
         {/* Level info */}
         <div className="duo-card">
-          <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">Niveau actuel</h3>
+          <h3 className="font-extrabold text-duo-text text-sm uppercase tracking-widest mb-4">{t('level.heading')}</h3>
           <div className="flex items-center gap-4">
             <div className={`px-4 py-2 rounded-full font-extrabold text-sm ${(LEVEL_INFO[user?.level] || LEVEL_INFO.debutant).bg} ${(LEVEL_INFO[user?.level] || LEVEL_INFO.debutant).color}`}>
-              {(LEVEL_INFO[user?.level] || LEVEL_INFO.debutant).label}
+              {translatedLevelLabel(t, user?.level || 'debutant')}
             </div>
             <div className="flex-1">
-              <div className="text-xs text-duo-muted font-semibold">Niveau adaptatif basé sur vos résultats</div>
+              <div className="text-xs text-duo-muted font-semibold">{t('level.subtitle')}</div>
             </div>
           </div>
         </div>

@@ -24,3 +24,12 @@ export const LANG_LOCALE = Object.fromEntries(LANGUAGES.map(l => [l.code, l.loca
 LANG_LOCALE.us = 'en-US'
 
 export const LANG_FLAG = Object.fromEntries(LANGUAGES.map(l => [l.code, l.flag]))
+
+// Nom de la langue affiché selon la langue du SITE (pas la langue apprise) —
+// ex. code 'en' affiche "Anglais" en site FR, "English" en site EN. `t` vient
+// de useTranslation() (n'importe quel namespace, la clé est préfixée `common:`).
+export const translatedLanguageName = (t, code) => {
+  if (!code) return ''
+  const key = code === 'us' ? 'en' : code
+  return t(`common:languageNames.${key}`, { defaultValue: LANG_NAMES[code] || code })
+}

@@ -36,3 +36,9 @@ export const LEVELS = [
 ]
 
 export const LEVEL_INFO = Object.fromEntries(LEVELS.map(l => [l.value, l]))
+
+// Libellé de niveau affiché selon la langue du SITE — ex. "Débutant" en site
+// FR, "Beginner" en site EN. `t` vient de useTranslation() (n'importe quel
+// namespace, la clé est préfixée `common:`).
+export const translatedLevelLabel = (t, value) =>
+  t(`common:levelNames.${value}`, { defaultValue: LEVEL_INFO[value]?.label || value })

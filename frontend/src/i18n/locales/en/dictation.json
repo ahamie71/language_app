@@ -1,0 +1,38 @@
+{
+  "micDenied": "Microphone access denied.",
+  "header": {
+    "title": "Dictation Mode",
+    "subtitle": "Listen → Write → Check"
+  },
+  "ready": {
+    "heading": "Dictation Mode",
+    "description": "The AI generates a text, reads it aloud, and you have to write it down or repeat it.",
+    "start": "Start dictation"
+  },
+  "listening": {
+    "listenCarefully": "Listen carefully",
+    "listenButton": "Listen to the text",
+    "hideText": "Hide text",
+    "showText": "Show text (hint)",
+    "yourAnswer": "Your answer:",
+    "placeholder": "Write here what you heard...",
+    "recordButton": "Dictate with mic",
+    "checkButton": "Check →"
+  },
+  "recording": {
+    "inProgress": "Recording in progress...",
+    "speakClearly": "Speak clearly into the microphone",
+    "stop": "Stop"
+  },
+  "checking": {
+    "analyzing": "Analyzing..."
+  },
+  "result": {
+    "score": "Score",
+    "originalText": "Original text",
+    "yourAnswer": "Your answer",
+    "noAnswer": "(no answer)",
+    "newExercise": "New exercise",
+    "finish": "Finish"
+  }
+}

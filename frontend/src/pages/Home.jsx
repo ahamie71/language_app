@@ -1,20 +1,24 @@
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   X, Eye, EyeOff, Loader2, CheckCircle, CheckCircle2, AlertCircle,
   Languages, Wand2, BookMarked, Mic2, Trophy, Volume2,
-  MessageSquare, Globe, ChevronRight, ChevronLeft,
+  MessageSquare, ChevronRight, ChevronLeft,
   UserPlus, LogIn, Flame, Star, Smartphone, Play
 } from 'lucide-react'
 import { FaXTwitter, FaFacebookF, FaInstagram, FaYoutube, FaGithub } from 'react-icons/fa6'
-import { login, register, getProfile } from '../services/api'
+import { login, register, getProfile, forgotPassword, resendVerification } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
-import { LANGUAGES } from '../constants/languages'
-import { LEVELS } from '../constants/levels'
+import { LANGUAGES, translatedLanguageName } from '../constants/languages'
+import { LEVELS, translatedLevelLabel } from '../constants/levels'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 
 export default function Home() {
   const navigate      = useNavigate()
+  const location       = useLocation()
   const { loginUser } = useAuth()
+  const { t }         = useTranslation('home')
   const chipRef        = useRef(null)
 
   const [modal,   setModal]   = useState(null)
@@ -22,21 +26,29 @@ export default function Home() {
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [needsVerification, setNeedsVerification] = useState(false)
 
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
-  const [regForm,   setRegForm]   = useState({
+  const [loginForm,   setLoginForm]   = useState({ email: '', password: '' })
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [regForm,     setRegForm]     = useState({
     username: '', email: '', password: '',
     native_language: 'fr', target_language: 'en', level: 'debutant',
   })
 
-  const openLogin    = () => { setModal('login');    setError(''); setSuccess(''); setShowPwd(false) }
-  const openRegister = () => { setModal('register'); setError(''); setSuccess(''); setShowPwd(false) }
+  const openLogin    = () => { setModal('login');    setError(''); setSuccess(''); setShowPwd(false); setNeedsVerification(false) }
+  const openRegister = () => { setModal('register'); setError(''); setSuccess(''); setShowPwd(false); setNeedsVerification(false) }
+  const openForgot   = () => { setModal('forgot');   setError(''); setSuccess(''); setForgotEmail('') }
   const closeModal   = () => { setModal(null); setError(''); setSuccess('') }
   const scrollChips  = (dir) => chipRef.current?.scrollBy({ left: dir * 240, behavior: 'smooth' })
 
+  useEffect(() => {
+    if (location.state?.openLogin) openLogin()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state])
+
   const handleLogin = async (e) => {
     e.preventDefault()
-    setLoading(true); setError('')
+    setLoading(true); setError(''); setNeedsVerification(false)
     try {
       const data = await login(loginForm.email, loginForm.password)
       if (data.access_token) {
@@ -44,11 +56,26 @@ export default function Home() {
         loginUser(profile)
         closeModal()
         navigate('/dashboard')
+      } else if (data.code === 'EMAIL_NOT_VERIFIED') {
+        setError(data.error || t('modal.errorEmailNotVerified'))
+        setNeedsVerification(true)
       } else {
-        setError(data.detail || 'Email ou mot de passe incorrect')
+        setError(data.detail || data.error || t('modal.errorLoginFailed'))
       }
     } catch {
-      setError('Impossible de joindre le serveur')
+      setError(t('modal.errorServerUnreachable'))
+    }
+    setLoading(false)
+  }
+
+  const handleResendVerification = async () => {
+    setLoading(true); setError('')
+    try {
+      const data = await resendVerification(loginForm.email)
+      setSuccess(data.message || t('modal.resendSuccess'))
+      setNeedsVerification(false)
+    } catch {
+      setError(t('modal.errorServerUnreachable'))
     }
     setLoading(false)
   }
@@ -59,13 +86,25 @@ export default function Home() {
     try {
       const data = await register(regForm)
       if (data.user_id) {
-        setSuccess('Compte créé ! Redirection vers la connexion…')
-        setTimeout(openLogin, 1800)
+        setSuccess(data.message || t('modal.registerSuccess'))
+        setTimeout(openLogin, 3000)
       } else {
-        setError(data.detail || "Erreur lors de l'inscription")
+        setError(data.detail || t('modal.errorRegisterFailed'))
       }
     } catch {
-      setError('Impossible de joindre le serveur')
+      setError(t('modal.errorServerUnreachable'))
+    }
+    setLoading(false)
+  }
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault()
+    setLoading(true); setError(''); setSuccess('')
+    try {
+      const data = await forgotPassword(forgotEmail)
+      setSuccess(data.message || t('modal.forgotSuccess'))
+    } catch {
+      setError(t('modal.errorServerUnreachable'))
     }
     setLoading(false)
   }
@@ -81,9 +120,7 @@ export default function Home() {
           </div>
           <span className="text-2xl font-black text-duo-green tracking-tight">duolingua</span>
         </div>
-        <button className="flex items-center gap-1 text-xs font-black uppercase tracking-wide text-duo-muted hover:text-duo-text transition-colors">
-          Langue du site : Français <ChevronRight size={13} className="rotate-90" />
-        </button>
+        <LanguageSwitcher />
       </header>
 
       {/* ════ HERO ══════════════════════════════════════════════════════════ */}
@@ -98,14 +135,14 @@ export default function Home() {
           {/* Text + CTAs */}
           <div className="flex-1 max-w-md order-2 text-center lg:text-left">
             <h1 className="text-4xl md:text-5xl font-black text-duo-text leading-[1.15] mb-8">
-              La méthode la plus fun pour apprendre une langue, et bien plus !
+              {t('hero.headline')}
             </h1>
             <div className="flex flex-col gap-3 max-w-xs mx-auto lg:mx-0">
               <button onClick={openRegister} className="duo-btn duo-btn-green w-full py-4 text-base">
-                C'est parti !
+                {t('hero.start')}
               </button>
               <button onClick={openLogin} className="duo-btn duo-btn-ghost w-full py-4 text-base">
-                J'ai déjà un compte
+                {t('hero.haveAccount')}
               </button>
             </div>
           </div>
@@ -125,7 +162,7 @@ export default function Home() {
               <button key={l.code} onClick={openRegister}
                 className="shrink-0 flex items-center gap-2 border-2 border-duo-border hover:border-duo-text/30 rounded-2xl px-4 py-2 transition-colors">
                 <span className={`fi fi-${l.flagCode} rounded-[2px]`} style={{ fontSize: '1.1em' }} />
-                <span className="text-xs font-black uppercase tracking-wide text-duo-text whitespace-nowrap">{l.name}</span>
+                <span className="text-xs font-black uppercase tracking-wide text-duo-text whitespace-nowrap">{translatedLanguageName(t, l.code)}</span>
               </button>
             ))}
           </div>
@@ -138,30 +175,30 @@ export default function Home() {
 
       {/* ════ FEATURE SECTIONS — alternées, comme duolingo.com ═══════════════ */}
       <FeatureSection
-        heading="gratuit. fun. efficace."
-        text={<>Apprendre avec nous, c'est fun, et en plus <button onClick={openRegister} className="text-duo-blue font-black hover:underline">ça marche vraiment</button> ! Avec des leçons courtes et interactives, gagne des points, progresse dans les niveaux et développe tes compétences linguistiques pour les situations de la vie courante.</>}
+        heading={t('sections.free.heading')}
+        text={<>{t('sections.free.text1')}<button onClick={openRegister} className="text-duo-blue font-black hover:underline">{t('sections.free.link')}</button>{t('sections.free.text2')}</>}
         illustration={<PhoneAppIllustration />}
         side="right"
       />
 
       <FeatureSection
-        heading="un coach disponible 24h/24"
-        text="Discute librement dans ta langue cible. Chaque message est corrigé, traduit et expliqué instantanément — comme un vrai professeur particulier, toujours là quand tu en as besoin."
+        heading={t('sections.coach.heading')}
+        text={t('sections.coach.text')}
         illustration={<ChatIllustration />}
         side="left"
         bg="bg-duo-gray/40"
       />
 
       <FeatureSection
-        heading="une motivation toujours au top"
-        text="On t'aide à prendre l'habitude de pratiquer grâce à des défis amusants, un streak quotidien, des points d'XP et un vocabulaire qui s'enregistre tout seul au fil de tes conversations."
+        heading={t('sections.motivation.heading')}
+        text={t('sections.motivation.text')}
         illustration={<StreakIllustration />}
         side="right"
       />
 
       <FeatureSection
-        heading="parle, on t'écoute"
-        text="Active le micro et parle à voix haute. Ta prononciation est transcrite, traduite et analysée en quelques secondes pour un apprentissage par immersion, jusqu'à 3× plus rapide."
+        heading={t('sections.voice.heading')}
+        text={t('sections.voice.text')}
         illustration={<VoiceIllustration />}
         side="left"
         bg="bg-duo-gray/40"
@@ -172,7 +209,7 @@ export default function Home() {
         <FloatingShapes />
         <div className="max-w-4xl mx-auto relative text-center">
           <h2 className="text-3xl md:text-4xl font-black mb-10" style={{ color: '#0F3A5F' }}>
-            apprends où tu veux,<br />quand tu veux
+            {t('cta.heading1')}<br />{t('cta.heading2')}
           </h2>
 
           <div className="flex justify-center mb-10">
@@ -183,21 +220,21 @@ export default function Home() {
             <a href="#" className="flex items-center gap-2.5 bg-white hover:bg-duo-gray px-4 py-2.5 rounded-2xl transition-colors border-2 border-duo-border">
               <Smartphone size={20} style={{ color: '#0F3A5F' }} />
               <div className="text-left">
-                <div className="text-[10px] font-bold leading-none" style={{ color: '#0F3A5F', opacity: 0.6 }}>Télécharger dans</div>
-                <div className="font-black text-sm leading-tight" style={{ color: '#0F3A5F' }}>l'App Store</div>
+                <div className="text-[10px] font-bold leading-none" style={{ color: '#0F3A5F', opacity: 0.6 }}>{t('cta.appStoreSub')}</div>
+                <div className="font-black text-sm leading-tight" style={{ color: '#0F3A5F' }}>{t('cta.appStore')}</div>
               </div>
             </a>
             <a href="#" className="flex items-center gap-2.5 bg-white hover:bg-duo-gray px-4 py-2.5 rounded-2xl transition-colors border-2 border-duo-border">
               <Play size={18} style={{ color: '#0F3A5F' }} />
               <div className="text-left">
-                <div className="text-[10px] font-bold leading-none" style={{ color: '#0F3A5F', opacity: 0.6 }}>Disponible sur</div>
-                <div className="font-black text-sm leading-tight" style={{ color: '#0F3A5F' }}>Google Play</div>
+                <div className="text-[10px] font-bold leading-none" style={{ color: '#0F3A5F', opacity: 0.6 }}>{t('cta.googlePlaySub')}</div>
+                <div className="font-black text-sm leading-tight" style={{ color: '#0F3A5F' }}>{t('cta.googlePlay')}</div>
               </div>
             </a>
           </div>
 
           <button onClick={openRegister} className="duo-btn duo-btn-green px-10 py-4 text-base">
-            Commencer gratuitement
+            {t('cta.button')}
           </button>
         </div>
       </section>
@@ -215,7 +252,7 @@ export default function Home() {
                 <span className="text-lg font-black text-duo-green">duolingua</span>
               </div>
               <p className="text-duo-muted text-sm font-semibold leading-relaxed mb-5">
-                Apprenez les langues gratuitement. Conversations immersives et suivi personnalisé.
+                {t('footer.tagline')}
               </p>
               <div className="flex gap-2">
                 {[FaXTwitter, FaFacebookF, FaInstagram, FaYoutube, FaGithub].map((Icon, i) => (
@@ -228,13 +265,13 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">Langues</h4>
+              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">{t('footer.languagesHeading')}</h4>
               <ul className="space-y-2.5">
                 {LANGUAGES.filter(l => l.code !== 'fr').map(l => (
                   <li key={l.code}>
                     <a href="#" onClick={e => { e.preventDefault(); openRegister() }}
                       className="text-duo-muted hover:text-duo-green text-sm font-semibold transition-colors flex items-center gap-1.5">
-                      <span className={`fi fi-${l.flagCode} rounded-[2px]`} style={{ fontSize: '1.1em' }} /> {l.name}
+                      <span className={`fi fi-${l.flagCode} rounded-[2px]`} style={{ fontSize: '1.1em' }} /> {translatedLanguageName(t, l.code)}
                     </a>
                   </li>
                 ))}
@@ -242,12 +279,12 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">Fonctionnalités</h4>
+              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">{t('footer.featuresHeading')}</h4>
               <ul className="space-y-2.5">
-                {['Conversation','Traduction auto','Explications','Vocabulaire auto','Reconnaissance vocale','Streak & XP','Flashcards','Dictée'].map(f => (
-                  <li key={f}>
+                {['conversation','translation','explanations','vocabulary','voice','streak','flashcards','dictation'].map(key => (
+                  <li key={key}>
                     <a href="#" className="text-duo-muted hover:text-duo-green text-sm font-semibold transition-colors flex items-center gap-1.5">
-                      <ChevronRight size={12} className="text-duo-border" /> {f}
+                      <ChevronRight size={12} className="text-duo-border" /> {t(`footer.features.${key}`)}
                     </a>
                   </li>
                 ))}
@@ -255,17 +292,17 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">Ressources</h4>
+              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">{t('footer.resourcesHeading')}</h4>
               <ul className="space-y-2.5">
                 {[
-                  { l: 'Blog',                     h: '#'    },
-                  { l: 'Guide de démarrage',        h: '#'    },
-                  { l: 'FAQ',                       h: '/faq' },
-                  { l: "Conseils d'apprentissage",  h: '#'    },
+                  { key: 'blog',           h: '#'    },
+                  { key: 'gettingStarted', h: '#'    },
+                  { key: 'faq',            h: '/faq' },
+                  { key: 'tips',           h: '#'    },
                 ].map(r => (
-                  <li key={r.l}>
+                  <li key={r.key}>
                     <a href={r.h} className="text-duo-muted hover:text-duo-green text-sm font-semibold transition-colors flex items-center gap-1.5">
-                      <ChevronRight size={12} className="text-duo-border" /> {r.l}
+                      <ChevronRight size={12} className="text-duo-border" /> {t(`footer.resources.${r.key}`)}
                     </a>
                   </li>
                 ))}
@@ -273,17 +310,17 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">Entreprise</h4>
+              <h4 className="font-extrabold text-duo-text text-xs uppercase tracking-widest mb-4">{t('footer.companyHeading')}</h4>
               <ul className="space-y-2.5">
                 {[
-                  { l: 'À propos',      h: '/about' },
-                  { l: 'Notre mission', h: '/about' },
-                  { l: "L'équipe",      h: '/about' },
-                  { l: 'Contact',       h: '#'      },
+                  { key: 'about',   h: '/about' },
+                  { key: 'mission', h: '/about' },
+                  { key: 'team',    h: '/about' },
+                  { key: 'contact', h: '#'      },
                 ].map(e => (
-                  <li key={e.l}>
+                  <li key={e.key}>
                     <a href={e.h} className="text-duo-muted hover:text-duo-green text-sm font-semibold transition-colors flex items-center gap-1.5">
-                      <ChevronRight size={12} className="text-duo-border" /> {e.l}
+                      <ChevronRight size={12} className="text-duo-border" /> {t(`footer.company.${e.key}`)}
                     </a>
                   </li>
                 ))}
@@ -294,20 +331,13 @@ export default function Home() {
 
         <div className="border-t-2 border-duo-border">
           <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-duo-muted text-xs font-bold">© 2026 DuoLingua. Tous droits réservés.</p>
+            <p className="text-duo-muted text-xs font-bold">{t('footer.copyright')}</p>
             <div className="flex flex-wrap gap-4 justify-center">
-              {['Confidentialité','Conditions','Cookies','Mentions légales'].map(l => (
-                <a key={l} href="#" className="text-duo-muted hover:text-duo-text text-xs font-bold transition-colors">{l}</a>
+              {['privacy','terms','cookies','legal'].map(key => (
+                <a key={key} href="#" className="text-duo-muted hover:text-duo-text text-xs font-bold transition-colors">{t(`footer.${key}`)}</a>
               ))}
             </div>
-            <div className="flex items-center gap-2">
-              <Globe size={13} className="text-duo-muted" />
-              <select className="bg-transparent text-xs font-bold text-duo-muted focus:outline-none cursor-pointer">
-                <option>Français</option>
-                <option>English</option>
-                <option>Español</option>
-              </select>
-            </div>
+            <LanguageSwitcher />
           </div>
         </div>
       </footer>
@@ -325,12 +355,14 @@ export default function Home() {
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-black text-duo-text">
-                    {modal === 'login' ? 'Connexion' : 'Créer un compte'}
+                    {modal === 'login' ? t('modal.loginTitle')
+                      : modal === 'forgot' ? t('modal.forgotTitle')
+                      : t('modal.registerTitle')}
                   </h2>
                   <p className="text-duo-muted font-semibold text-sm mt-1">
-                    {modal === 'login'
-                      ? 'Reprenez votre apprentissage là où vous vous êtes arrêté'
-                      : 'Commencez à apprendre gratuitement aujourd\'hui'}
+                    {modal === 'login' ? t('modal.loginSubtitle')
+                      : modal === 'forgot' ? t('modal.forgotSubtitle')
+                      : t('modal.registerSubtitle')}
                   </p>
                 </div>
                 <button onClick={closeModal}
@@ -340,8 +372,16 @@ export default function Home() {
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 bg-duo-red-bg border-2 border-duo-red text-duo-red-d text-sm font-semibold px-4 py-3 rounded-xl mb-4">
-                  <AlertCircle size={15} className="shrink-0" /> {error}
+                <div className="bg-duo-red-bg border-2 border-duo-red text-duo-red-d text-sm font-semibold px-4 py-3 rounded-xl mb-4">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle size={15} className="shrink-0" /> {error}
+                  </div>
+                  {needsVerification && (
+                    <button type="button" onClick={handleResendVerification} disabled={loading}
+                      className="mt-2 text-duo-red-d underline font-extrabold text-xs hover:opacity-80 disabled:opacity-50">
+                      {t('modal.resendLink')}
+                    </button>
+                  )}
                 </div>
               )}
               {success && (
@@ -352,61 +392,83 @@ export default function Home() {
 
               {modal === 'login' && (
                 <form onSubmit={handleLogin} className="space-y-4">
-                  <FieldLabel label="Adresse email">
-                    <input type="email" placeholder="votre@email.com" required
+                  <FieldLabel label={t('modal.fieldEmail')}>
+                    <input type="email" placeholder={t('modal.placeholderEmail')} required
                       className="duo-input"
                       value={loginForm.email}
                       onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} />
                   </FieldLabel>
-                  <FieldLabel label="Mot de passe">
+                  <FieldLabel label={t('modal.fieldPassword')}>
                     <PwdInput value={loginForm.password} show={showPwd}
                       onChange={v => setLoginForm({ ...loginForm, password: v })}
                       toggle={() => setShowPwd(!showPwd)} />
                   </FieldLabel>
+                  <div className="text-right -mt-1">
+                    <button type="button" onClick={openForgot}
+                      className="text-duo-blue hover:text-duo-blue-d font-bold text-xs transition-colors">
+                      {t('modal.forgotLink')}
+                    </button>
+                  </div>
                   <button type="submit" disabled={loading}
                     className="duo-btn duo-btn-green w-full py-3.5 mt-2">
                     {loading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
-                    {loading ? 'Connexion…' : 'Se connecter'}
+                    {loading ? t('modal.loginSubmitting') : t('modal.loginSubmit')}
+                  </button>
+                </form>
+              )}
+
+              {modal === 'forgot' && (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <FieldLabel label={t('modal.fieldEmail')}>
+                    <input type="email" placeholder={t('modal.placeholderEmail')} required
+                      className="duo-input"
+                      value={forgotEmail}
+                      onChange={e => setForgotEmail(e.target.value)} />
+                  </FieldLabel>
+                  <button type="submit" disabled={loading || !!success}
+                    className="duo-btn duo-btn-green w-full py-3.5 mt-2 disabled:opacity-60">
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : null}
+                    {loading ? t('modal.forgotSubmitting') : t('modal.forgotSubmit')}
                   </button>
                 </form>
               )}
 
               {modal === 'register' && (
                 <form onSubmit={handleRegister} className="space-y-3">
-                  <FieldLabel label="Nom d'utilisateur">
-                    <input type="text" placeholder="jean_dupont" required
+                  <FieldLabel label={t('modal.fieldUsername')}>
+                    <input type="text" placeholder={t('modal.placeholderUsername')} required
                       className="duo-input"
                       value={regForm.username}
                       onChange={e => setRegForm({ ...regForm, username: e.target.value })} />
                   </FieldLabel>
-                  <FieldLabel label="Adresse email">
-                    <input type="email" placeholder="votre@email.com" required
+                  <FieldLabel label={t('modal.fieldEmail')}>
+                    <input type="email" placeholder={t('modal.placeholderEmail')} required
                       className="duo-input"
                       value={regForm.email}
                       onChange={e => setRegForm({ ...regForm, email: e.target.value })} />
                   </FieldLabel>
-                  <FieldLabel label="Mot de passe">
+                  <FieldLabel label={t('modal.fieldPassword')}>
                     <PwdInput value={regForm.password} show={showPwd}
                       onChange={v => setRegForm({ ...regForm, password: v })}
                       toggle={() => setShowPwd(!showPwd)} />
                   </FieldLabel>
                   <div className="grid grid-cols-2 gap-3">
-                    <FieldLabel label="Langue maternelle">
+                    <FieldLabel label={t('modal.fieldNativeLanguage')}>
                       <select className="duo-select"
                         value={regForm.native_language}
                         onChange={e => setRegForm({ ...regForm, native_language: e.target.value })}>
-                        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
+                        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{translatedLanguageName(t, l.code)}</option>)}
                       </select>
                     </FieldLabel>
-                    <FieldLabel label="Langue cible">
+                    <FieldLabel label={t('modal.fieldTargetLanguage')}>
                       <select className="duo-select"
                         value={regForm.target_language}
                         onChange={e => setRegForm({ ...regForm, target_language: e.target.value })}>
-                        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
+                        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{translatedLanguageName(t, l.code)}</option>)}
                       </select>
                     </FieldLabel>
                   </div>
-                  <FieldLabel label="Niveau actuel">
+                  <FieldLabel label={t('modal.fieldLevel')}>
                     <div className="grid grid-cols-3 gap-2">
                       {LEVELS.map(opt => (
                         <button key={opt.value} type="button"
@@ -414,7 +476,7 @@ export default function Home() {
                           className={`py-2.5 rounded-xl border-2 font-extrabold text-xs transition-all ${
                             regForm.level === opt.value ? opt.selectedClass : 'border-duo-border text-duo-muted hover:border-duo-text/30'
                           }`}>
-                          {opt.label}
+                          {translatedLevelLabel(t, opt.value)}
                         </button>
                       ))}
                     </div>
@@ -422,18 +484,27 @@ export default function Home() {
                   <button type="submit" disabled={loading}
                     className="duo-btn duo-btn-green w-full py-3.5 mt-1">
                     {loading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
-                    {loading ? 'Création…' : 'Créer mon compte'}
+                    {loading ? t('modal.registerSubmitting') : t('modal.registerSubmit')}
                   </button>
                 </form>
               )}
 
-              <p className="text-center text-duo-muted font-semibold text-sm mt-4">
-                {modal === 'login' ? "Pas encore de compte ? " : "Déjà inscrit ? "}
-                <button onClick={modal === 'login' ? openRegister : openLogin}
-                  className="text-duo-blue hover:text-duo-blue-d font-extrabold transition-colors">
-                  {modal === 'login' ? "S'inscrire" : "Se connecter"}
-                </button>
-              </p>
+              {modal === 'forgot' ? (
+                <p className="text-center text-duo-muted font-semibold text-sm mt-4">
+                  <button onClick={openLogin}
+                    className="text-duo-blue hover:text-duo-blue-d font-extrabold transition-colors">
+                    {t('modal.backToLogin')}
+                  </button>
+                </p>
+              ) : (
+                <p className="text-center text-duo-muted font-semibold text-sm mt-4">
+                  {modal === 'login' ? t('modal.switchToRegister') : t('modal.switchToLogin')}
+                  <button onClick={modal === 'login' ? openRegister : openLogin}
+                    className="text-duo-blue hover:text-duo-blue-d font-extrabold transition-colors">
+                    {modal === 'login' ? t('modal.registerLink') : t('modal.loginLink')}
+                  </button>
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -513,6 +584,7 @@ function PhoneAppIllustration() {
 }
 
 function ChatIllustration() {
+  const { t } = useTranslation('home')
   return (
     <div className="w-64 space-y-3">
       <div className="bg-white border-2 border-duo-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm max-w-[220px]">
@@ -523,7 +595,7 @@ function ChatIllustration() {
       </div>
       <div className="bg-white border-2 border-duo-green rounded-2xl px-4 py-3 shadow-sm">
         <div className="flex items-center gap-1.5 text-xs font-black text-duo-green-d mb-1">
-          <Wand2 size={13} /> Correction
+          <Wand2 size={13} /> {t('illustration.correction')}
         </div>
         <p className="text-sm font-bold text-duo-text">"I <span className="line-through text-duo-red">are</span> <span className="text-duo-green-d">am</span> fine, thank you !"</p>
       </div>
@@ -532,6 +604,7 @@ function ChatIllustration() {
 }
 
 function StreakIllustration() {
+  const { t } = useTranslation('home')
   return (
     <div className="relative w-64 h-56">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 rounded-3xl bg-duo-orange rotate-6 flex flex-col items-center justify-center shadow-lg">
@@ -540,7 +613,7 @@ function StreakIllustration() {
       </div>
       <div className="absolute bottom-4 left-2 w-24 h-32 rounded-2xl bg-white border-2 border-duo-border shadow-md -rotate-6 flex flex-col items-center justify-center gap-2 p-3">
         <BookMarked size={22} className="text-duo-blue" />
-        <span className="text-xs font-black text-duo-muted text-center">Vocabulaire</span>
+        <span className="text-xs font-black text-duo-muted text-center">{t('illustration.vocabulary')}</span>
       </div>
       <div className="absolute bottom-2 right-2 w-24 h-32 rounded-2xl bg-white border-2 border-duo-border shadow-md rotate-6 flex flex-col items-center justify-center gap-2 p-3">
         <Trophy size={22} className="text-duo-yellow-d" />

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Plus, Loader2, MessageCircle, Flame, Zap, BookOpen, Layers, X, PenLine, Mic, TrendingUp, ChevronRight,
   Globe, PartyPopper, Utensils, Map, ShoppingCart, Briefcase, Palmtree, Handshake, Stethoscope, Drama,
@@ -7,24 +8,26 @@ import {
 import { getStats, createConversation, getConversations, getDueVocabulary, getVocabulary } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import BottomNav from '../components/BottomNav'
-import { LANG_NAMES } from '../constants/languages'
-import { LEVEL_INFO } from '../constants/levels'
+import TopNav from '../components/TopNav'
+import { translatedLanguageName } from '../constants/languages'
+import { LEVEL_INFO, translatedLevelLabel } from '../constants/levels'
 import { getXp, getMasteredCount } from '../utils/stats'
 
 const TOPICS = [
-  { icon: Utensils,    label: 'Au restaurant',      value: 'restaurant' },
-  { icon: Map,         label: 'Demander son chemin', value: 'directions' },
-  { icon: ShoppingCart, label: 'Faire les courses',   value: 'shopping'   },
-  { icon: Briefcase,   label: 'Entretien d\'embauche', value: 'job interview' },
-  { icon: Palmtree,    label: 'Vacances',            value: 'travel'     },
-  { icon: Handshake,   label: 'Se présenter',         value: 'introduction' },
-  { icon: Stethoscope, label: 'Chez le médecin',      value: 'doctor'     },
-  { icon: Drama,       label: 'Loisirs & culture',    value: 'hobbies'    },
+  { icon: Utensils,     key: 'restaurant',   value: 'restaurant' },
+  { icon: Map,          key: 'directions',   value: 'directions' },
+  { icon: ShoppingCart, key: 'shopping',     value: 'shopping'   },
+  { icon: Briefcase,    key: 'jobInterview', value: 'job interview' },
+  { icon: Palmtree,     key: 'travel',       value: 'travel'     },
+  { icon: Handshake,    key: 'introduction', value: 'introduction' },
+  { icon: Stethoscope,  key: 'doctor',       value: 'doctor'     },
+  { icon: Drama,        key: 'hobbies',      value: 'hobbies'    },
 ]
 
 export default function Dashboard() {
   const navigate         = useNavigate()
   const { user }         = useAuth()
+  const { t }            = useTranslation('dashboard')
   const [stats,          setStats]         = useState(null)
   const [conversations,  setConversations] = useState([])
   const [vocab,          setVocab]         = useState([])
@@ -81,38 +84,40 @@ export default function Dashboard() {
 
   const quickActions = [
     {
-      to: '/flashcards', icon: Layers, color: 'text-duo-orange', bg: 'bg-orange-50', label: 'Flashcards',
-      sub: dueCount > 0 ? `${dueCount} à réviser` : `${stats?.flashcards_reviewed || 0} révisées`,
+      to: '/flashcards', icon: Layers, color: 'text-duo-orange', bg: 'bg-orange-50', label: t('quickActions.flashcards.label'),
+      sub: dueCount > 0 ? t('quickActions.flashcards.toReview', { count: dueCount }) : t('quickActions.flashcards.reviewed', { count: stats?.flashcards_reviewed || 0 }),
       highlight: dueCount > 0,
     },
     {
-      to: '/dictation', icon: Mic, color: 'text-duo-blue', bg: 'bg-blue-50', label: 'Dictée',
-      sub: `${dictationsDone} complétée${dictationsDone !== 1 ? 's' : ''}`,
+      to: '/dictation', icon: Mic, color: 'text-duo-blue', bg: 'bg-blue-50', label: t('quickActions.dictation.label'),
+      sub: t('quickActions.dictation.completed', { count: dictationsDone }),
     },
     {
-      to: '/exercises', icon: PenLine, color: 'text-duo-purple', bg: 'bg-violet-50', label: 'Exercices',
-      sub: `${exercisesDone} complété${exercisesDone !== 1 ? 's' : ''}`,
+      to: '/exercises', icon: PenLine, color: 'text-duo-purple', bg: 'bg-violet-50', label: t('quickActions.exercises.label'),
+      sub: t('quickActions.exercises.completed', { count: exercisesDone }),
     },
     {
-      to: '/vocabulary', icon: BookOpen, color: 'text-emerald-600', bg: 'bg-emerald-50', label: 'Vocabulaire',
-      sub: `${masteredCount}/${wordsCount} maîtrisés`,
+      to: '/vocabulary', icon: BookOpen, color: 'text-emerald-600', bg: 'bg-emerald-50', label: t('quickActions.vocabulary.label'),
+      sub: t('quickActions.vocabulary.mastered', { mastered: masteredCount, total: wordsCount }),
     },
   ]
 
   return (
-    <div className="min-h-screen bg-duo-gray font-duo pb-24">
+    <div className="min-h-screen bg-duo-gray font-duo pb-24 md:pb-8">
+
+      <TopNav active="learn" />
 
       {/* Streak alert */}
       {streakAlert && streak > 0 && (
-        <div className="fixed top-4 left-4 right-4 z-50 max-w-lg mx-auto">
+        <div className="fixed top-4 left-4 right-4 z-50 max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto">
           <div className="bg-duo-orange text-white rounded-2xl p-4 flex items-center gap-3 shadow-xl">
             {streak === 1 ? <PartyPopper size={28} className="shrink-0" /> : <Flame size={28} className="shrink-0" />}
             <div className="flex-1">
               <div className="font-extrabold text-base">
-                {streak === 1 ? 'Bienvenue !' : `${streak} jours de suite !`}
+                {streak === 1 ? t('streakAlert.welcomeTitle') : t('streakAlert.continueTitle', { count: streak })}
               </div>
               <div className="text-sm opacity-90 font-semibold">
-                {streak === 1 ? "C'est parti, bonne session !" : "Continue comme ça, tu es en feu !"}
+                {streak === 1 ? t('streakAlert.welcomeSubtitle') : t('streakAlert.continueSubtitle')}
               </div>
             </div>
             <button onClick={() => setStreakAlert(false)} className="p-1 hover:opacity-70">
@@ -122,33 +127,33 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Top bar */}
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-30">
-        <div className="max-w-lg mx-auto px-4 py-3">
+      {/* Stats bar — reste visible sur desktop, juste plus sticky (TopNav prend déjà le haut) */}
+      <header className="bg-white border-b-2 border-duo-border sticky top-0 md:static z-30">
+        <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="flex items-center gap-1.5 text-xs font-extrabold text-duo-blue uppercase tracking-wide">
               <Globe size={14} />
-              {LANG_NAMES[user?.native_language]} → {LANG_NAMES[user?.target_language]}
+              {translatedLanguageName(t, user?.native_language)} → {translatedLanguageName(t, user?.target_language)}
             </div>
           </div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-extrabold text-duo-muted">{level.label}</span>
+            <span className="text-xs font-extrabold text-duo-muted">{translatedLevelLabel(t, user?.level || 'debutant')}</span>
             <div className="flex-1 duo-progress">
               <div className="duo-progress-fill" style={{ width: `${xpPct}%` }} />
             </div>
             <span className="text-xs font-extrabold text-duo-green">{xp} XP</span>
           </div>
           <div className="flex items-center justify-center gap-3">
-            <StatPill icon={Flame}    value={streak}     label="Streak" color="text-duo-orange" />
+            <StatPill icon={Flame}    value={streak}     label={t('stats.streak')} color="text-duo-orange" />
             <div className="w-px h-5 bg-duo-border" />
-            <StatPill icon={Zap}      value={xp}         label="XP"     color="text-duo-purple" />
+            <StatPill icon={Zap}      value={xp}         label={t('stats.xp')}     color="text-duo-purple" />
             <div className="w-px h-5 bg-duo-border" />
-            <StatPill icon={BookOpen} value={wordsCount}  label="Mots"   color="text-duo-blue"   />
+            <StatPill icon={BookOpen} value={wordsCount}  label={t('stats.words')}   color="text-duo-blue"   />
           </div>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 mt-4">
+      <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 mt-4">
 
         {/* Due flashcards alert */}
         {dueCount > 0 && (
@@ -159,9 +164,9 @@ export default function Dashboard() {
             </div>
             <div className="flex-1 text-left">
               <div className="font-extrabold text-duo-text text-sm">
-                {dueCount} carte{dueCount > 1 ? 's' : ''} à réviser
+                {t('dueFlashcards.title', { count: dueCount })}
               </div>
-              <div className="text-duo-muted text-xs font-semibold">Flashcards SRS · Réviser maintenant →</div>
+              <div className="text-duo-muted text-xs font-semibold">{t('dueFlashcards.subtitle')}</div>
             </div>
             <div className="duo-badge bg-duo-orange text-white">{dueCount}</div>
           </button>
@@ -175,16 +180,16 @@ export default function Dashboard() {
                 <MessageCircle size={22} className="text-duo-green" />
               </div>
               <div>
-                <div className="font-black text-duo-text">Parler avec le coach IA</div>
+                <div className="font-black text-duo-text">{t('coach.title')}</div>
                 <div className="text-duo-muted text-xs font-semibold">
-                  {convCount} conversation{convCount !== 1 ? 's' : ''} complétée{convCount !== 1 ? 's' : ''}
+                  {t('coach.conversationsCount', { count: convCount })}
                 </div>
               </div>
             </div>
             <button onClick={() => setShowTopics(true)} disabled={creating}
               className="duo-btn duo-btn-green w-full py-3 disabled:opacity-60">
               {creating ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
-              NOUVELLE CONVERSATION
+              {t('coach.newConversation')}
             </button>
           </div>
         </div>
@@ -195,23 +200,23 @@ export default function Dashboard() {
             onClick={() => setShowTopics(false)}>
             <div className="bg-white rounded-2xl w-full max-w-lg p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-extrabold text-duo-text text-lg">Choisir un thème</h3>
+                <h3 className="font-extrabold text-duo-text text-lg">{t('topicsModal.heading')}</h3>
                 <button onClick={() => setShowTopics(false)} className="p-1 text-duo-muted hover:text-duo-text">
                   <X size={20} />
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-3 mb-4">
-                {TOPICS.map(t => (
-                  <button key={t.value} onClick={() => startLesson(t.value)} disabled={creating}
+                {TOPICS.map(topic => (
+                  <button key={topic.value} onClick={() => startLesson(topic.value)} disabled={creating}
                     className="flex items-center gap-2 p-3 rounded-xl border-2 border-duo-border hover:border-duo-green hover:bg-duo-green-bg transition-all text-left">
-                    <t.icon size={20} className="text-duo-text shrink-0" />
-                    <span className="font-bold text-duo-text text-sm leading-tight">{t.label}</span>
+                    <topic.icon size={20} className="text-duo-text shrink-0" />
+                    <span className="font-bold text-duo-text text-sm leading-tight">{t(`topics.${topic.key}`)}</span>
                   </button>
                 ))}
               </div>
               <button onClick={() => startLesson(null)} disabled={creating}
                 className="w-full duo-btn bg-white border-2 border-duo-border text-duo-muted py-3 text-sm">
-                Conversation libre (sans thème)
+                {t('topicsModal.freeConversation')}
               </button>
             </div>
           </div>
@@ -220,9 +225,9 @@ export default function Dashboard() {
         {/* Quick actions — real counts from your account */}
         <div className="mb-6">
           <h3 className="font-extrabold text-duo-muted uppercase text-xs tracking-wider mb-3 px-1">
-            Mes activités
+            {t('quickActions.heading')}
           </h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {quickActions.map(a => (
               <button key={a.to} onClick={() => navigate(a.to)}
                 className={`duo-card flex items-center gap-3 text-left transition-colors ${a.highlight ? 'border-duo-orange' : 'hover:border-duo-border'}`}>
@@ -245,8 +250,8 @@ export default function Dashboard() {
             <TrendingUp size={19} className="text-duo-purple" />
           </div>
           <div className="flex-1 text-left">
-            <div className="font-extrabold text-duo-text text-sm">Ma progression</div>
-            <div className="text-duo-muted text-xs font-semibold">Statistiques détaillées de votre apprentissage</div>
+            <div className="font-extrabold text-duo-text text-sm">{t('progress.title')}</div>
+            <div className="text-duo-muted text-xs font-semibold">{t('progress.subtitle')}</div>
           </div>
           <ChevronRight size={18} className="text-duo-muted shrink-0" />
         </button>
@@ -255,7 +260,7 @@ export default function Dashboard() {
         {conversations.length > 0 && (
           <div className="mb-6">
             <h3 className="font-extrabold text-duo-muted uppercase text-xs tracking-wider mb-3 px-1">
-              Mes sessions IA récentes
+              {t('recentSessions.heading')}
             </h3>
             <div className="space-y-2">
               {conversations.slice(0, 4).map(conv => (
@@ -266,7 +271,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-extrabold text-sm text-duo-text truncate">
-                      {conv.title || 'Session de conversation'}
+                      {conv.title || t('recentSessions.defaultTitle')}
                     </div>
                     <div className="text-duo-muted text-xs font-semibold">
                       {new Date(conv.created_at).toLocaleDateString('fr-FR', {

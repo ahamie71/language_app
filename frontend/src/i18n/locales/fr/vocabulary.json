@@ -1,0 +1,43 @@
+{
+  "difficulty": {
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile"
+  },
+  "loading": "Chargement...",
+  "header": {
+    "title": "Mon Vocabulaire",
+    "exportButton": "CSV",
+    "subtitle": "Mots extraits automatiquement par l'IA lors de vos conversations"
+  },
+  "cta": {
+    "dueCards_one": "{{count}} carte à réviser",
+    "dueCards_other": "{{count}} cartes à réviser",
+    "launchSession": "Lancer la session Flashcards →"
+  },
+  "mastery": {
+    "heading": "Maîtrise globale",
+    "summary": "{{mastered}}/{{total}} mots maîtrisés",
+    "masteredLabel": "Maîtrisés ({{count}})",
+    "inProgressLabel": "En cours ({{count}})"
+  },
+  "search": {
+    "placeholder": "Rechercher un mot…"
+  },
+  "filters": {
+    "all": "Tous",
+    "learning": "En cours",
+    "mastered": "Maîtrisés"
+  },
+  "empty": {
+    "noWordsYet": "Aucun mot pour l'instant",
+    "noResults": "Aucun résultat",
+    "noWordsSubtitle": "L'IA extrait automatiquement les mots clés de vos conversations.",
+    "noResultsSubtitle": "Essayez un autre filtre ou mot-clé.",
+    "startLessonButton": "COMMENCER UNE LEÇON"
+  },
+  "word": {
+    "masteredBadge": "Maîtrisé",
+    "correctCount": "{{correct}}/{{total}} correct"
+  }
+}

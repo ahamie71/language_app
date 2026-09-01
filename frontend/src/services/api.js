@@ -61,6 +61,46 @@ export const logout = () => {
   localStorage.removeItem("token");
 };
 
+export const forgotPassword = async (email) => {
+  const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+};
+
+export const resetPassword = async (token, password) => {
+  const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Erreur lors de la réinitialisation");
+  }
+  return res.json();
+};
+
+export const verifyEmail = async (token) => {
+  const res = await fetch(`${API_URL}/api/auth/verify-email/${token}`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Erreur lors de la confirmation");
+  }
+  return res.json();
+};
+
+export const resendVerification = async (email) => {
+  const res = await fetch(`${API_URL}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+};
+
 // =========================
 // CONVERSATIONS
 // =========================

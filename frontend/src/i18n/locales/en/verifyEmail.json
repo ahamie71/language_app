@@ -1,0 +1,9 @@
+{
+  "loading": "Confirming your email…",
+  "successTitle": "Email confirmed!",
+  "successSubtitle": "Your account is now active, you can log in.",
+  "goToLogin": "Log in",
+  "errorTitle": "Invalid link",
+  "errorGeneric": "Invalid or expired link",
+  "backHome": "Back to home"
+}
