@@ -42,8 +42,8 @@
   }
   .duo-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-  .duo-btn-green  { @apply bg-duo-green  text-duo-black font-black; border-bottom-color:#B8890A; }
-  .duo-btn-yellow { @apply bg-duo-yellow text-duo-text; border-bottom-color:#CCA800; }
+  .duo-btn-green  { @apply bg-duo-green  text-white font-black; border-bottom-color:#58A700; }
+  .duo-btn-yellow { @apply bg-duo-yellow text-duo-text; border-bottom-color:#E6B400; }
   .duo-btn-blue   { @apply bg-duo-blue   text-white; border-bottom-color:#0099D6; }
   .duo-btn-red    { @apply bg-duo-red    text-white; border-bottom-color:#EA2929; }
   .duo-btn-ghost  {
