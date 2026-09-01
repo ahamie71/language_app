@@ -4,6 +4,11 @@ huggingface_hub
 httpx==0.27.2
 python-dotenv==1.0.0
 requests==2.31.0
+# PyTorch — sert a NLLB-200 et au classifieur d'intention (le LLM est dans Ollama).
+# Par defaut : build CPU. Pour mettre NLLB sur GPU (voir services/device.py), passer
+# a l'index CUDA 12.8 (obligatoire pour les cartes Blackwell RTX 50xx) :
+#   --extra-index-url https://download.pytorch.org/whl/cu128
+# et donner un GPU au conteneur ai_service dans docker-compose.yml.
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch
 torchaudio
