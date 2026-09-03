@@ -1,7 +1,7 @@
 {
   "hero": {
     "titlePrefix": "About",
-    "text": "Lingua was born from a simple idea: everyone deserves to learn a language, with no financial barrier and no boring method. AI finally lets us keep that promise."
+    "text": "Duolingia was born from a simple idea: everyone deserves to learn a language, with no financial barrier and no boring method. AI finally lets us keep that promise."
   },
   "stats": {
     "founded": "Year founded",
@@ -16,7 +16,7 @@
     },
     "philosophy": {
       "title": "Our philosophy",
-      "desc": "Learning a language means opening yourself up to the world. Lingua is designed so every exchange is a real human experience, not a mechanical exercise."
+      "desc": "Learning a language means opening yourself up to the world. Duolingia is designed so every exchange is a real human experience, not a mechanical exercise."
     },
     "technology": {
       "title": "Our technology",
@@ -29,9 +29,9 @@
   },
   "story": {
     "heading": "Our story",
-    "p1": "Lingua was born in 2023 in Paris, in an apartment shared between two people passionate about languages and technology. Sophie and Lucas had both experienced the frustration of learning a language with apps that seemed built for robots.",
+    "p1": "Duolingia was born in 2023 in Paris, in an apartment shared between two people passionate about languages and technology. Sophie and Lucas had both experienced the frustration of learning a language with apps that seemed built for robots.",
     "p2": "Their idea: what if AI could replace the private tutor? Not to imitate the human relationship, but to offer something unique — a conversation partner available 24/7, infinitely patient, able to adapt every response to the learner's exact level.",
-    "p3": "A few months later, Lingua came to life. Today, more than 10,000 people use it every day to improve their English, Spanish, German, Arabic and many other languages."
+    "p3": "A few months later, Duolingia came to life. Today, more than 10,000 people use it every day to improve their English, Spanish, German, Arabic and many other languages."
   },
   "team": {
     "heading": "The team",
@@ -50,6 +50,6 @@
     "button": "START FOR FREE"
   },
   "footer": {
-    "copyright": "© 2025 Lingua. All rights reserved."
+    "copyright": "© 2025 Duolingia. All rights reserved."
   }
 }
