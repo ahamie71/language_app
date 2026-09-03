@@ -1,7 +1,7 @@
 {
   "hero": {
     "titlePrefix": "À propos de",
-    "text": "Lingua est né d'une idée simple : tout le monde mérite d'apprendre une langue, sans barrière financière, sans méthode ennuyeuse. L'IA nous permet enfin de tenir cette promesse."
+    "text": "Duolingia est né d'une idée simple : tout le monde mérite d'apprendre une langue, sans barrière financière, sans méthode ennuyeuse. L'IA nous permet enfin de tenir cette promesse."
   },
   "stats": {
     "founded": "Année de création",
@@ -16,7 +16,7 @@
     },
     "philosophy": {
       "title": "Notre philosophie",
-      "desc": "Apprendre une langue, c'est s'ouvrir au monde. Lingua est conçu pour que chaque échange soit une vraie expérience humaine, pas un exercice mécanique."
+      "desc": "Apprendre une langue, c'est s'ouvrir au monde. Duolingia est conçu pour que chaque échange soit une vraie expérience humaine, pas un exercice mécanique."
     },
     "technology": {
       "title": "Notre technologie",
@@ -29,9 +29,9 @@
   },
   "story": {
     "heading": "Notre histoire",
-    "p1": "Lingua est né en 2023 à Paris, dans un appartement partagé entre deux passionnés de langues et de technologie. Sophie et Lucas avaient tous les deux vécu l'expérience frustrante d'apprendre une langue avec des applications qui semblaient faites pour des robots.",
+    "p1": "Duolingia est né en 2023 à Paris, dans un appartement partagé entre deux passionnés de langues et de technologie. Sophie et Lucas avaient tous les deux vécu l'expérience frustrante d'apprendre une langue avec des applications qui semblaient faites pour des robots.",
     "p2": "Leur idée : et si l'IA pouvait remplacer le prof particulier ? Pas pour imiter la relation humaine, mais pour offrir quelque chose d'unique — un interlocuteur disponible 24h/24, infiniment patient, capable d'adapter chaque réponse au niveau exact de l'apprenant.",
-    "p3": "Quelques mois plus tard, Lingua voyait le jour. Aujourd'hui, plus de 10 000 personnes l'utilisent chaque jour pour progresser en anglais, espagnol, allemand, arabe et bien d'autres langues."
+    "p3": "Quelques mois plus tard, Duolingia voyait le jour. Aujourd'hui, plus de 10 000 personnes l'utilisent chaque jour pour progresser en anglais, espagnol, allemand, arabe et bien d'autres langues."
   },
   "team": {
     "heading": "L'équipe",
@@ -50,6 +50,6 @@
     "button": "COMMENCER GRATUITEMENT"
   },
   "footer": {
-    "copyright": "© 2025 Lingua. Tous droits réservés."
+    "copyright": "© 2025 Duolingia. Tous droits réservés."
   }
 }

@@ -64,7 +64,7 @@ export default function About() {
           </button>
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <Languages size={26} className="text-duo-green" />
-            <span className="text-xl font-black text-duo-green">Lingua</span>
+            <span className="text-xl font-black text-duo-green">Duolingia</span>
           </div>
         </div>
       </header>
@@ -74,7 +74,7 @@ export default function About() {
         <div className="max-w-2xl mx-auto">
           <Globe2 size={56} className="text-duo-green mx-auto mb-6" />
           <h1 className="text-4xl font-black text-duo-text mb-4">
-            {t('hero.titlePrefix')} <span className="text-duo-green">Lingua</span>
+            {t('hero.titlePrefix')} <span className="text-duo-green">Duolingia</span>
           </h1>
           <p className="text-duo-muted font-semibold text-lg leading-relaxed">
             {t('hero.text')}
