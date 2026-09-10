@@ -61,6 +61,46 @@ export const logout = () => {
   localStorage.removeItem("token");
 };
 
+export const forgotPassword = async (email) => {
+  const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+};
+
+export const resetPassword = async (token, password) => {
+  const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Erreur lors de la réinitialisation");
+  }
+  return res.json();
+};
+
+export const verifyEmail = async (token) => {
+  const res = await fetch(`${API_URL}/api/auth/verify-email/${token}`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Erreur lors de la confirmation");
+  }
+  return res.json();
+};
+
+export const resendVerification = async (email) => {
+  const res = await fetch(`${API_URL}/api/auth/resend-verification`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+};
+
 // =========================
 // CONVERSATIONS
 // =========================
@@ -110,6 +150,50 @@ export const processMessage = async (messageData) => {
   });
 
   return res.json();
+};
+
+/** Comme processMessage, mais en SSE : appelle onEvent({ event, data }) au
+ * fil de l'eau (user_message, reply, translation, explanation, done, error)
+ * au lieu d'attendre la réponse complète. Pas d'EventSource natif (GET only,
+ * pas d'en-tête Authorization) : on lit le flux fetch à la main. */
+export const processMessageStream = async (messageData, onEvent) => {
+  const res = await fetch(`${API_URL}/api/conversations/process/stream`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify(messageData),
+  });
+
+  if (!res.ok || !res.body) {
+    onEvent({ event: "error", data: { error: "Impossible de joindre le serveur" } });
+    return;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    let sepIndex;
+    while ((sepIndex = buffer.indexOf("\n\n")) !== -1) {
+      const frame = buffer.slice(0, sepIndex);
+      buffer = buffer.slice(sepIndex + 2);
+
+      let event = "message";
+      let dataLine = "";
+      for (const line of frame.split("\n")) {
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) dataLine += line.slice(5).trim();
+      }
+      if (dataLine) {
+        try { onEvent({ event, data: JSON.parse(dataLine) }); }
+        catch { /* frame malformée, on l'ignore */ }
+      }
+    }
+  }
 };
 
 // =========================

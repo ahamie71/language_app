@@ -1,0 +1,75 @@
+{
+  "topics": {
+    "general": "Général",
+    "travel": "Voyage",
+    "food": "Nourriture",
+    "family": "Famille",
+    "work": "Travail",
+    "grammar": "Grammaire"
+  },
+  "vocabExercise": {
+    "question": "Comment traduit-on \"{{word}}\" ?",
+    "explanation": "\"{{word}}\" signifie \"{{translation}}\"."
+  },
+  "fallbackExercise": {
+    "question": "¿Cómo se dice 'Bonjour' en español?",
+    "explanation": "\"Hola\" signifie \"Bonjour\" en espagnol."
+  },
+  "vocabError": {
+    "notEnoughWords_one": "Vous avez {{count}} mot dans votre vocabulaire. Il en faut au moins 4 pour jouer.",
+    "notEnoughWords_other": "Vous avez {{count}} mots dans votre vocabulaire. Il en faut au moins 4 pour jouer."
+  },
+  "common": {
+    "loading": "Chargement…"
+  },
+  "modeSelect": {
+    "title": "Exercices",
+    "subtitle": "Entraînez-vous en ",
+    "selectMode": "Sélectionner un mode"
+  },
+  "modes": {
+    "vocab": {
+      "title": "Mon Vocabulaire",
+      "subtitle": "Révise les mots de tes conversations",
+      "tag1": "Répétition espacée",
+      "tag2": "Personnalisé"
+    },
+    "theme": {
+      "title": "Thèmes IA",
+      "subtitle": "Questions générées par intelligence artificielle",
+      "tag1": "Illimité",
+      "tag2": "6 thèmes"
+    }
+  },
+  "config": {
+    "notEnoughWordsHeading": "Pas assez de mots",
+    "startLessonButton": "COMMENCER UNE LEÇON",
+    "stats": {
+      "total": "Total",
+      "dueForReview": "À réviser",
+      "mastered": "Maîtrisés"
+    },
+    "startVocabRound": "COMMENCER — {{count}} QUESTIONS",
+    "chooseTopic": "Choisir un thème",
+    "startThemeRound": "COMMENCER — {{topic}}"
+  },
+  "results": {
+    "perfect": "Parfait !",
+    "good": "Bien joué !",
+    "keepGoing": "Continuez !",
+    "scoreSummary": "{{score}} bonnes réponses sur {{total}}",
+    "xpEarnedLabel": "XP gagnés",
+    "accuracyLabel": "Précision",
+    "replayButton": "REJOUER",
+    "changeModeButton": "CHANGER DE MODE"
+  },
+  "question": {
+    "comboBadge": "{{count}}x Combo",
+    "vocabBadge": "Vocabulaire",
+    "correctAnswer": "Bonne réponse",
+    "comboSuffix": "— {{count}}x combo !",
+    "notQuite": "Pas tout à fait…",
+    "viewResultsButton": "VOIR MES RÉSULTATS",
+    "nextQuestionButton": "QUESTION SUIVANTE"
+  }
+}

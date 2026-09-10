@@ -1,0 +1,27 @@
+{
+  "loading": "Chargement des cartes...",
+  "empty": {
+    "title": "Flashcards SRS",
+    "heading": "Aucune carte à réviser !",
+    "subtitle": "Toutes vos cartes sont à jour. Revenez plus tard ou faites plus de conversations pour en ajouter.",
+    "viewVocabulary": "Voir mon vocabulaire"
+  },
+  "results": {
+    "title": "Résultats",
+    "correctCount": "{{correct}}/{{total}} cartes correctes",
+    "replay": "Rejouer",
+    "finish": "Terminer"
+  },
+  "main": {
+    "title": "Flashcards SRS",
+    "flipHint": "Appuyer pour retourner",
+    "translationLabel": "Traduction",
+    "successRate": "Taux de réussite : {{pct}}%",
+    "dontKnow": "Je ne savais pas",
+    "knew": "Je savais !",
+    "thinkHint": "Pensez à la traduction, puis retournez la carte",
+    "srsPrefix": "Prochaine révision dans : ",
+    "srsValue_one": "{{count}} jour",
+    "srsValue_other": "{{count}} jours"
+  }
+}

@@ -99,6 +99,9 @@ services:
     container_name: linguaai-backend
     restart: unless-stopped
 
+    env_file:
+      - ./backend/.env
+
     environment:
       NODE_ENV: development
       PORT: 8000

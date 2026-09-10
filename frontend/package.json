@@ -14,9 +14,11 @@
   "description": "",
   "dependencies": {
     "flag-icons": "^7.5.0",
+    "i18next": "^26.4.1",
     "lucide-react": "^1.38.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-i18next": "^17.0.13",
     "react-icons": "^5.7.0",
     "react-router-dom": "^7.18.3"
   },

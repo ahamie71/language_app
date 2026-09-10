@@ -1,0 +1,34 @@
+{
+  "loading": "Chargement...",
+  "header": {
+    "title": "Ma progression"
+  },
+  "hero": {
+    "streakDays": "Jours de suite",
+    "totalXp": "XP total"
+  },
+  "statCards": {
+    "conversations": "Conversations",
+    "aiMessages": "Messages IA",
+    "exercisesDone": "Exercices faits",
+    "dictations": "Dictées",
+    "flashcardsReviewed": "Flashcards revues",
+    "wordsMastered": "Mots maîtrisés"
+  },
+  "vocabMastery": {
+    "heading": "Maîtrise du vocabulaire",
+    "count": "{{mastered}}/{{words}} mots maîtrisés",
+    "mastered": "Maîtrisés",
+    "inProgress": "En cours",
+    "easy": "Faciles",
+    "medium": "Moyens",
+    "hard": "Difficiles"
+  },
+  "categories": {
+    "heading": "Catégories les plus étudiées"
+  },
+  "level": {
+    "heading": "Niveau actuel",
+    "subtitle": "Niveau adaptatif basé sur vos résultats"
+  }
+}

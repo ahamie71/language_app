@@ -8,5 +8,6 @@ router.post('/', authMiddleware, conversationController.createConversation);
 router.get('/:conversationId/messages', authMiddleware, conversationController.getMessages);
 router.post('/messages', authMiddleware, conversationController.createMessage);
 router.post('/process', authMiddleware, conversationController.processUserMessage);
+router.post('/process/stream', authMiddleware, conversationController.processUserMessageStream);
 
 module.exports = router;
