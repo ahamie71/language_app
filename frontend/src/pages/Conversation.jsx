@@ -1,25 +1,30 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   X, Volume2, ChevronDown, ChevronUp, Sparkles,
   Mic, MicOff, Send, Loader2, Brain, BookOpen, Zap, PartyPopper, Bot, User
 } from 'lucide-react'
-import { getMessages, processMessage, transcribeAudio } from '../services/api'
+import { getMessages, processMessageStream, transcribeAudio } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import { useSpeak } from '../hooks/useSpeak'
 import { useAudioRecorder } from '../hooks/useAudioRecorder'
-import { LANG_NAMES } from '../constants/languages'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
+import { LANG_LOCALE, translatedLanguageName } from '../constants/languages'
 
 export default function Conversation() {
   const { id }     = useParams()
   const navigate   = useNavigate()
   const { user }   = useAuth()
+  const { t }      = useTranslation('conversation')
   const speak      = useSpeak()
   const { isRecording, startRecording, stopRecording } = useAudioRecorder()
+  const speech     = useSpeechRecognition()
 
   const [messages,       setMessages]       = useState([])
   const [input,          setInput]          = useState('')
   const [sending,        setSending]        = useState(false)
+  const [awaitingReply,  setAwaitingReply]  = useState(false)
   const [initLoading,    setInitLoading]    = useState(true)
   const [openExp,        setOpenExp]        = useState(null)
   const [isTranscribing, setIsTranscribing] = useState(false)
@@ -48,23 +53,58 @@ export default function Conversation() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, sending])
 
-  /* ── Send ── */
+  /* ── Send — SSE : la réponse du coach arrive dès qu'elle est prête,
+     traduction et explication se complètent ensuite au fil de l'eau ── */
   const handleSend = async () => {
     if (!input.trim() || sending) return
     const text = input.trim()
     setInput('')
     setSending(true)
+    setAwaitingReply(true)
     inputRef.current?.focus()
+
+    const tempId = `tmp-${Date.now()}`
+
     try {
-      const res = await processMessage({ conversation_id: parseInt(id), original_text: text })
-      setMessages(prev => [...prev, res.userMessage, { ...res.assistantMessage, role: 'assistant' }])
-      setXpGained(prev => prev + 10)
+      await processMessageStream(
+        { conversation_id: parseInt(id), original_text: text },
+        ({ event, data }) => {
+          if (event === 'user_message') {
+            setMessages(prev => [...prev, data])
+          } else if (event === 'reply') {
+            setAwaitingReply(false)
+            setMessages(prev => [...prev, {
+              id: tempId, role: 'assistant',
+              original_text: data.text, translated_text: null, explanation: null,
+            }])
+            setXpGained(prev => prev + 10)
+          } else if (event === 'translation') {
+            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, translated_text: data.text } : m))
+          } else if (event === 'explanation') {
+            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, explanation: data.text } : m))
+          } else if (event === 'done') {
+            setMessages(prev => prev.map(m => m.id === tempId ? { ...m, id: data.id } : m))
+            setSending(false)
+          } else if (event === 'error') {
+            console.error(event, data.error)
+            setSending(false)
+            setAwaitingReply(false)
+          }
+        }
+      )
     } catch (e) { console.error(e) }
     setSending(false)
+    setAwaitingReply(false)
   }
 
-  /* ── 3.3.1 Mic — enregistrement + transcription ── */
+  /* ── 3.3.1 Mic — dictée en direct (Web Speech API), avec repli
+     enregistrement + transcription Vosk si le navigateur ne la supporte pas ── */
   const toggleMic = async () => {
+    if (speech.supported) {
+      if (speech.listening) { speech.stop(); return }
+      speech.start(LANG_LOCALE[user?.native_language] || 'fr-FR', (text) => setInput(text))
+      return
+    }
     if (isRecording) {
       stopRecording()
       return
@@ -89,7 +129,7 @@ export default function Conversation() {
     <div className="flex items-center justify-center h-screen bg-duo-gray font-duo">
       <div className="text-center">
         <Bot size={48} className="text-duo-green mx-auto mb-4 animate-float" />
-        <p className="text-duo-muted font-bold">Chargement de la leçon...</p>
+        <p className="text-duo-muted font-bold">{t('loading')}</p>
       </div>
     </div>
   )
@@ -123,14 +163,14 @@ export default function Conversation() {
             </div>
             <div>
               <div className="font-extrabold text-sm text-duo-text">
-                Conversation IA — Coach Lingua
+                {t('header.title')}
               </div>
               <div className="text-xs text-duo-muted font-semibold">
-                {LANG_NAMES[user?.native_language]} → {LANG_NAMES[user?.target_language]}
-                &nbsp;•&nbsp; Objectif : {GOAL} échanges
+                {translatedLanguageName(t, user?.native_language)} → {translatedLanguageName(t, user?.target_language)}
+                &nbsp;•&nbsp; {t('header.goal', { count: GOAL })}
               </div>
             </div>
-            <Link to="/vocabulary" className="ml-auto p-2 text-duo-muted hover:text-duo-blue transition-colors" title="Mon vocabulaire">
+            <Link to="/vocabulary" className="ml-auto p-2 text-duo-muted hover:text-duo-blue transition-colors" title={t('header.vocabularyLink')}>
               <BookOpen size={19} />
             </Link>
           </div>
@@ -146,9 +186,9 @@ export default function Conversation() {
             <div className="flex flex-col items-center justify-center py-12 text-center gap-4">
               <Bot size={56} className="text-duo-green animate-float" />
               <div className="duo-card max-w-sm">
-                <p className="font-extrabold text-duo-text mb-1">Commencez la conversation !</p>
+                <p className="font-extrabold text-duo-text mb-1">{t('empty.title')}</p>
                 <p className="text-duo-muted text-sm font-semibold">
-                  Parlez en <strong className="text-duo-blue">{LANG_NAMES[user?.native_language]}</strong> — votre coach IA répond en <strong className="text-duo-green">{LANG_NAMES[user?.target_language]}</strong> et explique tout.
+                  {t('empty.text1')}<strong className="text-duo-blue">{translatedLanguageName(t, user?.native_language)}</strong>{t('empty.text2')}<strong className="text-duo-green">{translatedLanguageName(t, user?.target_language)}</strong>{t('empty.text3')}
                 </p>
               </div>
             </div>
@@ -178,7 +218,7 @@ export default function Conversation() {
                       <div className={`mt-2 pt-2 border-t text-xs font-semibold ${
                         isUser ? 'border-blue-400 text-blue-100' : 'border-duo-border text-duo-muted'
                       }`}>
-                        <span className="font-extrabold opacity-70">Traduction IA : </span>
+                        <span className="font-extrabold opacity-70">{t('message.translationLabel')}</span>
                         {msg.translated_text}
                       </div>
                     )}
@@ -187,7 +227,7 @@ export default function Conversation() {
                     <div className="flex items-center gap-2 mt-2">
                       <button onClick={() => speak(msg.original_text, isUser ? user?.native_language : user?.target_language)}
                         className={`p-1.5 rounded-lg transition-all ${isUser ? 'hover:bg-blue-500' : 'hover:bg-duo-gray'}`}
-                        title="Écouter">
+                        title={t('message.listen')}>
                         <Volume2 size={13} className={isUser ? 'text-blue-200' : 'text-duo-muted'} />
                       </button>
                       {!isUser && msg.explanation && (
@@ -196,7 +236,7 @@ export default function Conversation() {
                             openExp === expKey ? 'bg-duo-purple text-white' : 'bg-duo-purple-bg text-duo-purple'
                           }`}>
                           {openExp === expKey ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-                          EXPLICATION IA
+                          {t('message.explanationButton')}
                         </button>
                       )}
                     </div>
@@ -206,7 +246,7 @@ export default function Conversation() {
                   {!isUser && msg.explanation && openExp === expKey && (
                     <div className="bg-duo-purple-bg border-2 border-purple-200 rounded-duo p-4 text-sm text-duo-text animate-slide-up w-full max-w-full">
                       <div className="flex items-center gap-2 font-extrabold text-duo-purple mb-2">
-                        <Sparkles size={14} /> Analyse de votre coach IA
+                        <Sparkles size={14} /> {t('message.explanationTitle')}
                       </div>
                       <p className="font-semibold leading-relaxed text-duo-muted">{msg.explanation}</p>
                     </div>
@@ -217,7 +257,7 @@ export default function Conversation() {
           })}
 
           {/* Typing indicator */}
-          {sending && (
+          {awaitingReply && (
             <div className="flex items-end gap-2">
               <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-duo-green-bg text-duo-green">
                 <Bot size={17} />
@@ -236,11 +276,11 @@ export default function Conversation() {
           {msgCount >= GOAL && (
             <div className="duo-card border-duo-yellow border-2 bg-duo-yellow-bg text-center animate-bounce-in">
               <PartyPopper size={36} className="text-duo-orange mx-auto mb-2" />
-              <div className="font-extrabold text-duo-text">Objectif atteint !</div>
-              <div className="text-duo-muted text-sm font-semibold">Vous avez complété {GOAL} échanges avec votre coach IA</div>
+              <div className="font-extrabold text-duo-text">{t('goalReached.title')}</div>
+              <div className="text-duo-muted text-sm font-semibold">{t('goalReached.subtitle', { count: GOAL })}</div>
               <div className="flex justify-center gap-1 mt-2">
                 <span className="duo-badge bg-duo-yellow text-duo-text border border-yellow-300">
-                  <Zap size={12} /> +{msgCount * 10} XP gagnés
+                  <Zap size={12} /> +{msgCount * 10} {t('goalReached.xpEarned')}
                 </span>
               </div>
             </div>
@@ -255,10 +295,10 @@ export default function Conversation() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-end gap-2">
             {/* 3.3.1 Mic */}
-            {canRecord && (
+            {(canRecord || speech.supported) && (
               <button onClick={toggleMic} disabled={sending || isTranscribing}
                 className={`shrink-0 w-12 h-12 rounded-duo-sm border-b-4 flex items-center justify-center transition-all active:translate-y-0.5 active:border-b-0 ${
-                  isRecording
+                  (isRecording || speech.listening)
                     ? 'bg-duo-red border-duo-red-d animate-pulse'
                     : isTranscribing
                     ? 'bg-duo-yellow border-yellow-400 animate-pulse'
@@ -266,7 +306,7 @@ export default function Conversation() {
                 }`}>
                 {isTranscribing
                   ? <Loader2 size={19} className="animate-spin text-white" />
-                  : isRecording
+                  : (isRecording || speech.listening)
                   ? <MicOff size={19} className="text-white" />
                   : <Mic size={19} />}
               </button>
@@ -275,7 +315,7 @@ export default function Conversation() {
             {/* Textarea */}
             <textarea
               ref={inputRef} rows={1}
-              placeholder={`Parlez en ${LANG_NAMES[user?.native_language] || 'français'}…`}
+              placeholder={t('inputBar.placeholder', { lang: translatedLanguageName(t, user?.native_language || 'fr') })}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
@@ -291,7 +331,7 @@ export default function Conversation() {
             </button>
           </div>
           <p className="text-center text-duo-light text-xs font-semibold mt-2">
-            Entrée pour envoyer • Shift+Entrée pour un saut de ligne
+            {t('inputBar.hint')}
           </p>
         </div>
       </div>

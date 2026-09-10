@@ -1,0 +1,82 @@
+{
+  "hero": {
+    "title": "Questions fréquentes",
+    "subtitle": "Tout ce que vous devez savoir sur Lingua et son fonctionnement."
+  },
+  "categories": {
+    "general": "Général",
+    "ai": "L'IA",
+    "vocabulary": "Vocabulaire & Progression",
+    "accountTech": "Compte & Technique"
+  },
+  "questions": {
+    "general": {
+      "free": {
+        "q": "Lingua est-il vraiment gratuit ?",
+        "a": "Oui, totalement. Lingua est gratuit pour tous les apprenants. Pas d'abonnement caché, pas de limite artificielle. Notre mission est de rendre l'apprentissage des langues accessible à tous."
+      },
+      "languages": {
+        "q": "Quelles langues sont disponibles ?",
+        "a": "Lingua propose actuellement 9 langues : anglais, espagnol, allemand, arabe, italien, portugais, chinois, japonais et français. De nouvelles langues sont régulièrement ajoutées."
+      },
+      "account": {
+        "q": "Dois-je créer un compte pour utiliser Lingua ?",
+        "a": "Oui, un compte gratuit est nécessaire pour accéder aux conversations IA, sauvegarder votre vocabulaire et suivre votre progression."
+      }
+    },
+    "ai": {
+      "howItWorks": {
+        "q": "Comment fonctionne le coach IA ?",
+        "a": "Le coach IA utilise un modèle de langage avancé. Vous lui parlez dans votre langue maternelle (le français), et il vous répond dans la langue que vous apprenez, tout en corrigeant vos erreurs et en expliquant les points de grammaire."
+      },
+      "adaptsLevel": {
+        "q": "L'IA s'adapte-t-elle à mon niveau ?",
+        "a": "Absolument. L'IA tient compte de votre niveau déclaré (débutant, intermédiaire, avancé) et ajuste automatiquement sa complexité au fil de vos échanges."
+      },
+      "correctionsReliable": {
+        "q": "Les corrections sont-elles fiables ?",
+        "a": "Les corrections sont générées par des modèles d'IA de haute qualité et sont très fiables pour les erreurs courantes de grammaire, conjugaison et vocabulaire. Comme tout outil automatisé, une erreur occasionnelle reste possible."
+      },
+      "privacy": {
+        "q": "Mes conversations sont-elles privées ?",
+        "a": "Vos conversations sont stockées de manière sécurisée et utilisées uniquement pour améliorer votre expérience personnelle. Nous ne partageons pas vos données avec des tiers."
+      }
+    },
+    "vocabulary": {
+      "autoVocabulary": {
+        "q": "Comment fonctionne le vocabulaire automatique ?",
+        "a": "À chaque conversation, l'IA détecte les mots nouveaux ou difficiles et les ajoute automatiquement à votre carnet de vocabulaire personnel, avec traduction et contexte d'utilisation."
+      },
+      "streakXp": {
+        "q": "Que signifient le streak et les XP ?",
+        "a": "Le streak est le nombre de jours consécutifs où vous avez pratiqué. Les XP (points d'expérience) sont gagnés à chaque conversation et permettent de mesurer votre progression globale."
+      },
+      "offline": {
+        "q": "Puis-je consulter mon vocabulaire hors ligne ?",
+        "a": "La version actuelle nécessite une connexion internet. Une version hors ligne est prévue dans une prochaine mise à jour."
+      }
+    },
+    "accountTech": {
+      "editProfile": {
+        "q": "Comment modifier mon profil ou changer de langue cible ?",
+        "a": "Rendez-vous dans votre profil (icône en bas de l'application) puis appuyez sur Modifier le profil. Vous pouvez y changer votre langue cible, votre niveau et vos informations personnelles."
+      },
+      "mobileApp": {
+        "q": "L'application est-elle disponible sur mobile ?",
+        "a": "Lingua fonctionne parfaitement depuis un navigateur mobile. Des applications iOS et Android natives sont en cours de développement."
+      },
+      "contactSupport": {
+        "q": "Comment contacter le support ?",
+        "a": "Envoyez-nous un message à support@lingua.app. Nous répondons généralement sous 24 heures."
+      }
+    }
+  },
+  "contact": {
+    "heading": "Vous n'avez pas trouvé votre réponse ?",
+    "text": "Notre équipe est disponible pour vous aider.",
+    "button": "CONTACTER LE SUPPORT"
+  },
+  "footer": {
+    "copyright": "© 2025 Lingua. Tous droits réservés."
+  }
+}

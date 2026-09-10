@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   CheckCircle, XCircle, Loader2, RotateCcw, Zap, ChevronRight,
   Trophy, BookOpen, Sparkles, Flame, Target, Plane, Utensils,
@@ -9,21 +10,22 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { generateExercise, getVocabulary, updateWordProgress } from '../services/api'
 import BottomNav from '../components/BottomNav'
-import { LANG_NAMES } from '../constants/languages'
+import TopNav from '../components/TopNav'
+import { translatedLanguageName } from '../constants/languages'
 
 const TOPICS = [
-  { label: 'Général',    value: 'general vocabulary and greetings', Icon: MessageCircle },
-  { label: 'Voyage',     value: 'travel and transportation',        Icon: Plane         },
-  { label: 'Nourriture', value: 'food and restaurant',              Icon: Utensils      },
-  { label: 'Famille',    value: 'family and relationships',         Icon: Users         },
-  { label: 'Travail',    value: 'work and professions',             Icon: Briefcase     },
-  { label: 'Grammaire',  value: 'grammar and sentence structure',   Icon: GraduationCap },
+  { key: 'general', value: 'general vocabulary and greetings', Icon: MessageCircle },
+  { key: 'travel',  value: 'travel and transportation',        Icon: Plane         },
+  { key: 'food',    value: 'food and restaurant',              Icon: Utensils      },
+  { key: 'family',  value: 'family and relationships',         Icon: Users         },
+  { key: 'work',    value: 'work and professions',             Icon: Briefcase     },
+  { key: 'grammar', value: 'grammar and sentence structure',   Icon: GraduationCap },
 ]
 
 const ROUND_SIZE = 5
 const OPTION_LETTERS = ['A', 'B', 'C', 'D']
 
-function buildVocabExercise(words, usedIds) {
+function buildVocabExercise(words, usedIds, t) {
   const pool = words.filter(w => !usedIds.includes(w.id))
   if (pool.length === 0) return null
   const notMastered = pool.filter(w => !w.mastered)
@@ -34,10 +36,10 @@ function buildVocabExercise(words, usedIds) {
   const wrong  = [...others].sort(() => Math.random() - 0.5).slice(0, 3)
   const options = [...wrong.map(w => w.translation), target.translation].sort(() => Math.random() - 0.5)
   return {
-    question:    `Comment traduit-on "${target.word}" ?`,
+    question:    t('vocabExercise.question', { word: target.word }),
     options,
     correct:     options.indexOf(target.translation),
-    explanation: `"${target.word}" signifie "${target.translation}".`,
+    explanation: t('vocabExercise.explanation', { word: target.word, translation: target.translation }),
     wordId:      target.id,
   }
 }
@@ -66,6 +68,7 @@ function ScoreRing({ pct, score, total }) {
 export default function Exercises() {
   const navigate  = useNavigate()
   const { user }  = useAuth()
+  const { t }     = useTranslation('exercises')
 
   const [mode,       setMode]       = useState(null)
   const [topic,      setTopic]      = useState(TOPICS[0])
@@ -92,7 +95,7 @@ export default function Exercises() {
           const words = Array.isArray(d) ? d : []
           setVocabWords(words)
           setVocabError(words.length < 4
-            ? `Vous avez ${words.length} mot(s) dans votre vocabulaire. Il en faut au moins 4 pour jouer.`
+            ? t('vocabError.notEnoughWords', { count: words.length })
             : '')
         })
         .finally(() => setLoading(false))
@@ -102,7 +105,7 @@ export default function Exercises() {
   const fetchNext = async () => {
     setLoading(true); setSelected(null); setAnswered(false); setExercise(null)
     if (mode === 'vocab') {
-      const ex = buildVocabExercise(vocabWords, usedIds)
+      const ex = buildVocabExercise(vocabWords, usedIds, t)
       if (ex) { setUsedIds(prev => [...prev, ex.wordId]); setExercise(ex) }
       setLoading(false)
     } else {
@@ -110,7 +113,12 @@ export default function Exercises() {
         const data = await generateExercise(user?.target_language || 'en', user?.level || 'debutant', topic.value)
         setExercise(data)
       } catch {
-        setExercise({ question:"¿Cómo se dice 'Bonjour' en español?", options:["Hola","Adiós","Gracias","Por favor"], correct:0, explanation:'"Hola" signifie "Bonjour" en espagnol.' })
+        setExercise({
+          question: t('fallbackExercise.question'),
+          options: ["Hola", "Adiós", "Gracias", "Por favor"],
+          correct: 0,
+          explanation: t('fallbackExercise.explanation'),
+        })
       }
       setLoading(false)
     }
@@ -149,8 +157,10 @@ export default function Exercises() {
 
   /* ════ ÉCRAN 0 — Choix du mode ════════════════════════════════════════ */
   if (!mode) return (
-    <div className="min-h-screen font-duo pb-24"
+    <div className="min-h-screen font-duo pb-24 md:pb-8"
       style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
+
+      <TopNav active="exercises" />
 
       <div className="max-w-lg mx-auto px-5 pt-10">
         {/* Header */}
@@ -160,15 +170,15 @@ export default function Exercises() {
               style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
               <Target size={20} className="text-white" />
             </div>
-            <h1 className="text-2xl font-black text-gray-800">Exercices</h1>
+            <h1 className="text-2xl font-black text-gray-800">{t('modeSelect.title')}</h1>
           </div>
           <p className="text-gray-400 font-semibold text-sm pl-[52px]">
-            Entraînez-vous en <span className="text-purple-500 font-extrabold">{LANG_NAMES[user?.target_language]}</span>
+            {t('modeSelect.subtitle')}<span className="text-purple-500 font-extrabold">{translatedLanguageName(t, user?.target_language)}</span>
           </p>
         </div>
 
         <p className="text-xs font-extrabold text-gray-400 uppercase tracking-widest mb-4">
-          Sélectionner un mode
+          {t('modeSelect.selectMode')}
         </p>
 
         {/* Mode Vocabulaire */}
@@ -180,16 +190,16 @@ export default function Exercises() {
               <BookOpen size={26} className="text-white" />
             </div>
             <div className="flex-1">
-              <div className="font-black text-white text-lg leading-tight">Mon Vocabulaire</div>
+              <div className="font-black text-white text-lg leading-tight">{t('modes.vocab.title')}</div>
               <div className="text-blue-100 text-sm font-semibold mt-0.5">
-                Révise les mots de tes conversations
+                {t('modes.vocab.subtitle')}
               </div>
             </div>
             <ChevronRight className="text-white/60" size={20} />
           </div>
           <div className="px-5 pb-4 flex gap-2">
-            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Répétition espacée</span>
-            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Personnalisé</span>
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">{t('modes.vocab.tag1')}</span>
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">{t('modes.vocab.tag2')}</span>
           </div>
         </button>
 
@@ -202,16 +212,16 @@ export default function Exercises() {
               <Brain size={26} className="text-white" />
             </div>
             <div className="flex-1">
-              <div className="font-black text-white text-lg leading-tight">Thèmes IA</div>
+              <div className="font-black text-white text-lg leading-tight">{t('modes.theme.title')}</div>
               <div className="text-purple-100 text-sm font-semibold mt-0.5">
-                Questions générées par intelligence artificielle
+                {t('modes.theme.subtitle')}
               </div>
             </div>
             <ChevronRight className="text-white/60" size={20} />
           </div>
           <div className="px-5 pb-4 flex gap-2">
-            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Illimité</span>
-            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">6 thèmes</span>
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">{t('modes.theme.tag1')}</span>
+            <span className="bg-white/15 text-white text-xs font-bold px-2.5 py-1 rounded-lg">{t('modes.theme.tag2')}</span>
           </div>
         </button>
       </div>
@@ -222,10 +232,12 @@ export default function Exercises() {
 
   /* ════ ÉCRAN 1 — Config ══════════════════════════════════════════════ */
   if (phase === 'pick') return (
-    <div className="min-h-screen font-duo pb-24"
+    <div className="min-h-screen font-duo pb-24 md:pb-8"
       style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
 
-      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 z-30">
+      <TopNav active="exercises" />
+
+      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 md:static z-30">
         <div className="max-w-lg mx-auto px-5 py-4 flex items-center gap-3">
           <button onClick={() => setMode(null)}
             className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
@@ -233,9 +245,9 @@ export default function Exercises() {
           </button>
           <div>
             <h1 className="font-black text-gray-800 text-base leading-none">
-              {mode === 'vocab' ? 'Mon Vocabulaire' : 'Thèmes IA'}
+              {mode === 'vocab' ? t('modes.vocab.title') : t('modes.theme.title')}
             </h1>
-            <p className="text-xs text-gray-400 font-semibold mt-0.5">{LANG_NAMES[user?.target_language]}</p>
+            <p className="text-xs text-gray-400 font-semibold mt-0.5">{translatedLanguageName(t, user?.target_language)}</p>
           </div>
         </div>
       </header>
@@ -247,28 +259,28 @@ export default function Exercises() {
           loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Loader2 size={28} className="animate-spin text-blue-400" />
-              <p className="text-gray-400 font-semibold text-sm">Chargement…</p>
+              <p className="text-gray-400 font-semibold text-sm">{t('common.loading')}</p>
             </div>
           ) : vocabError ? (
             <div className="text-center py-10">
               <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-5">
                 <BookOpen size={28} className="text-gray-400" />
               </div>
-              <h2 className="font-black text-gray-800 text-xl mb-2">Pas assez de mots</h2>
+              <h2 className="font-black text-gray-800 text-xl mb-2">{t('config.notEnoughWordsHeading')}</h2>
               <p className="text-gray-400 font-semibold text-sm mb-8 max-w-xs mx-auto">{vocabError}</p>
               <button onClick={() => navigate('/dashboard')}
                 className="font-extrabold text-white px-8 py-4 rounded-xl shadow-md hover:opacity-90 transition-all active:scale-95 text-sm"
                 style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
-                COMMENCER UNE LEÇON
+                {t('config.startLessonButton')}
               </button>
             </div>
           ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { val: vocabWords.length,                          label: 'Total',     color: '#1cb0f6', bg: '#f0f9ff' },
-                  { val: vocabWords.filter(w => !w.mastered).length, label: 'À réviser', color: '#ff9600', bg: '#fff7ed' },
-                  { val: vocabWords.filter(w => w.mastered).length,  label: 'Maîtrisés', color: '#58cc02', bg: '#f0fdf4' },
+                  { val: vocabWords.length,                          label: t('config.stats.total'),        color: '#1cb0f6', bg: '#f0f9ff' },
+                  { val: vocabWords.filter(w => !w.mastered).length, label: t('config.stats.dueForReview'), color: '#ff9600', bg: '#fff7ed' },
+                  { val: vocabWords.filter(w => w.mastered).length,  label: t('config.stats.mastered'),     color: '#58cc02', bg: '#f0fdf4' },
                 ].map(s => (
                   <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg }}>
                     <div className="text-2xl font-black" style={{ color: s.color }}>{s.val}</div>
@@ -279,7 +291,7 @@ export default function Exercises() {
               <button onClick={startRound}
                 className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
-                <Zap size={18} fill="white" /> COMMENCER — {ROUND_SIZE} QUESTIONS
+                <Zap size={18} fill="white" /> {t('config.startVocabRound', { count: ROUND_SIZE })}
               </button>
             </div>
           )
@@ -288,22 +300,22 @@ export default function Exercises() {
         {/* Mode Thèmes */}
         {mode === 'theme' && (
           <div className="space-y-5">
-            <p className="text-xs font-extrabold text-gray-400 uppercase tracking-widest">Choisir un thème</p>
+            <p className="text-xs font-extrabold text-gray-400 uppercase tracking-widest">{t('config.chooseTopic')}</p>
             <div className="grid grid-cols-2 gap-3">
-              {TOPICS.map(t => {
-                const active = topic.value === t.value
+              {TOPICS.map(topicOption => {
+                const active = topic.value === topicOption.value
                 return (
-                  <button key={t.value} onClick={() => setTopic(t)}
+                  <button key={topicOption.value} onClick={() => setTopic(topicOption)}
                     className={`rounded-xl p-4 text-left border-2 transition-all ${
                       active ? 'border-purple-400 bg-purple-50 shadow-sm' : 'border-gray-100 bg-white hover:border-purple-200'
                     }`}>
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
                       active ? 'bg-purple-500' : 'bg-gray-100'
                     }`}>
-                      <t.Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
+                      <topicOption.Icon size={18} className={active ? 'text-white' : 'text-gray-400'} />
                     </div>
                     <div className={`font-extrabold text-sm ${active ? 'text-purple-600' : 'text-gray-700'}`}>
-                      {t.label}
+                      {t(`topics.${topicOption.key}`)}
                     </div>
                   </button>
                 )
@@ -312,7 +324,7 @@ export default function Exercises() {
             <button onClick={startRound}
               className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
               style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
-              <Sparkles size={18} /> COMMENCER — {topic.label.toUpperCase()}
+              <Sparkles size={18} /> {t('config.startThemeRound', { topic: t(`topics.${topic.key}`).toUpperCase() })}
             </button>
           </div>
         )}
@@ -324,12 +336,14 @@ export default function Exercises() {
   /* ════ ÉCRAN 2 — Résultats ═════════════════════════════════════════════ */
   if (phase === 'result') {
     const pct  = Math.round((score / ROUND_SIZE) * 100)
-    const perf = pct === 100 ? { msg:'Parfait !',   grad:'linear-gradient(135deg,#fbbf24,#f59e0b)', Icon: Trophy   }
-               : pct >= 60   ? { msg:'Bien joué !', grad:'linear-gradient(135deg,#58cc02,#3fa801)', Icon: Award    }
-               :               { msg:'Continuez !', grad:'linear-gradient(135deg,#1cb0f6,#0e8fcf)', Icon: TrendingUp }
+    const perf = pct === 100 ? { msg: t('results.perfect'),  grad:'linear-gradient(135deg,#fbbf24,#f59e0b)', Icon: Trophy   }
+               : pct >= 60   ? { msg: t('results.good'),     grad:'linear-gradient(135deg,#58cc02,#3fa801)', Icon: Award    }
+               :               { msg: t('results.keepGoing'), grad:'linear-gradient(135deg,#1cb0f6,#0e8fcf)', Icon: TrendingUp }
     return (
-      <div className="min-h-screen font-duo pb-24 flex flex-col items-center justify-center px-5"
+      <div className="min-h-screen font-duo pb-24 md:pb-8 flex flex-col"
         style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
+        <TopNav active="exercises" />
+        <div className="flex-1 flex flex-col items-center justify-center px-5">
         <div className="w-full max-w-sm">
 
           {/* Trophy card */}
@@ -339,7 +353,7 @@ export default function Exercises() {
                 <perf.Icon size={40} className="text-white" />
               </div>
               <h2 className="text-3xl font-black text-white mb-1">{perf.msg}</h2>
-              <p className="text-white/75 font-semibold">{score} bonnes réponses sur {ROUND_SIZE}</p>
+              <p className="text-white/75 font-semibold">{t('results.scoreSummary', { score, total: ROUND_SIZE })}</p>
             </div>
           </div>
 
@@ -352,12 +366,12 @@ export default function Exercises() {
                   <Zap size={16} className="text-yellow-500" fill="#eab308" />
                   <span className="text-2xl font-black text-gray-800">+{xp}</span>
                 </div>
-                <div className="text-xs font-bold text-gray-400 mt-0.5">XP gagnés</div>
+                <div className="text-xs font-bold text-gray-400 mt-0.5">{t('results.xpEarnedLabel')}</div>
               </div>
               <div className="w-px bg-gray-100" />
               <div className="text-center">
                 <div className="text-2xl font-black text-gray-800">{pct}%</div>
-                <div className="text-xs font-bold text-gray-400 mt-0.5">Précision</div>
+                <div className="text-xs font-bold text-gray-400 mt-0.5">{t('results.accuracyLabel')}</div>
               </div>
             </div>
           </div>
@@ -366,13 +380,14 @@ export default function Exercises() {
             <button onClick={startRound}
               className="w-full py-4 rounded-xl font-black text-white text-sm shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
               style={{ background: 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
-              <RotateCcw size={16} /> REJOUER
+              <RotateCcw size={16} /> {t('results.replayButton')}
             </button>
             <button onClick={() => { setPhase('pick'); setMode(null) }}
               className="w-full py-4 rounded-xl font-black text-gray-500 bg-white border-2 border-gray-100 text-sm hover:bg-gray-50 transition-all">
-              CHANGER DE MODE
+              {t('results.changeModeButton')}
             </button>
           </div>
+        </div>
         </div>
         <BottomNav active="exercises" />
       </div>
@@ -384,11 +399,13 @@ export default function Exercises() {
   const TopicIcon = topic.Icon
 
   return (
-    <div className="min-h-screen font-duo pb-24"
+    <div className="min-h-screen font-duo pb-24 md:pb-8"
       style={{ background: 'linear-gradient(160deg,#f0f9ff 0%,#faf5ff 50%,#f0fdf4 100%)' }}>
 
+      <TopNav active="exercises" />
+
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 z-30">
+      <header className="bg-white/80 backdrop-blur border-b border-gray-100 sticky top-0 md:static z-30">
         <div className="max-w-lg mx-auto px-5 py-3">
           <div className="flex items-center justify-between mb-3">
             <button onClick={() => setPhase('pick')}
@@ -399,7 +416,7 @@ export default function Exercises() {
             {combo >= 2 && (
               <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl animate-bounce-in">
                 <Flame size={13} className="text-orange-500" fill="#f97316" />
-                <span className="text-orange-600 font-extrabold text-xs">{combo}x Combo</span>
+                <span className="text-orange-600 font-extrabold text-xs">{t('question.comboBadge', { count: combo })}</span>
               </div>
             )}
 
@@ -428,8 +445,8 @@ export default function Exercises() {
             mode === 'vocab' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'
           }`}>
             {mode === 'vocab'
-              ? <><BookOpen size={13} /> Vocabulaire</>
-              : <><TopicIcon size={13} /> {topic.label}</>
+              ? <><BookOpen size={13} /> {t('question.vocabBadge')}</>
+              : <><TopicIcon size={13} /> {t(`topics.${topic.key}`)}</>
             }
           </div>
         </div>
@@ -441,7 +458,7 @@ export default function Exercises() {
           {loading || !exercise
             ? <div className="flex flex-col items-center gap-3">
                 <Loader2 size={24} className="animate-spin text-gray-300" />
-                <span className="text-gray-300 text-sm font-semibold">Chargement…</span>
+                <span className="text-gray-300 text-sm font-semibold">{t('common.loading')}</span>
               </div>
             : <p className="font-black text-gray-800 text-xl text-center leading-relaxed">
                 {exercise.question}
@@ -491,8 +508,8 @@ export default function Exercises() {
               isCorrect ? 'text-green-600' : 'text-red-500'
             }`}>
               {isCorrect
-                ? <><CheckCircle size={15} /> Bonne réponse {combo >= 2 ? `— ${combo}x combo !` : ''}</>
-                : <><XCircle size={15} /> Pas tout à fait…</>
+                ? <><CheckCircle size={15} /> {t('question.correctAnswer')} {combo >= 2 ? t('question.comboSuffix', { count: combo }) : ''}</>
+                : <><XCircle size={15} /> {t('question.notQuite')}</>
               }
             </div>
             <p className="text-gray-500 font-semibold text-sm leading-relaxed">{exercise.explanation}</p>
@@ -507,8 +524,8 @@ export default function Exercises() {
               ? 'linear-gradient(135deg,#fbbf24,#f59e0b)'
               : 'linear-gradient(135deg,#58cc02,#3fa801)' }}>
             {round + 1 >= ROUND_SIZE
-              ? <><Trophy size={17} /> VOIR MES RÉSULTATS</>
-              : <>QUESTION SUIVANTE <ChevronRight size={17} /></>
+              ? <><Trophy size={17} /> {t('question.viewResultsButton')}</>
+              : <>{t('question.nextQuestionButton')} <ChevronRight size={17} /></>
             }
           </button>
         )}

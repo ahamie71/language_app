@@ -9,6 +9,8 @@ import Profile      from './pages/Profile'
 import EditProfile  from './pages/EditProfile'
 import About        from './pages/About'
 import FAQ          from './pages/FAQ'
+import ResetPassword from './pages/ResetPassword'
+import VerifyEmail   from './pages/VerifyEmail'
 import Exercises    from './pages/Exercises'
 import Flashcards   from './pages/Flashcards'
 import Dictation    from './pages/Dictation'
@@ -42,6 +44,8 @@ function AppRoutes() {
       <Route path="/profile/edit"       element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
       <Route path="/about"              element={<About />} />
       <Route path="/faq"                element={<FAQ />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/verify-email/:token"   element={<VerifyEmail />} />
       <Route path="/exercises"          element={<ProtectedRoute><Exercises /></ProtectedRoute>} />
       <Route path="/flashcards"         element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
       <Route path="/dictation"          element={<ProtectedRoute><Dictation /></ProtectedRoute>} />

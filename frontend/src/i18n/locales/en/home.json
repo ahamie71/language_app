@@ -1,0 +1,110 @@
+{
+  "hero": {
+    "headline": "The most fun way to learn a language, and much more!",
+    "start": "Let's go!",
+    "haveAccount": "I already have an account"
+  },
+  "sections": {
+    "free": {
+      "heading": "free. fun. effective.",
+      "text1": "Learning with us is fun, and it ",
+      "link": "actually works",
+      "text2": "! With short, interactive lessons, earn points, level up and build real language skills for everyday situations."
+    },
+    "coach": {
+      "heading": "a coach available 24/7",
+      "text": "Chat freely in the language you're learning. Every message is corrected, translated and explained instantly — like a real private tutor, always there when you need it."
+    },
+    "motivation": {
+      "heading": "motivation that stays high",
+      "text": "We help you build a practice habit with fun challenges, a daily streak, XP points, and vocabulary that saves itself automatically as you chat."
+    },
+    "voice": {
+      "heading": "speak, we're listening",
+      "text": "Turn on the mic and speak out loud. Your pronunciation is transcribed, translated and analyzed in seconds for immersive learning, up to 3x faster."
+    }
+  },
+  "illustration": {
+    "correction": "Correction",
+    "vocabulary": "Vocabulary"
+  },
+  "cta": {
+    "heading1": "learn wherever you want,",
+    "heading2": "whenever you want",
+    "appStoreSub": "Download on the",
+    "appStore": "App Store",
+    "googlePlaySub": "Get it on",
+    "googlePlay": "Google Play",
+    "button": "Start for free"
+  },
+  "footer": {
+    "tagline": "Learn languages for free. Immersive conversations and personalized tracking.",
+    "languagesHeading": "Languages",
+    "featuresHeading": "Features",
+    "features": {
+      "conversation": "Conversation",
+      "translation": "Auto translation",
+      "explanations": "Explanations",
+      "vocabulary": "Auto vocabulary",
+      "voice": "Voice recognition",
+      "streak": "Streak & XP",
+      "flashcards": "Flashcards",
+      "dictation": "Dictation"
+    },
+    "resourcesHeading": "Resources",
+    "resources": {
+      "blog": "Blog",
+      "gettingStarted": "Getting started guide",
+      "faq": "FAQ",
+      "tips": "Learning tips"
+    },
+    "companyHeading": "Company",
+    "company": {
+      "about": "About",
+      "mission": "Our mission",
+      "team": "The team",
+      "contact": "Contact"
+    },
+    "copyright": "© 2026 DuoLingua. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "legal": "Legal notice"
+  },
+  "modal": {
+    "loginTitle": "Log in",
+    "loginSubtitle": "Pick up your learning right where you left off",
+    "loginSubmit": "Log in",
+    "loginSubmitting": "Logging in…",
+    "registerTitle": "Create an account",
+    "registerSubtitle": "Start learning for free today",
+    "registerSubmit": "Create my account",
+    "registerSubmitting": "Creating…",
+    "fieldEmail": "Email address",
+    "fieldPassword": "Password",
+    "fieldUsername": "Username",
+    "fieldNativeLanguage": "Native language",
+    "fieldTargetLanguage": "Target language",
+    "fieldLevel": "Current level",
+    "placeholderEmail": "you@email.com",
+    "placeholderUsername": "john_doe",
+    "switchToRegister": "Don't have an account yet? ",
+    "switchToLogin": "Already registered? ",
+    "registerLink": "Sign up",
+    "loginLink": "Log in",
+    "errorLoginFailed": "Incorrect email or password",
+    "errorRegisterFailed": "Error during registration",
+    "errorServerUnreachable": "Could not reach the server",
+    "errorEmailNotVerified": "Please confirm your email before logging in",
+    "resendLink": "Resend confirmation email",
+    "resendSuccess": "If an unconfirmed account exists with this email, a new link was just sent to it.",
+    "registerSuccess": "Account created! Check your email to activate it, then log in.",
+    "forgotLink": "Forgot password?",
+    "forgotTitle": "Forgot password",
+    "forgotSubtitle": "Enter your email and we'll send you a reset link",
+    "forgotSubmit": "Send reset link",
+    "forgotSubmitting": "Sending…",
+    "forgotSuccess": "If an account exists with this email, a reset link was just sent to it.",
+    "backToLogin": "Back to login"
+  }
+}

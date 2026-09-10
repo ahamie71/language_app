@@ -1,0 +1,31 @@
+{
+  "loading": "Chargement de la leçon...",
+  "header": {
+    "title": "Conversation IA — Coach Lingua",
+    "goal_one": "Objectif : {{count}} échange",
+    "goal_other": "Objectif : {{count}} échanges",
+    "vocabularyLink": "Mon vocabulaire"
+  },
+  "empty": {
+    "title": "Commencez la conversation !",
+    "text1": "Parlez en ",
+    "text2": " — votre coach IA répond en ",
+    "text3": " et explique tout."
+  },
+  "message": {
+    "translationLabel": "Traduction IA : ",
+    "listen": "Écouter",
+    "explanationButton": "EXPLICATION IA",
+    "explanationTitle": "Analyse de votre coach IA"
+  },
+  "goalReached": {
+    "title": "Objectif atteint !",
+    "subtitle_one": "Vous avez complété {{count}} échange avec votre coach IA",
+    "subtitle_other": "Vous avez complété {{count}} échanges avec votre coach IA",
+    "xpEarned": "XP gagnés"
+  },
+  "inputBar": {
+    "placeholder": "Parlez en {{lang}}…",
+    "hint": "Entrée pour envoyer • Shift+Entrée pour un saut de ligne"
+  }
+}

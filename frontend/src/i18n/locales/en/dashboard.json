@@ -1,0 +1,68 @@
+{
+  "streakAlert": {
+    "welcomeTitle": "Welcome!",
+    "welcomeSubtitle": "Let's go, have a great session!",
+    "continueTitle": "{{count}} days in a row!",
+    "continueSubtitle": "Keep it up, you're on fire!"
+  },
+  "stats": {
+    "streak": "Streak",
+    "xp": "XP",
+    "words": "Words"
+  },
+  "dueFlashcards": {
+    "title_one": "{{count}} card to review",
+    "title_other": "{{count}} cards to review",
+    "subtitle": "SRS Flashcards · Review now →"
+  },
+  "coach": {
+    "title": "Talk with the AI coach",
+    "conversationsCount_one": "{{count}} conversation completed",
+    "conversationsCount_other": "{{count}} conversations completed",
+    "newConversation": "NEW CONVERSATION"
+  },
+  "topicsModal": {
+    "heading": "Choose a topic",
+    "freeConversation": "Free conversation (no topic)"
+  },
+  "topics": {
+    "restaurant": "At the restaurant",
+    "directions": "Asking for directions",
+    "shopping": "Going shopping",
+    "jobInterview": "Job interview",
+    "travel": "Vacation",
+    "introduction": "Introducing yourself",
+    "doctor": "At the doctor's",
+    "hobbies": "Hobbies & culture"
+  },
+  "quickActions": {
+    "heading": "My activities",
+    "flashcards": {
+      "label": "Flashcards",
+      "toReview": "{{count}} to review",
+      "reviewed": "{{count}} reviewed"
+    },
+    "dictation": {
+      "label": "Dictation",
+      "completed_one": "{{count}} completed",
+      "completed_other": "{{count}} completed"
+    },
+    "exercises": {
+      "label": "Exercises",
+      "completed_one": "{{count}} completed",
+      "completed_other": "{{count}} completed"
+    },
+    "vocabulary": {
+      "label": "Vocabulary",
+      "mastered": "{{mastered}}/{{total}} mastered"
+    }
+  },
+  "progress": {
+    "title": "My progress",
+    "subtitle": "Detailed statistics on your learning"
+  },
+  "recentSessions": {
+    "heading": "My recent AI sessions",
+    "defaultTitle": "Conversation session"
+  }
+}

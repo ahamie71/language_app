@@ -1,0 +1,38 @@
+{
+  "micDenied": "Accès au microphone refusé.",
+  "header": {
+    "title": "Mode Dictée",
+    "subtitle": "Écoute → Écris → Vérife"
+  },
+  "ready": {
+    "heading": "Mode Dictée",
+    "description": "L'IA génère un texte, le lit à voix haute, et tu dois l'écrire ou le répéter.",
+    "start": "Commencer la dictée"
+  },
+  "listening": {
+    "listenCarefully": "Écoute attentivement",
+    "listenButton": "Écouter le texte",
+    "hideText": "Masquer le texte",
+    "showText": "Voir le texte (aide)",
+    "yourAnswer": "Ta réponse :",
+    "placeholder": "Écris ici ce que tu as entendu...",
+    "recordButton": "Dicter avec micro",
+    "checkButton": "Vérifier →"
+  },
+  "recording": {
+    "inProgress": "Enregistrement en cours...",
+    "speakClearly": "Parle clairement dans le microphone",
+    "stop": "Arrêter"
+  },
+  "checking": {
+    "analyzing": "Analyse en cours..."
+  },
+  "result": {
+    "score": "Score",
+    "originalText": "Texte original",
+    "yourAnswer": "Ta réponse",
+    "noAnswer": "(aucune réponse)",
+    "newExercise": "Nouvel exercice",
+    "finish": "Terminer"
+  }
+}

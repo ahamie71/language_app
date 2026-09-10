@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   LogOut, Loader2, Pencil,
   MessageCircle, BookOpen, Flame, Star,
@@ -8,31 +9,33 @@ import {
 import { getStats, getVocabulary } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import BottomNav from '../components/BottomNav'
-import { LANG_NAMES } from '../constants/languages'
-import { LEVEL_INFO } from '../constants/levels'
+import TopNav from '../components/TopNav'
+import { translatedLanguageName } from '../constants/languages'
+import { LEVEL_INFO, translatedLevelLabel } from '../constants/levels'
 import { getXp, getMasteredCount } from '../utils/stats'
 
 const BADGES = [
-  { cond: c => c.convs    >= 1,  icon: MessageCircle, label: 'Premier échange',    color: 'text-blue-500'    },
-  { cond: c => c.convs    >= 5,  icon: MessageCircle, label: '5 conversations',    color: 'text-blue-600'    },
-  { cond: c => c.convs    >= 10, icon: MessageCircle, label: '10 conversations',   color: 'text-blue-700'    },
-  { cond: c => c.words    >= 10, icon: BookOpen,      label: '10 mots appris',     color: 'text-emerald-500' },
-  { cond: c => c.words    >= 50, icon: BookOpen,      label: '50 mots appris',     color: 'text-emerald-600' },
-  { cond: c => c.words    >= 100,icon: BookOpen,      label: '100 mots appris',    color: 'text-emerald-700' },
-  { cond: c => c.streak   >= 3,  icon: Flame,         label: '3 jours de suite',   color: 'text-orange-500'  },
-  { cond: c => c.streak   >= 7,  icon: Flame,         label: '7 jours de suite',   color: 'text-orange-600'  },
-  { cond: c => c.streak   >= 30, icon: Flame,         label: '30 jours de suite',  color: 'text-orange-700'  },
-  { cond: c => c.mastered >= 5,  icon: CheckCircle,   label: '5 mots maîtrisés',   color: 'text-violet-500'  },
-  { cond: c => c.mastered >= 20, icon: CheckCircle,   label: '20 mots maîtrisés',  color: 'text-violet-600'  },
-  { cond: c => c.exercises >= 5, icon: PenLine,       label: '5 exercices',        color: 'text-amber-500'   },
-  { cond: c => c.exercises >= 20,icon: PenLine,       label: '20 exercices',       color: 'text-amber-600'   },
-  { cond: c => c.flashcards >= 10, icon: Layers,      label: '10 flashcards',      color: 'text-cyan-500'    },
-  { cond: c => c.dictations >= 3,  icon: Mic,         label: '3 dictées',          color: 'text-rose-500'    },
+  { cond: c => c.convs    >= 1,  icon: MessageCircle, key: 'firstExchange',    color: 'text-blue-500'    },
+  { cond: c => c.convs    >= 5,  icon: MessageCircle, key: 'conversations5',   color: 'text-blue-600'    },
+  { cond: c => c.convs    >= 10, icon: MessageCircle, key: 'conversations10',  color: 'text-blue-700'    },
+  { cond: c => c.words    >= 10, icon: BookOpen,      key: 'words10',         color: 'text-emerald-500' },
+  { cond: c => c.words    >= 50, icon: BookOpen,      key: 'words50',         color: 'text-emerald-600' },
+  { cond: c => c.words    >= 100,icon: BookOpen,      key: 'words100',        color: 'text-emerald-700' },
+  { cond: c => c.streak   >= 3,  icon: Flame,         key: 'streak3',         color: 'text-orange-500'  },
+  { cond: c => c.streak   >= 7,  icon: Flame,         key: 'streak7',         color: 'text-orange-600'  },
+  { cond: c => c.streak   >= 30, icon: Flame,         key: 'streak30',        color: 'text-orange-700'  },
+  { cond: c => c.mastered >= 5,  icon: CheckCircle,   key: 'mastered5',       color: 'text-violet-500'  },
+  { cond: c => c.mastered >= 20, icon: CheckCircle,   key: 'mastered20',      color: 'text-violet-600'  },
+  { cond: c => c.exercises >= 5, icon: PenLine,       key: 'exercises5',      color: 'text-amber-500'   },
+  { cond: c => c.exercises >= 20,icon: PenLine,       key: 'exercises20',     color: 'text-amber-600'   },
+  { cond: c => c.flashcards >= 10, icon: Layers,      key: 'flashcards10',    color: 'text-cyan-500'    },
+  { cond: c => c.dictations >= 3,  icon: Mic,         key: 'dictations3',     color: 'text-rose-500'    },
 ]
 
 export default function Profile() {
   const navigate             = useNavigate()
   const { user, logoutUser } = useAuth()
+  const { t }                 = useTranslation('profile')
 
   const [stats,   setStats]   = useState(null)
   const [vocab,   setVocab]   = useState([])
@@ -66,21 +69,23 @@ export default function Profile() {
   )
 
   return (
-    <div className="min-h-screen bg-duo-gray font-duo pb-24">
+    <div className="min-h-screen bg-duo-gray font-duo pb-24 md:pb-8">
+
+      <TopNav active="profile" />
 
       {/* Header */}
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 z-30">
+      <header className="bg-white border-b-2 border-duo-border sticky top-0 md:static z-30">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-black text-duo-text">Mon profil</h1>
+          <h1 className="text-xl font-black text-duo-text">{t('header.title')}</h1>
           <div className="flex items-center gap-4">
             <button onClick={() => navigate('/profile/edit')}
               className="flex items-center gap-2 text-duo-muted hover:text-duo-blue font-extrabold text-sm transition-colors">
-              <Pencil size={16} /> Modifier le profil
+              <Pencil size={16} /> {t('header.editProfile')}
             </button>
             <div className="w-px h-5 bg-duo-border" />
             <button onClick={handleLogout}
               className="flex items-center gap-2 text-duo-muted hover:text-duo-red font-extrabold text-sm transition-colors">
-              <LogOut size={16} /> Déconnexion
+              <LogOut size={16} /> {t('header.logout')}
             </button>
           </div>
         </div>
@@ -103,21 +108,21 @@ export default function Profile() {
                 <p className="text-duo-muted font-semibold text-sm mt-1 mb-4">{user?.email}</p>
 
                 <span className={`inline-block text-sm font-extrabold px-4 py-1.5 rounded-full border ${level.bg} ${level.color} ${level.border} mb-4`}>
-                  {level.label}
+                  {translatedLevelLabel(t, user?.level || 'debutant')}
                 </span>
 
                 <div className="border-t border-gray-100 pt-4 space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-duo-muted font-semibold flex items-center gap-1.5">
-                      <Globe size={14} /> Langue maternelle
+                      <Globe size={14} /> {t('identity.nativeLanguage')}
                     </span>
-                    <span className="font-extrabold text-duo-text">{LANG_NAMES[user?.native_language]}</span>
+                    <span className="font-extrabold text-duo-text">{translatedLanguageName(t, user?.native_language)}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-duo-muted font-semibold flex items-center gap-1.5">
-                      <Globe size={14} /> J'apprends
+                      <Globe size={14} /> {t('identity.learning')}
                     </span>
-                    <span className="font-extrabold text-duo-green">{LANG_NAMES[user?.target_language]}</span>
+                    <span className="font-extrabold text-duo-green">{translatedLanguageName(t, user?.target_language)}</span>
                   </div>
                 </div>
               </div>
@@ -130,14 +135,14 @@ export default function Profile() {
                   <Flame size={24} className="text-orange-500" />
                 </div>
                 <div className="text-3xl font-black text-duo-text">{streak}</div>
-                <div className="text-xs font-bold text-duo-muted mt-1">Jours de suite</div>
+                <div className="text-xs font-bold text-duo-muted mt-1">{t('stats.streakDays')}</div>
               </div>
               <div className="duo-card text-center">
                 <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mx-auto mb-3">
                   <Zap size={24} className="text-violet-500" />
                 </div>
                 <div className="text-3xl font-black text-duo-text">{xp}</div>
-                <div className="text-xs font-bold text-duo-muted mt-1">XP total</div>
+                <div className="text-xs font-bold text-duo-muted mt-1">{t('stats.totalXp')}</div>
               </div>
             </div>
           </div>
@@ -149,20 +154,20 @@ export default function Profile() {
             <div className="duo-card p-6">
               <div className="flex items-center gap-2 mb-6">
                 <BarChart2 size={18} className="text-duo-muted" />
-                <h3 className="font-extrabold text-duo-text uppercase text-xs tracking-widest">Statistiques</h3>
+                <h3 className="font-extrabold text-duo-text uppercase text-xs tracking-widest">{t('stats.heading')}</h3>
                 <button onClick={() => navigate('/progress')}
                   className="ml-auto text-xs font-extrabold text-duo-green hover:underline">
-                  Voir tout →
+                  {t('stats.seeAll')}
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: MessageCircle, label: 'Conversations',       value: convs,     color: 'text-blue-500',    bg: 'bg-blue-50'    },
-                  { icon: Star,          label: 'Messages échangés',   value: messages,  color: 'text-violet-500',  bg: 'bg-violet-50'  },
-                  { icon: BookOpen,      label: 'Mots dans le carnet', value: words,     color: 'text-emerald-500', bg: 'bg-emerald-50' },
-                  { icon: CheckCircle,   label: 'Mots maîtrisés',      value: mastered,  color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                  { icon: PenLine,       label: 'Exercices faits',     value: exercises, color: 'text-amber-500',   bg: 'bg-amber-50'   },
-                  { icon: Layers,        label: 'Flashcards revues',   value: flashcards,color: 'text-cyan-500',    bg: 'bg-cyan-50'    },
+                  { icon: MessageCircle, label: t('stats.conversations'),       value: convs,     color: 'text-blue-500',    bg: 'bg-blue-50'    },
+                  { icon: Star,          label: t('stats.messagesExchanged'),   value: messages,  color: 'text-violet-500',  bg: 'bg-violet-50'  },
+                  { icon: BookOpen,      label: t('stats.wordsInNotebook'),     value: words,     color: 'text-emerald-500', bg: 'bg-emerald-50' },
+                  { icon: CheckCircle,   label: t('stats.wordsMastered'),       value: mastered,  color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                  { icon: PenLine,       label: t('stats.exercisesDone'),       value: exercises, color: 'text-amber-500',   bg: 'bg-amber-50'   },
+                  { icon: Layers,        label: t('stats.flashcardsReviewed'),  value: flashcards,color: 'text-cyan-500',    bg: 'bg-cyan-50'    },
                 ].map(s => (
                   <div key={s.label} className={`rounded-xl ${s.bg} p-5 flex items-center gap-4`}>
                     <s.icon size={22} className={s.color} />
@@ -179,9 +184,9 @@ export default function Profile() {
             <div className="duo-card p-6">
               <div className="flex items-center gap-2 mb-6">
                 <Star size={18} className="text-duo-muted" />
-                <h3 className="font-extrabold text-duo-text uppercase text-xs tracking-widest">Badges</h3>
+                <h3 className="font-extrabold text-duo-text uppercase text-xs tracking-widest">{t('badges.heading')}</h3>
                 <span className="ml-auto text-sm font-bold text-duo-muted">
-                  {earnedBadges} / {BADGES.length} obtenus
+                  {t('badges.obtained', { earned: earnedBadges, total: BADGES.length })}
                 </span>
               </div>
 
@@ -196,8 +201,9 @@ export default function Profile() {
               <div className="grid grid-cols-4 gap-3">
                 {BADGES.map((b, i) => {
                   const earned = b.cond(ctx)
+                  const label = t(`badges.${b.key}`)
                   return (
-                    <div key={i} title={b.label}
+                    <div key={i} title={label}
                       className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all ${
                         earned
                           ? 'bg-white border-gray-200 shadow-sm'
@@ -205,7 +211,7 @@ export default function Profile() {
                       }`}>
                       <b.icon size={24} className={earned ? b.color : 'text-gray-300'} />
                       <span className="text-center text-xs font-bold text-duo-muted leading-tight">
-                        {b.label}
+                        {label}
                       </span>
                     </div>
                   )

@@ -1,0 +1,34 @@
+{
+  "errors": {
+    "sameLanguage": "The native language and target language must be different.",
+    "generic": "An error occurred.",
+    "serverUnreachable": "Could not reach the server."
+  },
+  "success": {
+    "updated": "Profile updated successfully!"
+  },
+  "header": {
+    "title": "Edit profile"
+  },
+  "avatar": {
+    "caption": "Profile picture based on your initial"
+  },
+  "personalInfo": {
+    "heading": "Personal information",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "Your username",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@email.com"
+  },
+  "learning": {
+    "heading": "Learning",
+    "nativeLanguageLabel": "Native language",
+    "targetLanguageLabel": "Target language (to learn)",
+    "levelLabel": "Level"
+  },
+  "actions": {
+    "saving": "Saving…",
+    "save": "SAVE",
+    "cancel": "CANCEL"
+  }
+}

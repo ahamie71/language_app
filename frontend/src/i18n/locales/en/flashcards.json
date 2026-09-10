@@ -1,0 +1,27 @@
+{
+  "loading": "Loading cards...",
+  "empty": {
+    "title": "Flashcards SRS",
+    "heading": "No cards to review!",
+    "subtitle": "All your cards are up to date. Come back later or have more conversations to add some.",
+    "viewVocabulary": "View my vocabulary"
+  },
+  "results": {
+    "title": "Results",
+    "correctCount": "{{correct}}/{{total}} correct cards",
+    "replay": "Replay",
+    "finish": "Finish"
+  },
+  "main": {
+    "title": "Flashcards SRS",
+    "flipHint": "Tap to flip",
+    "translationLabel": "Translation",
+    "successRate": "Success rate: {{pct}}%",
+    "dontKnow": "I didn't know",
+    "knew": "I knew it!",
+    "thinkHint": "Think of the translation, then flip the card",
+    "srsPrefix": "Next review in: ",
+    "srsValue_one": "{{count}} day",
+    "srsValue_other": "{{count}} days"
+  }
+}

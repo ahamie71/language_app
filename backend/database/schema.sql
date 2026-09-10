@@ -12,6 +12,11 @@ CREATE TABLE IF NOT EXISTS users (
     target_language VARCHAR(10) DEFAULT 'en',
     native_language VARCHAR(10) DEFAULT 'fr',
     level ENUM('debutant', 'intermediaire', 'avance') DEFAULT 'debutant',
+    reset_token_hash VARCHAR(255) DEFAULT NULL,
+    reset_token_expires DATETIME DEFAULT NULL,
+    email_verified BOOLEAN DEFAULT TRUE,
+    verify_token_hash VARCHAR(255) DEFAULT NULL,
+    verify_token_expires DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

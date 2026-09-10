@@ -1,0 +1,34 @@
+{
+  "errors": {
+    "sameLanguage": "La langue native et la langue cible doivent être différentes.",
+    "generic": "Une erreur est survenue.",
+    "serverUnreachable": "Impossible de contacter le serveur."
+  },
+  "success": {
+    "updated": "Profil mis à jour avec succès !"
+  },
+  "header": {
+    "title": "Modifier le profil"
+  },
+  "avatar": {
+    "caption": "Photo de profil basée sur l'initiale"
+  },
+  "personalInfo": {
+    "heading": "Informations personnelles",
+    "usernameLabel": "Nom d'utilisateur",
+    "usernamePlaceholder": "Votre pseudo",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "votre@email.com"
+  },
+  "learning": {
+    "heading": "Apprentissage",
+    "nativeLanguageLabel": "Langue native",
+    "targetLanguageLabel": "Langue cible (à apprendre)",
+    "levelLabel": "Niveau"
+  },
+  "actions": {
+    "saving": "Enregistrement…",
+    "save": "ENREGISTRER",
+    "cancel": "ANNULER"
+  }
+}

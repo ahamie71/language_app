@@ -1,0 +1,43 @@
+{
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "loading": "Loading...",
+  "header": {
+    "title": "My Vocabulary",
+    "exportButton": "CSV",
+    "subtitle": "Words automatically extracted by the AI during your conversations"
+  },
+  "cta": {
+    "dueCards_one": "{{count}} card to review",
+    "dueCards_other": "{{count}} cards to review",
+    "launchSession": "Start Flashcards session →"
+  },
+  "mastery": {
+    "heading": "Overall mastery",
+    "summary": "{{mastered}}/{{total}} words mastered",
+    "masteredLabel": "Mastered ({{count}})",
+    "inProgressLabel": "Learning ({{count}})"
+  },
+  "search": {
+    "placeholder": "Search for a word…"
+  },
+  "filters": {
+    "all": "All",
+    "learning": "Learning",
+    "mastered": "Mastered"
+  },
+  "empty": {
+    "noWordsYet": "No words yet",
+    "noResults": "No results",
+    "noWordsSubtitle": "The AI automatically extracts key words from your conversations.",
+    "noResultsSubtitle": "Try a different filter or keyword.",
+    "startLessonButton": "START A LESSON"
+  },
+  "word": {
+    "masteredBadge": "Mastered",
+    "correctCount": "{{correct}}/{{total}} correct"
+  }
+}
