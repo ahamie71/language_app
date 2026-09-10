@@ -485,7 +485,7 @@ ahmed/
 
 ### `backend` (variables d'environnement)
 
-`NODE_ENV`, `PORT` (`8000`), `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `AI_SERVICE_URL` (`http://ai_service:5000`).
+`NODE_ENV`, `PORT` (`8000`), `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `AI_SERVICE_URL` (`http://ai_service:5000`), `FRONTEND_URL` (base des liens envoyés par email, ex. `http://localhost:5173`), `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` (envoi des emails de vérification et de réinitialisation — tant que `SMTP_HOST` n'est pas défini, les liens sont simplement loggés en console).
 
 ### `frontend` (variables Vite)
 
@@ -537,6 +537,10 @@ Changer de modèle : éditer le `FROM`, ou poser `LLM_MODEL=qwen3:4b` (etc.) dan
 | Méthode | Endpoint | Auth | Rôle |
 |---|---|---|---|
 | `POST` | `/auth/register` · `/auth/login` | — | inscription / connexion (JWT) |
+| `POST` | `/auth/forgot-password` | — | envoie un email de réinitialisation (lien `FRONTEND_URL/reset-password/:token`) |
+| `POST` | `/auth/reset-password` | — | définit un nouveau mot de passe à partir du token reçu par email |
+| `GET` | `/auth/verify-email/:token` | — | confirme l'adresse email |
+| `POST` | `/auth/resend-verification` | — | renvoie l'email de vérification |
 | `GET` `PUT` | `/user/me` | JWT | profil |
 | `GET` | `/user/stats` | JWT | statistiques |
 | `POST` | `/user/activity` | JWT | enregistrer une activité |
