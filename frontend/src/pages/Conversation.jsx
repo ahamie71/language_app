@@ -12,6 +12,16 @@ import { useAudioRecorder } from '../hooks/useAudioRecorder'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { LANG_LOCALE, translatedLanguageName } from '../constants/languages'
 
+// Le LLM met les mots cles en **gras** / *italique* : on rend ces deux
+// marqueurs et on retire les asterisques orphelins.
+function renderInlineMarkdown(text) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i} className="text-duo-text">{part.slice(2, -2)}</strong>
+    if (/^\*[^*]+\*$/.test(part))     return <em key={i}>{part.slice(1, -1)}</em>
+    return part.replace(/\*/g, '')
+  })
+}
+
 export default function Conversation() {
   const { id }     = useParams()
   const navigate   = useNavigate()
@@ -248,7 +258,7 @@ export default function Conversation() {
                       <div className="flex items-center gap-2 font-extrabold text-duo-purple mb-2">
                         <Sparkles size={14} /> {t('message.explanationTitle')}
                       </div>
-                      <p className="font-semibold leading-relaxed text-duo-muted">{msg.explanation}</p>
+                      <p className="font-semibold leading-relaxed text-duo-muted">{renderInlineMarkdown(msg.explanation)}</p>
                     </div>
                   )}
                 </div>

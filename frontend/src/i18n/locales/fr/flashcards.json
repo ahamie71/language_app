@@ -20,8 +20,9 @@
     "dontKnow": "Je ne savais pas",
     "knew": "Je savais !",
     "thinkHint": "Pensez à la traduction, puis retournez la carte",
-    "srsPrefix": "Prochaine révision dans : ",
+    "srsPrefix": "Intervalle de révision actuel : ",
     "srsValue_one": "{{count}} jour",
-    "srsValue_other": "{{count}} jours"
+    "srsValue_other": "{{count}} jours",
+    "removeWord": "Retirer ce mot (nom propre, mauvaise traduction…)"
   }
 }

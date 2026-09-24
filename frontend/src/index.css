@@ -140,6 +140,21 @@
   }
   .animate-pulse-green { animation: pulse-green 2s infinite; }
 
+  /* Bandeau des langues : la liste est dupliquee, on la decale de -50 % en
+     boucle pour un defilement continu sans saut. */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .animate-marquee { animation: marquee 30s linear infinite; }
+  .marquee-mask {
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee { animation: none; }
+  }
+
   /* Typing dots */
   @keyframes typingDot {
     0%, 100% { opacity: 0.2; transform: scale(0.75); }

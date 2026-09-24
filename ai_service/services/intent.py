@@ -16,10 +16,14 @@ import re
 import config
 
 _VOCAB_QUESTION_VERBS = r"dire|dit-on|dis-tu|dis tu|on dit|on prononce|prononcer|tu prononces|épeler|traduire|traduis"
+# Fin de phrase : ponctuation eventuelle, avec l'espace francaise avant « ? ».
+_END = r"\s*[\?\.\!]*\s*$"
 _TRANSLATION_QUESTION_PATTERNS = [
-    re.compile(rf"(?:comment|que)\s+(?:{_VOCAB_QUESTION_VERBS})(?:-moi|\s+moi)?\s+en\s+\w+\s+(.+?)[\?\.\!]*$", re.IGNORECASE),
-    re.compile(rf"(?:comment|que)\s+(?:{_VOCAB_QUESTION_VERBS})(?:-moi|\s+moi)?\s+(.+?)\s+en\s+\w+[\?\.\!]*$", re.IGNORECASE),
-    re.compile(rf"(.+?)\s+en\s+\w+\s+ça\s+se\s+(?:dit|prononce)\s+comment[\?\.\!]*$", re.IGNORECASE),
+    re.compile(rf"(?:comment|que)\s+(?:{_VOCAB_QUESTION_VERBS})(?:-moi|\s+moi)?\s+en\s+\w+\s+(.+?){_END}", re.IGNORECASE),
+    re.compile(rf"(?:comment|que)\s+(?:{_VOCAB_QUESTION_VERBS})(?:-moi|\s+moi)?\s+(.+?)\s+en\s+\w+{_END}", re.IGNORECASE),
+    re.compile(rf"(.+?)\s+en\s+\w+\s+ça\s+se\s+(?:dit|prononce)\s+comment{_END}", re.IGNORECASE),
+    re.compile(rf"(?:traduis|traduire|traduction\s+de)(?:-moi|\s+moi)?\s+(.+?)\s+en\s+\w+{_END}", re.IGNORECASE),
+    re.compile(rf"(?:c'est\s+quoi|c\s+est\s+quoi|que\s+veut\s+dire)\s+(.+?)\s+en\s+\w+{_END}", re.IGNORECASE),
 ]
 
 
