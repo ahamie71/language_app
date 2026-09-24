@@ -92,6 +92,46 @@ NEGATIVE_TEMPLATES = [
     "quel est ton plat préféré",
     "as-tu déjà voyagé en Europe",
     "explique-moi la conjugaison du verbe être",
+    # Phrases pièges : contiennent « comment » ou « en {lang} » sans être des
+    # questions de vocabulaire.
+    "je ne sais pas bien parler {lang}",
+    "je ne parle pas du tout {lang}",
+    "j'ai du mal à parler {lang}",
+    "donne-moi un exercice en {lang}",
+    "propose-moi un petit exercice en {lang}",
+    "tu peux me faire un quiz en {lang}",
+    "on peut discuter en {lang}",
+    "écris-moi un dialogue en {lang}",
+    "comment ça va",
+    "comment vas-tu",
+    "comment tu vas ce matin",
+    "comment s'est passée ta journée",
+    "comment je peux progresser plus vite",
+    "c'est quoi la différence entre ces mots en {lang}",
+    "quelle est la différence entre ces deux verbes en {lang}",
+    "pourquoi c'est si difficile en {lang}",
+    "comment on conjugue {word}",
+    "comment conjuguer {word} au passé",
+    "comment on accorde {word}",
+    "explique-moi la grammaire {lang}",
+    # Quelques messages de conversation en anglais
+    "how are you",
+    "can we practice together",
+    "i don't understand this sentence",
+    "thank you for your help",
+]
+
+# Questions de vocabulaire en anglais
+EN_WORDS = ["dog", "apple", "house", "car", "book", "water", "tree", "chair", "thank you", "good morning"]
+EN_LANGUAGES = ["spanish", "french", "german", "italian", "portuguese", "japanese", "chinese", "arabic"]
+
+EN_POSITIVE_TEMPLATES = [
+    "how do you say {word} in {lang}",
+    "how do i say {word} in {lang}",
+    "what is {word} in {lang}",
+    "translate {word} to {lang}",
+    "how to say {word} in {lang}",
+    "what's the {lang} word for {word}",
 ]
 
 
@@ -102,6 +142,10 @@ def build_dataset():
             for lang in random.sample(LANGUAGES, 3):  # échantillonne pour limiter la taille
                 text = tpl.format(word=word, lang=lang)
                 examples.append((text, 1))
+    for tpl in EN_POSITIVE_TEMPLATES:
+        for word in EN_WORDS:
+            for lang in random.sample(EN_LANGUAGES, 3):
+                examples.append((tpl.format(word=word, lang=lang), 1))
     for tpl in NEGATIVE_TEMPLATES:
         if "{word}" in tpl or "{lang}" in tpl:
             for word in random.sample(WORDS, 8):
