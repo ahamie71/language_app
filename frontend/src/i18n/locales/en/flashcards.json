@@ -20,8 +20,9 @@
     "dontKnow": "I didn't know",
     "knew": "I knew it!",
     "thinkHint": "Think of the translation, then flip the card",
-    "srsPrefix": "Next review in: ",
+    "srsPrefix": "Current review interval: ",
     "srsValue_one": "{{count}} day",
-    "srsValue_other": "{{count}} days"
+    "srsValue_other": "{{count}} days",
+    "removeWord": "Remove this word (name, wrong translation…)"
   }
 }

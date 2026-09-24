@@ -25,6 +25,15 @@ const TOPICS = [
 const ROUND_SIZE = 5
 const OPTION_LETTERS = ['A', 'B', 'C', 'D']
 
+// Mots utilisables dans le quiz : une vraie traduction (les anciens mots
+// extraits des conversations ont parfois "…" comme placeholder).
+function quizWords(words) {
+  return words.filter(w => {
+    const tr = (w.translation || '').trim()
+    return tr && !/^[.…\s]+$/.test(tr) && tr.toLowerCase() !== (w.word || '').toLowerCase()
+  })
+}
+
 function buildVocabExercise(words, usedIds, t) {
   const pool = words.filter(w => !usedIds.includes(w.id))
   if (pool.length === 0) return null
@@ -32,9 +41,18 @@ function buildVocabExercise(words, usedIds, t) {
   const target = notMastered.length > 0
     ? notMastered[Math.floor(Math.random() * notMastered.length)]
     : pool[Math.floor(Math.random() * pool.length)]
-  const others = words.filter(w => w.id !== target.id)
-  const wrong  = [...others].sort(() => Math.random() - 0.5).slice(0, 3)
-  const options = [...wrong.map(w => w.translation), target.translation].sort(() => Math.random() - 0.5)
+  // Distracteurs : meme langue que le mot demande (sinon on melange des
+  // traductions francaises et anglaises) et traductions toutes differentes.
+  const sameLang = words.filter(w => w.language === target.language)
+  const candidates = (sameLang.length >= 4 ? sameLang : words)
+    .filter(w => w.translation.toLowerCase() !== target.translation.toLowerCase())
+  const wrong = []
+  for (const w of [...candidates].sort(() => Math.random() - 0.5)) {
+    if (wrong.length === 3) break
+    if (!wrong.some(tr => tr.toLowerCase() === w.translation.toLowerCase())) wrong.push(w.translation)
+  }
+  if (wrong.length < 3) return null
+  const options = [...wrong, target.translation].sort(() => Math.random() - 0.5)
   return {
     question:    t('vocabExercise.question', { word: target.word }),
     options,
@@ -92,7 +110,7 @@ export default function Exercises() {
       setLoading(true)
       getVocabulary()
         .then(d => {
-          const words = Array.isArray(d) ? d : []
+          const words = quizWords(Array.isArray(d) ? d : [])
           setVocabWords(words)
           setVocabError(words.length < 4
             ? t('vocabError.notEnoughWords', { count: words.length })
@@ -107,6 +125,7 @@ export default function Exercises() {
     if (mode === 'vocab') {
       const ex = buildVocabExercise(vocabWords, usedIds, t)
       if (ex) { setUsedIds(prev => [...prev, ex.wordId]); setExercise(ex) }
+      else setPhase('result') // plus de mot exploitable : fin de manche plutot qu'un spinner infini
       setLoading(false)
     } else {
       try {
