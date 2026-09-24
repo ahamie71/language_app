@@ -1,7 +1,7 @@
 {
   "hero": {
     "title": "Questions fréquentes",
-    "subtitle": "Tout ce que vous devez savoir sur Lingua et son fonctionnement."
+    "subtitle": "Tout ce que vous devez savoir sur DuoLingua et son fonctionnement."
   },
   "categories": {
     "general": "Général",
@@ -12,15 +12,15 @@
   "questions": {
     "general": {
       "free": {
-        "q": "Lingua est-il vraiment gratuit ?",
-        "a": "Oui, totalement. Lingua est gratuit pour tous les apprenants. Pas d'abonnement caché, pas de limite artificielle. Notre mission est de rendre l'apprentissage des langues accessible à tous."
+        "q": "DuoLingua est-il vraiment gratuit ?",
+        "a": "Oui, totalement. DuoLingua est gratuit pour tous les apprenants. Pas d'abonnement caché, pas de limite artificielle. Notre mission est de rendre l'apprentissage des langues accessible à tous."
       },
       "languages": {
         "q": "Quelles langues sont disponibles ?",
-        "a": "Lingua propose actuellement 9 langues : anglais, espagnol, allemand, arabe, italien, portugais, chinois, japonais et français. De nouvelles langues sont régulièrement ajoutées."
+        "a": "DuoLingua propose actuellement 9 langues : anglais, espagnol, allemand, arabe, italien, portugais, chinois, japonais et français. De nouvelles langues sont régulièrement ajoutées."
       },
       "account": {
-        "q": "Dois-je créer un compte pour utiliser Lingua ?",
+        "q": "Dois-je créer un compte pour utiliser DuoLingua ?",
         "a": "Oui, un compte gratuit est nécessaire pour accéder aux conversations IA, sauvegarder votre vocabulaire et suivre votre progression."
       }
     },
@@ -63,7 +63,7 @@
       },
       "mobileApp": {
         "q": "L'application est-elle disponible sur mobile ?",
-        "a": "Lingua fonctionne parfaitement depuis un navigateur mobile. Des applications iOS et Android natives sont en cours de développement."
+        "a": "DuoLingua fonctionne parfaitement depuis un navigateur mobile. Des applications iOS et Android natives sont en cours de développement."
       },
       "contactSupport": {
         "q": "Comment contacter le support ?",
@@ -77,6 +77,6 @@
     "button": "CONTACTER LE SUPPORT"
   },
   "footer": {
-    "copyright": "© 2025 Lingua. Tous droits réservés."
+    "copyright": "© 2025 DuoLingua. Tous droits réservés."
   }
 }

@@ -1,7 +1,7 @@
 {
   "hero": {
     "title": "Frequently asked questions",
-    "subtitle": "Everything you need to know about Lingua and how it works."
+    "subtitle": "Everything you need to know about DuoLingua and how it works."
   },
   "categories": {
     "general": "General",
@@ -12,15 +12,15 @@
   "questions": {
     "general": {
       "free": {
-        "q": "Is Lingua really free?",
-        "a": "Yes, completely. Lingua is free for all learners. No hidden subscription, no artificial limits. Our mission is to make language learning accessible to everyone."
+        "q": "Is DuoLingua really free?",
+        "a": "Yes, completely. DuoLingua is free for all learners. No hidden subscription, no artificial limits. Our mission is to make language learning accessible to everyone."
       },
       "languages": {
         "q": "Which languages are available?",
-        "a": "Lingua currently offers 9 languages: English, Spanish, German, Arabic, Italian, Portuguese, Chinese, Japanese and French. New languages are regularly added."
+        "a": "DuoLingua currently offers 9 languages: English, Spanish, German, Arabic, Italian, Portuguese, Chinese, Japanese and French. New languages are regularly added."
       },
       "account": {
-        "q": "Do I need to create an account to use Lingua?",
+        "q": "Do I need to create an account to use DuoLingua?",
         "a": "Yes, a free account is required to access AI conversations, save your vocabulary and track your progress."
       }
     },
@@ -63,7 +63,7 @@
       },
       "mobileApp": {
         "q": "Is the app available on mobile?",
-        "a": "Lingua works perfectly from a mobile browser. Native iOS and Android apps are currently in development."
+        "a": "DuoLingua works perfectly from a mobile browser. Native iOS and Android apps are currently in development."
       },
       "contactSupport": {
         "q": "How do I contact support?",
@@ -77,6 +77,6 @@
     "button": "CONTACT SUPPORT"
   },
   "footer": {
-    "copyright": "© 2025 Lingua. All rights reserved."
+    "copyright": "© 2025 DuoLingua. All rights reserved."
   }
 }

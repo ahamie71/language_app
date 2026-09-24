@@ -1,4 +1,4 @@
-"""Point d'entree du service IA de LinguaAI.
+"""Point d'entree du service IA de DuoLingua.
 
 Architecture (voir les sous-dossiers) :
   - language/     : tables de correspondance par langue (une par fichier)

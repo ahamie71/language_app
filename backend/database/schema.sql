@@ -1,4 +1,4 @@
--- LinguaAI Database Schema
+-- DuoLingua Database Schema
 -- Create database
 CREATE DATABASE IF NOT EXISTS linguaai;
 USE linguaai;

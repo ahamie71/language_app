@@ -1,7 +1,7 @@
 {
   "loading": "Loading the lesson...",
   "header": {
-    "title": "AI Conversation — Coach Lingua",
+    "title": "AI Conversation — Coach DuoLingua",
     "goal_one": "Goal: {{count}} exchange",
     "goal_other": "Goal: {{count}} exchanges",
     "vocabularyLink": "My vocabulary"

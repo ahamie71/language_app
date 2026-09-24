@@ -48,7 +48,7 @@ def respond(user_msg, history, target_lang, level):
         {
             "role": "system",
             "content": (
-                f"Tu es Lingua Coach, un assistant chaleureux qui aide à apprendre cette langue : {lang_name}. "
+                f"Tu es le coach DuoLingua, un assistant chaleureux qui aide à apprendre cette langue : {lang_name}. "
                 f"L'utilisateur est de niveau {level_desc}. "
                 f"Réponds TOUJOURS en français, en 1 à 2 phrases courtes maximum, en texte brut "
                 f"(jamais de markdown, d'astérisques ni de guillemets décoratifs). "

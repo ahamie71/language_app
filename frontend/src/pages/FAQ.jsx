@@ -50,7 +50,7 @@ export default function FAQ() {
           </button>
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <Languages size={26} className="text-duo-green" />
-            <span className="text-xl font-black text-duo-green">Lingua</span>
+            <span className="text-xl font-black text-duo-green">duolingua</span>
           </div>
         </div>
       </header>

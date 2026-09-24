@@ -40,7 +40,7 @@ app.use('/api/vocabulary', vocabularyRoutes);
 app.get('/', (req, res) => {
   res.json({
     status: "OK",
-    service: "LinguaAI API",
+    service: "DuoLingua API",
     time: new Date().toISOString()
   });
 });

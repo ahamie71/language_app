@@ -1,6 +1,6 @@
 # AI Service - Language Learning
 
-Service Python pour les fonctionnalités IA de l'application LinguaAI.
+Service Python pour les fonctionnalités IA de l'application DuoLingua.
 Tous les modèles tournent **en local, sur CPU, gratuitement** — aucune clé API,
 aucun compte, aucun coût. Les modèles sont téléchargés automatiquement au
 premier appel puis mis en cache (voir `docker-compose.yml`, volumes `hf_cache`,

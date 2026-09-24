@@ -1,4 +1,4 @@
-# LinguaAI Backend - Node.js
+# DuoLingua Backend - Node.js
 
 ## 🚀 Quick Start
 

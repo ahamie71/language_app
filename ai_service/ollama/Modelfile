@@ -1,4 +1,4 @@
-# Modele derive optimise pour LinguaAI (coach de langue, explications, QCM, dictee).
+# Modele derive optimise pour DuoLingua (coach de langue, explications, QCM, dictee).
 # Build : ollama create lingua-llm -f Modelfile
 # Le FROM declenche le pull automatique de la base au premier build.
 
