@@ -1,6 +1,8 @@
-# LinguaAI
+# Duolingua
 
-Application web d'apprentissage des langues avec assistant IA — traduction, transcription vocale, synthèse vocale, explications grammaticales, conversation et exercices générés automatiquement.
+**Duolingua** est une application web d'apprentissage des langues avec assistant IA — traduction, transcription vocale, synthèse vocale, explications grammaticales, conversation et exercices générés automatiquement.
+
+> Le projet s'appelait auparavant *LinguaAI* : certains noms techniques gardent ce préfixe (modèle Ollama `lingua-llm`, réseau Docker `linguaai-network`, base `linguaai`).
 
 Tous les modèles IA tournent **en local**, sans clé API externe ni coût d'usage :
 
