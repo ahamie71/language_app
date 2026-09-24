@@ -23,7 +23,10 @@ def explain(text, language, level):
                 f"Analyze the following {lang_name} text and provide a concise explanation covering: "
                 f"key vocabulary, grammar points, and any cultural context. "
                 f"CRITICAL RULE: write your explanation entirely in FRENCH, regardless of what language the text is in. "
-                f"Keep it encouraging and easy to understand. Maximum 3 sentences, written in French."
+                f"Only discuss words and structures that actually appear in the text; "
+                f"never add unrelated grammar lessons. "
+                f"Keep it encouraging and easy to understand. Maximum 3 sentences, written in French, "
+                f"in plain text (you may put key words in **bold**, nothing else)."
             ),
         },
         {"role": "user", "content": text},
