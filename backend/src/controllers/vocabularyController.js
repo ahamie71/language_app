@@ -105,6 +105,8 @@ exports.updateWordProgress = async (req, res) => {
     const successRate = (word.times_correct / word.times_practiced) * 100;
     if (word.times_practiced >= 5 && successRate >= 80 && !word.mastered) {
       word.mastered = true;
+    } else if (word.mastered && successRate < 80) {
+      word.mastered = false; // un mot rate a nouveau n'est plus « maitrise »
     }
 
     await word.save();
@@ -124,14 +126,21 @@ exports.getDueForReview = async (req, res) => {
     const { Op } = require('sequelize');
     const now = new Date();
 
-    const dueWords = await Vocabulary.findAll({
+    const candidates = await Vocabulary.findAll({
       where: {
         user_id: req.user.id,
-        next_review_date: { [Op.lte]: now }
+        next_review_date: { [Op.lte]: now },
+        // Anciens mots sans vraie traduction (placeholder "…") : carte inutile.
+        translation: { [Op.notIn]: ['…', '...', ''] }
       },
       order: [['next_review_date', 'ASC']],
-      limit: 20
+      limit: 40
     });
+
+    // Anciens noms propres enregistres avant le filtre d'extraction.
+    const dueWords = candidates
+      .filter(w => w.translation.trim().toLowerCase() !== w.word.trim().toLowerCase())
+      .slice(0, 20);
 
     res.json(dueWords);
   } catch (error) {
@@ -192,6 +201,20 @@ exports.deleteWord = async (req, res) => {
   }
 };
 
+// Langues qui ne mettent pas de majuscule aux noms communs, jours, mois ni
+// langues : une traduction qui y commence par une majuscule est un nom propre.
+// (Pas l'anglais — Monday, English — ni l'allemand, qui capitalise les noms.)
+const LOWERCASE_LANGS = ['fr', 'es', 'it', 'pt'];
+
+// NLLB renvoie un nom propre tel quel (« messi » -> « Messi ») ou juste
+// capitalise (« leonel » -> « Leonel ») au lieu de le traduire.
+function isProperNounTranslation(word, translation, translationLang) {
+  const tr = translation.trim();
+  if (tr.toLowerCase() === word.toLowerCase()) return true;
+  return LOWERCASE_LANGS.includes(translationLang) && /^\p{Lu}/u.test(tr) && !/\s/.test(tr);
+}
+exports.isProperNounTranslation = isProperNounTranslation;
+
 exports.extractWordsFromMessage = async (userId, messageText, language) => {
   try {
     // Get user info to know their target language
@@ -199,14 +222,23 @@ exports.extractWordsFromMessage = async (userId, messageText, language) => {
     const user = await User.findByPk(userId);
     if (!user) return;
 
+    // Mots avec majuscule en milieu de phrase = noms propres (Lionel, Paris…) :
+    // on ne les apprend pas comme du vocabulaire.
+    const properNouns = new Set(
+      [...messageText.replace(/[’]/g, "'").matchAll(/(?<![.!?]\s*|^\s*)(?<=[\s"«(])(\p{Lu}[\p{L}-]*)/gu)]
+        .map(m => m[1].toLowerCase())
+    );
+
     // Simple word extraction - split by spaces and filter common words
     const words = messageText.toLowerCase()
-      .replace(/[^\w\s]/g, '') // Remove punctuation
+      .replace(/[’]/g, "'")
+      .replace(/[^\p{L}\s'-]/gu, ' ') // Remove punctuation (keep accented letters: \w drops é, à…)
       .split(/\s+/)
+      .map(word => word.replace(/^(?:qu|[cdjlmnst])'/, '').replace(/^[-']+|[-']+$/g, '')) // l'assiette -> assiette
       .filter(word => word.length > 2) // Filter short words
       .filter(word => !['les', 'des', 'une', 'dans', 'pour', 'avec', 'sur', 'par', 'mais', 'donc', 'puis', 'the', 'and', 'but', 'for', 'with', 'from', 'this', 'that', 'keep', 'your', 'english'].includes(word)); // Filter common words
 
-    const uniqueWords = [...new Set(words)];
+    const uniqueWords = [...new Set(words)].filter(word => !properNouns.has(word));
 
     for (const word of uniqueWords.slice(0, 3)) { // Limit to 3 words per message to avoid spam
       // Check if word already exists
@@ -223,15 +255,19 @@ exports.extractWordsFromMessage = async (userId, messageText, language) => {
           ? user.target_language
           : user.native_language;
 
-        let translation = '…';
+        let translation = null;
         try {
           const result = await require('../services/aiService').translate(word, language, translationLang);
-          if (result && !result.includes('[') && result !== word) {
-            translation = result;
+          if (result && !result.includes('[') && !isProperNounTranslation(word, result, translationLang)) {
+            translation = result.trim();
           }
         } catch (translationError) {
           console.error(`Translation error for "${word}":`, translationError.message);
         }
+
+        // Without a real translation the word is useless (the vocab quiz used to
+        // show "…" as answer options), so skip it instead of storing a placeholder.
+        if (!translation) continue;
 
         await Vocabulary.create({
           user_id: userId,

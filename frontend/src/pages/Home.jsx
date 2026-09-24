@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   X, Eye, EyeOff, Loader2, CheckCircle, CheckCircle2, AlertCircle,
   Languages, Wand2, BookMarked, Mic2, Trophy, Volume2,
-  MessageSquare, ChevronRight, ChevronLeft,
+  MessageSquare, ChevronRight,
   UserPlus, LogIn, Flame, Star, Smartphone, Play
 } from 'lucide-react'
 import { FaXTwitter, FaFacebookF, FaInstagram, FaYoutube, FaGithub } from 'react-icons/fa6'
@@ -19,7 +19,6 @@ export default function Home() {
   const location       = useLocation()
   const { loginUser } = useAuth()
   const { t }         = useTranslation('home')
-  const chipRef        = useRef(null)
 
   const [modal,   setModal]   = useState(null)
   const [showPwd, setShowPwd] = useState(false)
@@ -39,7 +38,6 @@ export default function Home() {
   const openRegister = () => { setModal('register'); setError(''); setSuccess(''); setShowPwd(false); setNeedsVerification(false) }
   const openForgot   = () => { setModal('forgot');   setError(''); setSuccess(''); setForgotEmail('') }
   const closeModal   = () => { setModal(null); setError(''); setSuccess('') }
-  const scrollChips  = (dir) => chipRef.current?.scrollBy({ left: dir * 240, behavior: 'smooth' })
 
   useEffect(() => {
     if (location.state?.openLogin) openLogin()
@@ -151,25 +149,18 @@ export default function Home() {
 
       {/* ════ LANGUAGE CHIPS ═══════════════════════════════════════════════ */}
       <section className="border-y-2 border-duo-border bg-white sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-2">
-          <button onClick={() => scrollChips(-1)}
-            className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-duo-muted hover:bg-duo-gray transition-colors hidden sm:flex">
-            <ChevronLeft size={18} />
-          </button>
-          <div ref={chipRef} className="flex-1 flex items-center gap-2 overflow-x-auto scroll-smooth"
-            style={{ scrollbarWidth: 'none' }}>
-            {LANGUAGES.map(l => (
-              <button key={l.code} onClick={openRegister}
-                className="shrink-0 flex items-center gap-2 border-2 border-duo-border hover:border-duo-text/30 rounded-2xl px-4 py-2 transition-colors">
+        <div className="max-w-6xl mx-auto px-4 py-3 overflow-hidden marquee-mask">
+          {/* Liste en double : l'animation decale de -50 % pour boucler sans saut */}
+          <div className="flex w-max animate-marquee">
+            {[...LANGUAGES, ...LANGUAGES].map((l, i) => (
+              <button key={`${l.code}-${i}`} onClick={openRegister} aria-hidden={i >= LANGUAGES.length}
+                tabIndex={i >= LANGUAGES.length ? -1 : 0}
+                className="shrink-0 mr-2 flex items-center gap-2 border-2 border-duo-border hover:border-duo-text/30 rounded-2xl px-4 py-2 transition-colors">
                 <span className={`fi fi-${l.flagCode} rounded-[2px]`} style={{ fontSize: '1.1em' }} />
                 <span className="text-xs font-black uppercase tracking-wide text-duo-text whitespace-nowrap">{translatedLanguageName(t, l.code)}</span>
               </button>
             ))}
           </div>
-          <button onClick={() => scrollChips(1)}
-            className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-duo-muted hover:bg-duo-gray transition-colors hidden sm:flex">
-            <ChevronRight size={18} />
-          </button>
         </div>
       </section>
 

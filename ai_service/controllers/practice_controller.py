@@ -1,10 +1,11 @@
 """/exercise + /dictation-text — generation d'activites via le LLM local."""
 
 import json
+import random
 import re
 
-from language import LANG_EN
-from services import llm
+from language import LANG_EN, LANG_FR
+from services import llm, translation
 
 _LEVELS_EN = {"debutant": "beginner", "intermediaire": "intermediate", "avance": "advanced"}
 _DICTATION_LEVELS = {
@@ -42,64 +43,92 @@ _DICTATION_FALLBACKS = {
 }
 
 
-def _is_valid_exercise(parsed):
-    """Rejette les generations ou le LLM a recopie les placeholders du prompt
-    (ex : "..." ou "explanation") au lieu de produire de vrais mots."""
-    options = parsed.get("options")
-    correct = parsed.get("correct")
-    question = str(parsed.get("question", "")).strip()
-    explanation = str(parsed.get("explanation", "")).strip()
+def _clean(value):
+    return str(value or "").strip().strip("<>\"'«» ").strip()
 
-    if not isinstance(options, list) or len(options) != 4:
-        return False
-    if not isinstance(correct, int) or not (0 <= correct < 4):
-        return False
-    if len(question) < 3 or len(explanation) < 3:
-        return False
 
-    cleaned = [str(o).strip().strip("<>").lower() for o in options]
-    if any(not c or c in _EXERCISE_PLACEHOLDER_TOKENS for c in cleaned):
-        return False
-    if len(set(cleaned)) != len(cleaned):
-        return False
+def _parse_item(result):
+    """Extrait {french, answer, distractors, explanation} du texte du LLM,
+    ou None si la generation est inexploitable (placeholders recopies, doublons...)."""
+    if not result:
+        return None
+    match = re.search(r"\{.*\}", result, re.DOTALL)
+    if not match:
+        return None
+    try:
+        parsed = json.loads(re.sub(r",(\s*[}\]])", r"\1", match.group(0)))  # virgules finales
+    except Exception:
+        return None
 
-    return True
+    french = _clean(parsed.get("french"))
+    answer = _clean(parsed.get("answer"))
+    distractors = parsed.get("distractors")
+    explanation = str(parsed.get("explanation") or "").strip()
+    if not isinstance(distractors, list):
+        return None
+    distractors = [_clean(d) for d in distractors][:3]
+
+    options = [answer] + distractors
+    lowered = [o.lower() for o in options]
+    if len(options) != 4 or len(french) < 2 or len(explanation) < 3:
+        return None
+    if any(not o or o in _EXERCISE_PLACEHOLDER_TOKENS for o in lowered):
+        return None
+    if len(set(lowered)) != 4 or french.lower() in lowered:
+        return None
+    return {"french": french, "answer": answer, "distractors": distractors, "explanation": explanation}
+
+
+def _answer_is_ambiguous(item, target_lang):
+    """Verification croisee avec NLLB : si la traduction de l'expression
+    francaise tombe sur un distracteur, le QCM aurait deux bonnes reponses."""
+    try:
+        reference = (translation.translate(item["french"], "fr", target_lang) or "").strip(" .!?").lower()
+    except Exception:
+        return False
+    return bool(reference) and any(reference == d.lower() for d in item["distractors"])
 
 
 def exercise(target_lang, level, topic):
-    lang_name  = LANG_EN.get(target_lang, target_lang)
-    level_desc = _LEVELS_EN.get(level, level)
+    lang_name    = LANG_EN.get(target_lang, target_lang)
+    lang_name_fr = LANG_FR.get(target_lang, target_lang)
+    level_desc   = _LEVELS_EN.get(level, level)
 
-    result = llm.generate([
+    # Le LLM ne fournit que le contenu ; la question, l'ordre des options et
+    # l'index de la bonne reponse sont construits ici (le modele se trompait
+    # d'index et ecrivait la question dans la langue cible, reponses comprises).
+    messages = [
         {
             "role": "system",
             "content": (
-                f"You are a JSON API for a {lang_name} vocabulary quiz generator (learner level: {level_desc}). "
-                f"You output ONLY a single JSON object, nothing else — no explanations, no markdown, no code fences. "
-                f"The quiz question is about the topic: {topic}. "
-                f"Required JSON shape (fill in the values, keep the exact keys):\n"
-                f'{{"question": "<a vocabulary question written in {lang_name}>", '
-                f'"options": ["<opt1>", "<opt2>", "<opt3>", "<opt4>"], '
-                f'"correct": <integer index 0-3 of the right option>, '
-                f'"explanation": "<short explanation in French, then two newlines, then the same explanation in {lang_name}>"}}\n'
-                f"Example shape (do not reuse this content, just the structure): "
-                f'{{"question": "Comment dit-on chat ?", "options": ["chien", "chat_word", "oiseau", "poisson"], "correct": 1, "explanation": "Ceci est un exemple.\\n\\nThis is an example."}}\n'
-                f"Now output ONLY the JSON object for the real quiz question, in {lang_name}, about {topic}."
+                f"You are a JSON API for a vocabulary quiz for French speakers learning {lang_name} "
+                f"(learner level: {level_desc}), topic: {topic}. "
+                f"You output ONLY a single JSON object — no markdown, no code fences. Keys:\n"
+                f'"french": a common French word or short expression about the topic;\n'
+                f'"answer": its correct {lang_name} translation;\n'
+                f'"distractors": 3 other {lang_name} words or expressions from the same topic that are clearly WRONG translations of "french", '
+                f'written in the same form as "answer" (all with an article or all without);\n'
+                f'"explanation": one or two short sentences in French only, explaining the {lang_name} answer.\n'
+                f'Example (do not reuse): {{"french": "le chat", "answer": "the cat", '
+                f'"distractors": ["the dog", "the bird", "the fish"], '
+                f'"explanation": "« The cat » veut dire « le chat » ; « cat » est le mot anglais pour cet animal."}}'
             ),
         },
         {"role": "user", "content": "Generate the JSON now."},
-    ], max_tokens=350, temperature=0.8)
+    ]
 
-    if result:
-        match = re.search(r"\{.*\}", result, re.DOTALL)
-        if match:
-            json_str = re.sub(r",(\s*[}\]])", r"\1", match.group(0))  # virgules finales
-            try:
-                parsed = json.loads(json_str)
-                if all(k in parsed for k in ("question", "options", "correct", "explanation")) and _is_valid_exercise(parsed):
-                    return parsed
-            except Exception:
-                pass
+    for _ in range(2):
+        item = _parse_item(llm.generate(messages, max_tokens=250, temperature=0.8))
+        if not item or _answer_is_ambiguous(item, target_lang):
+            continue
+        options = [item["answer"]] + item["distractors"]
+        random.shuffle(options)
+        return {
+            "question": f"Comment dit-on « {item['french']} » en {lang_name_fr} ?",
+            "options": options,
+            "correct": options.index(item["answer"]),
+            "explanation": item["explanation"],
+        }
 
     return _EXERCISE_FALLBACKS.get(target_lang, _EXERCISE_FALLBACKS["en"])
 
