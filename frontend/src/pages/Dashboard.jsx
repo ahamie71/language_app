@@ -14,14 +14,14 @@ import { LEVEL_INFO, translatedLevelLabel } from '../constants/levels'
 import { getXp, getMasteredCount } from '../utils/stats'
 
 const TOPICS = [
-  { icon: Utensils,     key: 'restaurant',   value: 'restaurant' },
-  { icon: Map,          key: 'directions',   value: 'directions' },
-  { icon: ShoppingCart, key: 'shopping',     value: 'shopping'   },
-  { icon: Briefcase,    key: 'jobInterview', value: 'job interview' },
-  { icon: Palmtree,     key: 'travel',       value: 'travel'     },
-  { icon: Handshake,    key: 'introduction', value: 'introduction' },
-  { icon: Stethoscope,  key: 'doctor',       value: 'doctor'     },
-  { icon: Drama,        key: 'hobbies',      value: 'hobbies'    },
+  { icon: Utensils,     key: 'restaurant',   value: 'restaurant',    color: 'text-orange-500',  bg: 'bg-orange-50'  },
+  { icon: Map,          key: 'directions',   value: 'directions',    color: 'text-blue-500',    bg: 'bg-blue-50'    },
+  { icon: ShoppingCart, key: 'shopping',     value: 'shopping',      color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { icon: Briefcase,    key: 'jobInterview', value: 'job interview', color: 'text-violet-500',  bg: 'bg-violet-50'  },
+  { icon: Palmtree,     key: 'travel',       value: 'travel',        color: 'text-teal-500',    bg: 'bg-teal-50'    },
+  { icon: Handshake,    key: 'introduction', value: 'introduction',  color: 'text-pink-500',    bg: 'bg-pink-50'    },
+  { icon: Stethoscope,  key: 'doctor',       value: 'doctor',        color: 'text-red-500',     bg: 'bg-red-50'     },
+  { icon: Drama,        key: 'hobbies',      value: 'hobbies',       color: 'text-amber-500',   bg: 'bg-amber-50'   },
 ]
 
 export default function Dashboard() {
@@ -127,33 +127,34 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Stats bar — reste visible sur desktop, juste plus sticky (TopNav prend déjà le haut) */}
-      <header className="bg-white border-b-2 border-duo-border sticky top-0 md:static z-30">
-        <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-center gap-2 mb-2">
+      <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 mt-4">
+
+        {/* Language pair + level progress */}
+        <div className="duo-card mb-3">
+          <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-1.5 text-xs font-extrabold text-duo-blue uppercase tracking-wide">
               <Globe size={14} />
               {translatedLanguageName(t, user?.native_language)} → {translatedLanguageName(t, user?.target_language)}
             </div>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-extrabold text-duo-muted">{translatedLevelLabel(t, user?.level || 'debutant')}</span>
-            <div className="flex-1 duo-progress">
-              <div className="duo-progress-fill" style={{ width: `${xpPct}%` }} />
+            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold ${level.bg} ${level.color}`}>
+              <level.icon size={14} />
+              {translatedLevelLabel(t, user?.level || 'debutant')}
             </div>
-            <span className="text-xs font-extrabold text-duo-green">{xp} XP</span>
           </div>
-          <div className="flex items-center justify-center gap-3">
-            <StatPill icon={Flame}    value={streak}     label={t('stats.streak')} color="text-duo-orange" />
-            <div className="w-px h-5 bg-duo-border" />
-            <StatPill icon={Zap}      value={xp}         label={t('stats.xp')}     color="text-duo-purple" />
-            <div className="w-px h-5 bg-duo-border" />
-            <StatPill icon={BookOpen} value={wordsCount}  label={t('stats.words')}   color="text-duo-blue"   />
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-5 bg-duo-border rounded-full overflow-hidden">
+              <div className="duo-progress-fill" style={{ width: `${Math.max(xpPct, xp > 0 ? 4 : 0)}%` }} />
+            </div>
+            <span className="text-sm font-black text-duo-green whitespace-nowrap">{xp} / {level.xpNeeded} XP</span>
           </div>
         </div>
-      </header>
 
-      <div className="max-w-lg md:max-w-3xl lg:max-w-5xl mx-auto px-4 mt-4">
+        {/* Stat tiles */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <StatTile icon={Flame}    value={streak}     label={t('stats.streak')} color="text-duo-orange" bg="bg-orange-50" />
+          <StatTile icon={Zap}      value={xp}         label={t('stats.xp')}     color="text-duo-purple" bg="bg-violet-50" />
+          <StatTile icon={BookOpen} value={wordsCount} label={t('stats.words')}  color="text-duo-blue"   bg="bg-blue-50"   />
+        </div>
 
         {/* Due flashcards alert */}
         {dueCount > 0 && (
@@ -173,7 +174,7 @@ export default function Dashboard() {
         )}
 
         {/* Primary CTA — single entry point to start a conversation */}
-        <div className="duo-card p-0 overflow-hidden mb-4 border-2 border-duo-green">
+        <div className="duo-card p-0 overflow-hidden mb-6 border-2 border-duo-green shadow-sm hover:shadow-md transition-shadow">
           <div className="p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-11 h-11 bg-duo-green-bg rounded-xl flex items-center justify-center shrink-0">
@@ -196,26 +197,36 @@ export default function Dashboard() {
 
         {/* Guided topics modal */}
         {showTopics && (
-          <div className="fixed inset-0 bg-black/50 z-40 flex items-end justify-center p-4"
+          <div className="fixed inset-0 bg-black/50 z-40 flex items-end sm:items-center justify-center p-4"
             onClick={() => setShowTopics(false)}>
-            <div className="bg-white rounded-2xl w-full max-w-lg p-5 shadow-2xl" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-extrabold text-duo-text text-lg">{t('topicsModal.heading')}</h3>
-                <button onClick={() => setShowTopics(false)} className="p-1 text-duo-muted hover:text-duo-text">
+            <div className="bg-white rounded-3xl w-full max-w-lg p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+              onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-duo-green-bg rounded-xl flex items-center justify-center shrink-0">
+                    <MessageCircle size={20} className="text-duo-green" />
+                  </div>
+                  <h3 className="font-black text-duo-text text-xl">{t('topicsModal.heading')}</h3>
+                </div>
+                <button onClick={() => setShowTopics(false)}
+                  className="p-2 rounded-xl text-duo-muted hover:text-duo-text hover:bg-duo-gray transition-colors">
                   <X size={20} />
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3 mb-4">
                 {TOPICS.map(topic => (
                   <button key={topic.value} onClick={() => startLesson(topic.value)} disabled={creating}
-                    className="flex items-center gap-2 p-3 rounded-xl border-2 border-duo-border hover:border-duo-green hover:bg-duo-green-bg transition-all text-left">
-                    <topic.icon size={20} className="text-duo-text shrink-0" />
-                    <span className="font-bold text-duo-text text-sm leading-tight">{t(`topics.${topic.key}`)}</span>
+                    className="group flex items-center gap-3 p-3 rounded-2xl border-2 border-duo-border bg-white hover:border-duo-green hover:bg-duo-green-bg hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition-all text-left disabled:opacity-60">
+                    <div className={`w-11 h-11 ${topic.bg} rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                      <topic.icon size={22} className={topic.color} />
+                    </div>
+                    <span className="font-extrabold text-duo-text text-sm leading-tight">{t(`topics.${topic.key}`)}</span>
                   </button>
                 ))}
               </div>
               <button onClick={() => startLesson(null)} disabled={creating}
-                className="w-full duo-btn bg-white border-2 border-duo-border text-duo-muted py-3 text-sm">
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-duo-border text-duo-muted font-extrabold text-sm hover:border-duo-green hover:text-duo-green hover:bg-duo-green-bg transition-colors disabled:opacity-60">
+                <MessageCircle size={16} />
                 {t('topicsModal.freeConversation')}
               </button>
             </div>
@@ -230,7 +241,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {quickActions.map(a => (
               <button key={a.to} onClick={() => navigate(a.to)}
-                className={`duo-card flex items-center gap-3 text-left transition-colors ${a.highlight ? 'border-duo-orange' : 'hover:border-duo-border'}`}>
+                className={`duo-card flex items-center gap-3 text-left hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${a.highlight ? 'border-duo-orange' : 'hover:border-duo-green'}`}>
                 <div className={`w-10 h-10 ${a.bg} rounded-xl flex items-center justify-center shrink-0`}>
                   <a.icon size={19} className={a.color} />
                 </div>
@@ -245,7 +256,7 @@ export default function Dashboard() {
 
         {/* Progress link */}
         <button onClick={() => navigate('/progress')}
-          className="duo-card w-full flex items-center gap-3 mb-6 hover:border-duo-purple transition-colors">
+          className="duo-card w-full flex items-center gap-3 mb-6 hover:border-duo-purple hover:-translate-y-0.5 hover:shadow-md active:translate-y-0">
           <div className="w-10 h-10 bg-duo-purple-bg rounded-xl flex items-center justify-center shrink-0">
             <TrendingUp size={19} className="text-duo-purple" />
           </div>
@@ -292,14 +303,14 @@ export default function Dashboard() {
   )
 }
 
-function StatPill({ icon: Icon, value, label, color }) {
+function StatTile({ icon: Icon, value, label, color, bg }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <Icon size={16} className={color} />
-      <div>
-        <div className={`text-sm font-extrabold leading-none ${color}`}>{value}</div>
-        <div className="text-duo-light text-xs font-bold">{label}</div>
+    <div className="duo-card flex flex-col items-center gap-1 py-4 px-2">
+      <div className={`w-11 h-11 ${bg} rounded-xl flex items-center justify-center`}>
+        <Icon size={22} className={color} />
       </div>
+      <div className={`text-2xl font-black leading-none mt-1 ${color}`}>{value}</div>
+      <div className="text-duo-muted text-xs font-extrabold uppercase tracking-wide">{label}</div>
     </div>
   )
 }
