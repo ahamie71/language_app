@@ -4,6 +4,13 @@
     "start": "Let's go!",
     "haveAccount": "I already have an account"
   },
+  "demo": {
+    "badge": "Demo",
+    "heading": "see duolingua in action",
+    "text": "A quick look at how your AI coach helps you speak, write and improve every day.",
+    "cta": "Try it for free",
+    "unsupported": "Your browser can't play this video."
+  },
   "sections": {
     "free": {
       "heading": "free. fun. effective.",

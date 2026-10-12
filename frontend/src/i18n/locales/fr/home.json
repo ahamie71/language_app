@@ -4,6 +4,13 @@
     "start": "C'est parti !",
     "haveAccount": "J'ai déjà un compte"
   },
+  "demo": {
+    "badge": "Démo",
+    "heading": "découvre duolingua en vidéo",
+    "text": "Deux minutes pour voir comment ton coach IA t'aide à parler, écrire et progresser chaque jour.",
+    "cta": "Essayer gratuitement",
+    "unsupported": "Ton navigateur ne peut pas lire cette vidéo."
+  },
   "sections": {
     "free": {
       "heading": "gratuit. fun. efficace.",

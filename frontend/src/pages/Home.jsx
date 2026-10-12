@@ -164,6 +164,31 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ════ DÉMO VIDÉO ════════════════════════════════════════════════════ */}
+      <section id="demo" className="py-16 md:py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 border-2 border-duo-border text-duo-green px-4 py-1.5 rounded-2xl text-xs font-black uppercase tracking-wider mb-5">
+            <Play size={12} /> {t('demo.badge')}
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black text-duo-green mb-4">{t('demo.heading')}</h2>
+          <p className="text-duo-muted font-semibold text-lg max-w-xl mx-auto mb-10">{t('demo.text')}</p>
+          <div className="rounded-3xl overflow-hidden border-2 border-duo-border shadow-xl bg-black">
+            <video
+              className="w-full aspect-video"
+              src="/duolingua-promo.mp4"
+              controls
+              playsInline
+              preload="metadata"
+            >
+              {t('demo.unsupported')}
+            </video>
+          </div>
+          <button onClick={openRegister} className="duo-btn duo-btn-green mt-10 px-10 py-4 text-base">
+            {t('demo.cta')}
+          </button>
+        </div>
+      </section>
+
       {/* ════ FEATURE SECTIONS — alternées, comme duolingo.com ═══════════════ */}
       <FeatureSection
         heading={t('sections.free.heading')}
